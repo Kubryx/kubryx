@@ -24,6 +24,10 @@ export default function CommandPalette() {
 
   const commands: CommandItem[] = [
     { id: 'nav-dash', title: 'Open Dashboard Command Center', subtitle: 'View system health & stats', category: 'Navigation', action: () => router.push('/dashboard') },
+    { id: 'nav-architecture', title: 'Open Architecture View', subtitle: 'Interactive SVG system topology model', category: 'Navigation', action: () => router.push('/architecture') },
+    { id: 'nav-developers', title: 'Open Developer Console', subtitle: 'Interactive REST API & SDK explorer', category: 'Navigation', action: () => router.push('/developers') },
+    { id: 'nav-security', title: 'Open Security Command Center', subtitle: 'Simulate anomalies & verify trusted signing keys', category: 'Navigation', action: () => router.push('/security') },
+    { id: 'nav-story', title: 'Open Executive Storytelling Mode', subtitle: 'Immersive slide presentation for accelerators', category: 'Navigation', action: () => router.push('/story') },
     { id: 'nav-credit', title: 'Open Credit Passport Score', subtitle: 'View soulbound NFT & NCRD APYs', category: 'Navigation', action: () => router.push('/credit') },
     { id: 'nav-lend', title: 'Open AI Lending Desk', subtitle: 'Negotiate interest rates statefully', category: 'Navigation', action: () => router.push('/lend') },
     { id: 'nav-split', title: 'Open SyncSplit payments', subtitle: 'Stellar Soroban multi-party splits', category: 'Navigation', action: () => router.push('/split') },

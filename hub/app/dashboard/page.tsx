@@ -10,6 +10,7 @@ import { toast } from '../../lib/toast'
 import { logTelemetryError, getTelemetryErrors, clearTelemetryErrors, TelemetryError } from '../../lib/telemetry'
 import OnboardingTour from '../components/OnboardingTour'
 import { useCrossToolIntelligence, updateIntelligenceState, getRecommendedActions, recordOSEvent } from '../../lib/cross-tool-intelligence'
+import { usePlatformState } from '../../lib/platform-engine'
 import ExecutiveWalkthrough from '../components/ExecutiveWalkthrough'
 import CommandPalette from '../components/CommandPalette'
 
@@ -99,6 +100,7 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
 export default function DashboardPage() {
   const pathname = usePathname()
   const intelligenceState = useCrossToolIntelligence()
+  const { activeScenario, analytics } = usePlatformState()
   const [ethWallet, setEthWallet] = useState('')
   const [solWallet, setSolWallet] = useState('')
   const [stellarWallet, setStellarWallet] = useState('')
@@ -479,6 +481,82 @@ export default function DashboardPage() {
             <StatCard label="Active Vaults"   value={activeVaults}    live={liveSources.vaults} />
             <StatCard label="Active Agents"   value={activeAgents}    live={liveSources.agents} />
             <StatCard label="Treasury Balance" value={treasuryBalance} live={liveSources.treasury} />
+          </section>
+        </ErrorBoundary>
+
+        <ErrorBoundary label="analytics">
+          <section className="card" style={{ marginTop: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div>
+                <p className="eyebrow" style={{ color: '#F5C518', fontSize: 10 }}>Operational Analytics</p>
+                <h2 style={{ fontSize: 18, margin: 0, fontWeight: 800 }}>⚡ Real-Time System Analytics</h2>
+              </div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <Link className="btn-outline" href="/architecture" style={{ fontSize: 10, padding: '4px 8px', height: 'auto' }}>OS Topology</Link>
+                <Link className="btn-outline" href="/security" style={{ fontSize: 10, padding: '4px 8px', height: 'auto' }}>Security Center</Link>
+                <Link className="btn-outline" href="/developers" style={{ fontSize: 10, padding: '4px 8px', height: 'auto' }}>Developers API</Link>
+                <Link className="btn-outline" href="/story" style={{ fontSize: 10, padding: '4px 8px', height: 'auto' }}>Our Narrative</Link>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 16 }}>
+              <div style={{ padding: 12, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 8 }}>
+                <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>AI Requests</span>
+                <strong className="gold-text" style={{ display: 'block', fontSize: 22, marginTop: 4 }}>{analytics.aiRequestsProcessed}</strong>
+              </div>
+              <div style={{ padding: 12, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 8 }}>
+                <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>Tx Confirmed</span>
+                <strong className="gold-text" style={{ display: 'block', fontSize: 22, marginTop: 4 }}>{analytics.transactionsObserved}</strong>
+              </div>
+              <div style={{ padding: 12, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 8 }}>
+                <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>SLA Latency</span>
+                <strong style={{ display: 'block', fontSize: 22, marginTop: 4, color: activeScenario === 'degraded_rpc' ? '#EF4444' : '#10B981' }}>{analytics.averageLatency}ms</strong>
+              </div>
+              <div style={{ padding: 12, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 8 }}>
+                <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>Fallback Cache</span>
+                <strong style={{ display: 'block', fontSize: 22, marginTop: 4, color: '#fff' }}>{analytics.fallbackActivations} activations</strong>
+              </div>
+            </div>
+
+            <div>
+              <h4 style={{ margin: '0 0 10px', fontSize: 12, color: '#F5C518', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Supported Chain Integrations</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
+                {Object.entries(analytics.chainActivityRates).map(([chainName, tps]) => {
+                  let status = 'nominal'
+                  let statusColor = '#10B981'
+                  if (activeScenario === 'chain_congestion' && chainName === 'QIE Mainnet') {
+                    status = 'congested'
+                    statusColor = '#F5C518'
+                  } else if (activeScenario === 'degraded_rpc') {
+                    status = 'degraded'
+                    statusColor = '#F5C518'
+                  }
+                  
+                  return (
+                    <div 
+                      key={chainName} 
+                      style={{ 
+                        padding: '10px 14px', 
+                        background: '#040404', 
+                        border: '1px solid rgba(255,255,255,0.04)', 
+                        borderRadius: 6,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <div>
+                        <strong style={{ fontSize: 12, color: '#fff' }}>{chainName}</strong>
+                        <span style={{ display: 'block', fontSize: 10, color: '#888', marginTop: 2 }}>{tps} TPS activity</span>
+                      </div>
+                      <span style={{ fontSize: 9, background: 'rgba(255,255,255,0.03)', color: statusColor, border: `1px solid ${statusColor}`, padding: '2px 6px', borderRadius: 4, textTransform: 'uppercase', fontWeight: 800 }}>
+                        {status}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
           </section>
         </ErrorBoundary>
 
