@@ -1733,6 +1733,11 @@ async def websocket_endpoint(ws: WebSocket):
         manager.disconnect(ws)
 
 
+@app.get("/health")
+async def health():
+    return {"status": "ok", "service": "lendora"}
+
+
 # ============================================================================
 # Entry Point
 # ============================================================================

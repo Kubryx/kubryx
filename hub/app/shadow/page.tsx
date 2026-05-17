@@ -35,7 +35,7 @@ type FeedItem = {
   timestamp?: string
 }
 
-const apiBase = process.env.NEXT_PUBLIC_SHADOW_API || ''
+const apiBase = process.env.NEXT_PUBLIC_SHADOW_URL || process.env.NEXT_PUBLIC_SHADOW_API || ''
 
 const departments = [
   ['cfo', 'CFO Agent', 'Treasury overview'],

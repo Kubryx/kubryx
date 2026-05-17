@@ -37,7 +37,7 @@ type PayrollStream = {
   status?: string
 }
 
-const apiBase = process.env.NEXT_PUBLIC_PALMFLOW_API || ''
+const apiBase = process.env.NEXT_PUBLIC_PALMFLOW_URL || process.env.NEXT_PUBLIC_PALMFLOW_API || ''
 
 function shortAddress(address: string) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: kubryx-palmflow
+    env: node
+    region: oregon
+    plan: free
+    rootDir: palmflowai/PalmFlow-AI-main
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3006"

@@ -46,6 +46,7 @@ type SplitRecord = {
 
 const CONTRACT_ID = 'CCEIBX7TF3OY5CWE5GDGZPFNNTIRTLLHDYJ4NQG4YLWYTNURUZ4YGKGF'
 const rpcUrl = process.env.NEXT_PUBLIC_STELLAR_RPC || 'https://soroban-testnet.stellar.org'
+const apiBase = process.env.NEXT_PUBLIC_SYNCSPLIT_URL || ''
 
 function shortAddress(address: string) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -66,6 +67,7 @@ export default function SplitPage() {
   const [participants, setParticipants] = useState('')
   const [splits, setSplits] = useState<SplitRecord[]>([])
   const [history, setHistory] = useState<string[]>([])
+  const [health, setHealth] = useState<'checking' | 'ok' | 'down'>('checking')
   const [loading, setLoading] = useState(false)
   const [isDemo, setIsDemo] = useState(false)
   const [error, setError] = useState('')
@@ -82,6 +84,23 @@ export default function SplitPage() {
     } else if (!isFreighterInstalled()) {
       setIsDemo(true)
     }
+  }, [])
+
+  useEffect(() => {
+    async function checkHealth() {
+      if (!apiBase) {
+        setHealth('ok')
+        return
+      }
+      try {
+        const response = await fetch(`${apiBase}/health`)
+        const data = await response.json()
+        setHealth(data.status === 'ok' ? 'ok' : 'down')
+      } catch {
+        setHealth('down')
+      }
+    }
+    checkHealth()
   }, [])
 
   const participantList = useMemo(() => {
@@ -231,6 +250,7 @@ export default function SplitPage() {
         </div>
         <div className="hero-actions" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <ChainBadge />
+          <span className={`health-badge ${health === 'ok' ? 'is-live' : 'is-down'}`}><span className="chain-dot" />{health === 'ok' ? 'Live' : 'Offline'}</span>
           <button className="btn-gold" onClick={connectWallet} aria-label={wallet ? `Connected as ${shortAddress(wallet)}` : 'Connect Freighter Wallet'}>{wallet ? shortAddress(wallet) : 'Connect Freighter'}</button>
         </div>
       </section>

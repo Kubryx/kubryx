@@ -33,12 +33,17 @@ const checks = [
   },
   {
     name: 'CipherVault',
-    url: 'https://kubryx-cipher.onrender.com/health',
+    url: 'https://kubryx-cipher.onrender.com/api/health',
+    expect: { status: 'ok' },
+  },
+  {
+    name: 'StellarSyncSplit',
+    url: 'https://kubryx-syncsplit.onrender.com/health',
     expect: { status: 'ok' },
   },
   {
     name: 'PalmFlow',
-    url: 'https://kubryx-palmflow.vercel.app/api/health',
+    url: 'https://kubryx-palmflow.onrender.com/api/health',
     expect: { status: 'ok' },
   },
   {

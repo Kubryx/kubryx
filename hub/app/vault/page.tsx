@@ -37,7 +37,7 @@ type PrivacyScore = {
   breakdown?: Record<string, string | number>
 }
 
-const apiBase = process.env.NEXT_PUBLIC_CIPHER_API || ''
+const apiBase = process.env.NEXT_PUBLIC_CIPHER_URL || process.env.NEXT_PUBLIC_CIPHER_API || ''
 
 function shortAddress(address: string) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`

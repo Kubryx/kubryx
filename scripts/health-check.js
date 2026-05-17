@@ -8,8 +8,9 @@ const BACKENDS = [
   { name: 'lendora',       url: 'https://kubryx-lendora.onrender.com/health' },
   { name: 'trustmesh',     url: 'https://kubryx-trustmesh.onrender.com/health' },
   { name: 'shadow',        url: 'https://kubryx-shadow.onrender.com/health' },
-  { name: 'cipher',        url: 'https://kubryx-cipher.onrender.com/health' },
-  { name: 'palmflow',      url: 'https://kubryx-palmflow.vercel.app/api/health' },
+  { name: 'cipher',        url: 'https://kubryx-cipher.onrender.com/api/health' },
+  { name: 'syncsplit',     url: 'https://kubryx-syncsplit.onrender.com/health' },
+  { name: 'palmflow',      url: 'https://kubryx-palmflow.onrender.com/api/health' },
 ];
 
 const TIMEOUT_MS = 15000;

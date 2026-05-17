@@ -74,7 +74,7 @@ type ChatMessage = {
   timestamp?: Date
 }
 
-const apiBase = process.env.NEXT_PUBLIC_LENDORA_API || ''
+const apiBase = process.env.NEXT_PUBLIC_LENDORA_URL || process.env.NEXT_PUBLIC_LENDORA_API || ''
 
 function shortAddress(address: string) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`

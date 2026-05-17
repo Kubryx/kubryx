@@ -1,51 +1,27 @@
-# Kubryx — All Environment Variables
+# Kubryx Environment Variables Documentation
 
-## Vercel (hub project)
-NEXT_PUBLIC_CREDITBLOCKS_API=https://creditblock-rs-backend.onrender.com
-NEXT_PUBLIC_ETERNALVAULT_API=https://kubryx-eternalvault.onrender.com
-NEXT_PUBLIC_LENDORA_API=https://kubryx-lendora.onrender.com
-NEXT_PUBLIC_TRUSTMESH_API=https://kubryx-trustmesh.onrender.com
-NEXT_PUBLIC_SHADOW_API=https://kubryx-shadow.onrender.com
-NEXT_PUBLIC_CIPHER_API=https://kubryx-cipher.onrender.com
-NEXT_PUBLIC_PALMFLOW_API=https://kubryx-palmflow.vercel.app
-NEXT_PUBLIC_STELLAR_RPC=https://soroban-testnet.stellar.org
+This document maintains the canonical environment variable mappings for production Vercel and Render deployments across the locked Hub frontend and 7 backend services.
 
-## Render — kubryx-eternalvault
-PORT=3001
-SUPABASE_URL=
-SUPABASE_ANON_KEY=
-PRIVATE_KEY=
-VAULT_ADDRESS=
-QIE_RPC_URL=https://rpc.qie.digital
-CHAIN_ID=1990
+## CipherVault
+NEXT_PUBLIC_CIPHER_URL=https://kubryx-cipher.onrender.com
+(Add to Vercel environment variables before going live)
 
-## Render — kubryx-lendora
-PORT=8000
-GROQ_API_KEY=
-GROQ_MODEL=llama-3.3-70b-versatile
-ARBITRUM_RPC_URL=
+## Lendora AI
+NEXT_PUBLIC_LENDORA_URL=https://kubryx-lendora.onrender.com
+(Add to Vercel environment variables before going live)
 
-## Render — kubryx-trustmesh
-PORT=3002
-DATABASE_URL=
-REDIS_URL=
-SOLANA_RPC_URL=https://api.devnet.solana.com
+## ShadowLedger
+NEXT_PUBLIC_SHADOW_URL=https://kubryx-shadow.onrender.com
+(Add to Vercel environment variables before going live)
 
-## Render — kubryx-shadow
-PORT=3003
-DATABASE_URL=
-OPENAI_API_KEY=
-SOLANA_RPC_URL=https://api.devnet.solana.com
+## StellarSyncSplit
+NEXT_PUBLIC_SYNCSPLIT_URL=https://kubryx-syncsplit.onrender.com
+(Add to Vercel environment variables before going live)
 
-## Render — kubryx-cipher
-PORT=3004
-SOLANA_RPC_URL=https://api.devnet.solana.com
+## PalmFlow
+NEXT_PUBLIC_PALMFLOW_URL=https://kubryx-palmflow.onrender.com
+(Add to Vercel environment variables before going live)
 
-## Vercel — palmflow project
-DATABASE_URL=
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_KEY=
-GEMINI_API_KEY=
-PUSD_AUTHORITY_KEY=
-NEXT_PUBLIC_PUSD_MINT=
+
+
+

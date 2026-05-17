@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: kubryx-syncsplit
+    env: node
+    region: oregon
+    plan: free
+    rootDir: syncsplit/Stellar-Syncsplit-main/backend
+    buildCommand: npm install
+    startCommand: node index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3005"
