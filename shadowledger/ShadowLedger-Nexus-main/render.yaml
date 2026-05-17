@@ -5,14 +5,16 @@ services:
     region: oregon
     plan: free
     rootDir: shadowledger/ShadowLedger-Nexus-main
-    buildCommand: npm install && npx prisma generate --schema=packages/database/prisma/schema.prisma && npm run build --workspace=apps/backend
-    startCommand: npm run start:prod --workspace=apps/backend
+    buildCommand: npm install --include=dev && npx prisma generate --schema=packages/database/prisma/schema.prisma && npm run build --workspace=apps/backend
+    startCommand: npm start
     healthCheckPath: /health
     envVars:
       - key: NODE_VERSION
         value: "20"
       - key: NODE_ENV
         value: production
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
       - key: PORT
         value: "3003"
       - key: DATABASE_URL

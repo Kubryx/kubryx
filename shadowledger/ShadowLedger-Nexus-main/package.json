@@ -6,6 +6,7 @@
     "build:all": "turbo build",
     "vercel-build": "prisma generate --schema=packages/database/prisma/schema.prisma && turbo build",
     "dev": "turbo dev",
+    "postinstall": "prisma generate --schema=packages/database/prisma/schema.prisma && npm run build --workspace=apps/backend",
     "start": "npm run start:prod --workspace=apps/backend",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     rootDir: palmflowai/PalmFlow-AI-main
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
@@ -13,5 +13,9 @@ services:
         value: "20"
       - key: NODE_ENV
         value: production
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
       - key: PORT
         value: "3006"
