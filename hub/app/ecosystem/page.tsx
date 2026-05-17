@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useGlobalOperations, KubryxEventType } from '../../lib/global-operations-engine'
 import { useStrategicIntelligence } from '../../lib/strategic-intelligence-engine'
+import { useCivilizationOrchestration, InstitutionalAgent, InterAgentNegotiation } from '../../lib/civilization-orchestration-engine'
 import { toast } from '../../lib/toast'
 import ExecutiveWalkthrough from '../components/ExecutiveWalkthrough'
 import CommandPalette from '../components/CommandPalette'
@@ -74,6 +75,23 @@ export default function EcosystemPage() {
   // Connect to Strategic Intelligence Layer
   const { recommendations, forecasts, activeMitigationPlan } = useStrategicIntelligence()
 
+  // Connect to Civilization Orchestration Layer
+  const {
+    agents,
+    negotiations,
+    diplomaticRelations,
+    coalitionScore,
+    negotiationConfidence,
+    stabilizationAlignment,
+    activeConflict,
+    triggerInstability,
+    simulateDeadlock,
+    initiateNegotiation,
+    replayCrisis,
+    stabilizeTrust,
+    restoreEquilibrium
+  } = useCivilizationOrchestration()
+
   const [selectedWebhook, setSelectedWebhook] = useState<WebhookEvent>(DEFAULT_WEBHOOKS[0])
   const [targetUrl, setTargetUrl] = useState('https://api.enterprise.dao/webhooks/kubryx')
   const [inspectPayload, setInspectPayload] = useState<string | null>(null)
@@ -87,6 +105,29 @@ export default function EcosystemPage() {
   // Strategic Explorer State
   const [selectedForecastTimeframe, setSelectedForecastTimeframe] = useState<'1-hour' | '24-hour' | '7-day'>('1-hour')
 
+  // Phase 13 Sandbox States
+  const [selectedSandboxAgent, setSelectedSandboxAgent] = useState<InstitutionalAgent>(agents[0])
+  const [selectedSandboxNeg, setSelectedSandboxNeg] = useState<InterAgentNegotiation>(negotiations[0] || {
+    id: 'neg-dummy',
+    proposer: 'System',
+    responder: 'All',
+    topic: 'Quorum sync test',
+    consensusRequired: 90,
+    currentAlignment: 90,
+    status: 'agreed',
+    timestamp: new Date().toISOString()
+  })
+  const [simEventType, setSimEventType] = useState<
+    | 'kubryx_agent_negotiation'
+    | 'kubryx_agent_conflict'
+    | 'kubryx_coalition_update'
+    | 'kubryx_diplomatic_shift'
+    | 'kubryx_recovery_alignment'
+    | 'kubryx_institutional_alert'
+    | 'kubryx_sovereign_recommendation'
+  >('kubryx_agent_negotiation')
+  const [simEventDesc, setSimEventDesc] = useState('Diplomatic agreement secured statefully.')
+
   function handleTriggerWebhook() {
     setTriggering(true)
     setTimeout(() => {
@@ -99,30 +140,26 @@ export default function EcosystemPage() {
         selectedWebhook.payload,
         `Webhook payload dispatched: "${selectedWebhook.name}"`
       )
-      
-      toast.success(`Sent event: "${selectedWebhook.name}" payload successfully dispatched!`)
-    }, 1200)
+      toast.success(`Dispatched webhook event: ${selectedWebhook.name}`)
+    }, 800)
   }
 
-  function handleDispatchCustomEvent(e: React.FormEvent) {
-    e.preventDefault()
-    try {
-      // Validate JSON content
-      JSON.parse(customPayload)
-      publish(customEventType, customPayload, customEventDesc)
-      toast.success(`Event bus: successfully published "${customEventType}"!`)
-      setCustomEventDesc('')
-    } catch {
-      toast.error('Invalid JSON payload provided inside simulator.')
-    }
+  function handleSendCustom() {
+    if (!customPayload.trim() || !customEventDesc.trim()) return
+    publish(customEventType, customPayload, customEventDesc)
+    toast.success(`Dispatched custom event [${customEventType}]`)
   }
 
-  function handleReplayEvent(payload: string, desc: string, type: KubryxEventType) {
-    publish(type, payload, `[REPLAY] ${desc}`)
-    toast.success(`Replayed past event: "${type}" successfully re-dispatched!`)
+  function handleDispatchDiplomaticEvent() {
+    publish(
+      simEventType as any,
+      JSON.stringify({ agent: selectedSandboxAgent.name, alignment: stabilizationAlignment }),
+      `Diplomatic Sandbox Dispatch: ${simEventDesc}`
+    )
+    toast.success(`Dispatched agent event: ${simEventType}`)
   }
 
-  const selectedForecast = forecasts.find(f => f.timeframe === selectedForecastTimeframe) || forecasts[0]
+  const activeForecast = forecasts.find(f => f.timeframe === selectedForecastTimeframe) || forecasts[0]
 
   return (
     <main className="dashboard-layout" style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 24px' }}>
@@ -136,163 +173,307 @@ export default function EcosystemPage() {
             <span style={{ fontSize: 13, color: '#aaa' }}>Developer Portal</span>
           </div>
           <h1 style={{ margin: '6px 0 0', fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span>🛠️</span> Developer Ecosystem & SDK Portal
+            <span>💻</span> Developer Portal & Webhooks Playground
           </h1>
+        </div>
+
+        <div style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 6 }}>
+          <span style={{ fontSize: 10, color: '#888', display: 'block' }}>Operational Consensus</span>
+          <strong style={{ fontSize: 16, color: '#F5C518' }}>{consensusIndex}%</strong>
         </div>
       </header>
 
-      {/* Consensus Replay Explorer Panel */}
-      <section className="card" style={{ padding: 18, marginBottom: 24 }}>
-        <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>🔍 Live Consensus Replay & State Explorer</h3>
-        <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-          Inspect current sovereign parameters. Every event dispatched below directly mutates consensus scoring in real-time.
-        </p>
+      {/* Strategic Intelligence Explorer Section */}
+      <section className="card" style={{ padding: 18, marginBottom: 24, border: '1px solid rgba(245,197,24,0.25)', background: 'rgba(245,197,24,0.01)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 14 }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#F5C518', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>🧠</span> Strategic Forecast & Scenario Payload Explorer
+            </h3>
+            <p style={{ margin: '2px 0 0', fontSize: 12, color: '#aaa' }}>
+              Inspect live REST API JSON schemas dynamically mapping consensus waves and mitigation restoration curves.
+            </p>
+          </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-          <div style={{ padding: 12, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
-            <span style={{ fontSize: 10, color: '#888' }}>Current Global Consensus</span>
-            <strong style={{ display: 'block', fontSize: 22, color: '#F5C518', marginTop: 4 }}>{consensusIndex}%</strong>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {(['1-hour', '24-hour', '7-day'] as const).map((t) => (
+              <button 
+                key={t}
+                onClick={() => setSelectedForecastTimeframe(t)}
+                className={selectedForecastTimeframe === t ? "btn-gold" : "btn-outline"}
+                style={{ padding: '4px 10px', fontSize: 10, height: 'auto' }}
+              >
+                {t}
+              </button>
+            ))}
           </div>
-          <div style={{ padding: 12, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
-            <span style={{ fontSize: 10, color: '#888' }}>Active Event Traces</span>
-            <strong style={{ display: 'block', fontSize: 22, color: '#fff', marginTop: 4 }}>{globalEvents.length} Events</strong>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 16 }}>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            <div style={{ padding: 10, background: '#020202', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 6 }}>
+              <span style={{ fontSize: 9, color: '#888' }}>Consensus Trajectory</span>
+              <strong style={{ display: 'block', fontSize: 18, color: '#fff', marginTop: 4 }}>{activeForecast?.consensusTrajectory}%</strong>
+            </div>
+            <div style={{ padding: 10, background: '#020202', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 6 }}>
+              <span style={{ fontSize: 9, color: '#888' }}>Treasury Stability</span>
+              <strong style={{ display: 'block', fontSize: 18, color: '#fff', marginTop: 4 }}>{activeForecast?.treasuryStability}%</strong>
+            </div>
+            <div style={{ padding: 10, background: '#020202', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 6 }}>
+              <span style={{ fontSize: 9, color: '#888' }}>Governance Volatility</span>
+              <strong style={{ display: 'block', fontSize: 18, color: '#fff', marginTop: 4 }}>{activeForecast?.governanceVolatility}%</strong>
+            </div>
+            <div style={{ padding: 10, background: '#020202', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 6 }}>
+              <span style={{ fontSize: 9, color: '#888' }}>Regional Resilience</span>
+              <strong style={{ display: 'block', fontSize: 18, color: '#fff', marginTop: 4 }}>{activeForecast?.regionalResilience}%</strong>
+            </div>
+            <div style={{ padding: 10, background: '#020202', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 6 }}>
+              <span style={{ fontSize: 9, color: '#888' }}>Ecosystem Trust</span>
+              <strong style={{ display: 'block', fontSize: 18, color: '#fff', marginTop: 4 }}>{activeForecast?.ecosystemTrust}%</strong>
+            </div>
+            <div style={{ padding: 10, background: '#020202', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 6 }}>
+              <span style={{ fontSize: 9, color: '#888' }}>AI Confidence Rate</span>
+              <strong style={{ display: 'block', fontSize: 18, color: '#fff', marginTop: 4 }}>{activeForecast?.aiConfidence}%</strong>
+            </div>
           </div>
-          <div style={{ padding: 12, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
-            <span style={{ fontSize: 10, color: '#888' }}>Archived Checkpoints</span>
-            <strong style={{ display: 'block', fontSize: 22, color: '#fff', marginTop: 4 }}>{globalCheckpoints.length} Snaps</strong>
+
+          <div style={{ background: '#020202', padding: 12, borderRadius: 6, border: '1px solid rgba(255,255,255,0.04)', display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: 9, color: '#888', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>REST API Payload Response</span>
+            <pre style={{ flex: 1, margin: 0, padding: 8, background: '#050505', color: '#10B981', fontSize: 9, fontFamily: 'monospace', overflowX: 'auto', borderRadius: 4 }}>
+{JSON.stringify({
+  status: 'success',
+  timeframe: selectedForecastTimeframe,
+  metrics: {
+    consensusTrajectory: activeForecast?.consensusTrajectory,
+    treasuryStability: activeForecast?.treasuryStability,
+    governanceVolatility: activeForecast?.governanceVolatility,
+    regionalResilience: activeForecast?.regionalResilience,
+    ecosystemTrust: activeForecast?.ecosystemTrust,
+    aiConfidence: activeForecast?.aiConfidence
+  },
+  mitigationAvailable: !!activeMitigationPlan
+}, null, 2)}
+            </pre>
           </div>
+
         </div>
       </section>
 
-      {/* Main Grid Layout */}
+      {/* Main Grid splits */}
       <section style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 20, marginBottom: 24 }}>
         
-        {/* Left Side: Code integrations & playground */}
+        {/* Left Side: Webhook Simulation Playgrounds */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           
-          {/* Mitigation Simulation Sandbox */}
-          <article className="card" style={{ padding: 18, border: '1px solid rgba(245,197,24,0.15)' }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>🧪 Mitigation Simulation Sandbox</h3>
-            <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-              Simulate strategic outage cascades and test real-time failover curves and restoration timelines.
-            </p>
-
-            {activeMitigationPlan ? (
-              <div style={{ padding: 12, background: 'rgba(239,68,68,0.02)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: 6 }}>
-                <strong style={{ display: 'block', fontSize: 13, color: '#EF4444', marginBottom: 6 }}>{activeMitigationPlan.title}</strong>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {activeMitigationPlan.steps.map((step, idx) => (
-                    <div key={idx} style={{ fontSize: 11, color: '#ccc', display: 'flex', gap: 6 }}>
-                      <span style={{ color: '#F5C518' }}>✔</span>
-                      <span>{step}</span>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ display: 'flex', gap: 12, fontSize: 10, color: '#666', marginTop: 10 }}>
-                  <span>Timeline: {activeMitigationPlan.estimatedTimelineSeconds}s Target</span>
-                  <span>Restoration: 98.2% baseline consensus</span>
-                </div>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 0', opacity: 0.7 }}>
-                <span style={{ fontSize: 32 }}>🛡️</span>
-                <p style={{ margin: '6px 0 0', fontSize: 12 }}>Ecosystem Nominal: Simulate an outage on `/executive` to test recovery cascades.</p>
-              </div>
-            )}
-          </article>
-
-          {/* Webhook Playground */}
+          {/* Simulated Webhook Playgrounds */}
           <article className="card" style={{ padding: 18 }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>📡 Autonomous Webhook & Event Playground</h3>
+            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>🔌 Live Enterprise Webhook Simulation Sandbox</h3>
             <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-              Simulate webhook payloads and trace dynamic orchestration synchronization event dispatches.
+              Select a preconfigured payload schema, designate your local webhook endpoints, and trigger real-time dispatch checks.
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>Webhook Event Type</label>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  {DEFAULT_WEBHOOKS.map((evt) => (
-                    <button
-                      key={evt.id}
-                      onClick={() => setSelectedWebhook(evt)}
-                      className="btn-outline"
-                      style={{
-                        padding: '6px 12px',
-                        fontSize: 11,
-                        borderColor: selectedWebhook.id === evt.id ? '#F5C518' : 'rgba(255,255,255,0.08)',
-                        color: selectedWebhook.id === evt.id ? '#F5C518' : '#aaa',
-                        background: selectedWebhook.id === evt.id ? 'rgba(245,197,24,0.05)' : '#000',
-                        flex: 1
-                      }}
-                    >
-                      {evt.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>Endpoint Destination URL</label>
-                <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 16 }}>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>Designated Webhook Endpoint</label>
                   <input 
-                    type="text"
+                    type="url"
                     value={targetUrl}
                     onChange={(e) => setTargetUrl(e.target.value)}
-                    style={{ width: '100%', padding: '8px 12px', background: '#040404', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: 12, borderRadius: 6, outline: 'none' }}
+                    style={{ width: '100%', padding: '8px 10px', background: '#040404', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', fontSize: 11, borderRadius: 6, outline: 'none' }}
                   />
-                  <button
-                    onClick={handleTriggerWebhook}
-                    className="btn-gold"
-                    style={{ padding: '8px 16px', fontSize: 12, minWidth: 120 }}
-                    disabled={triggering}
-                  >
-                    {triggering ? '⚡ Dispatching...' : '📡 Trigger Event'}
-                  </button>
                 </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>Select Event Payload Schema</label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {DEFAULT_WEBHOOKS.map((hook) => (
+                      <div 
+                        key={hook.id} 
+                        onClick={() => setSelectedWebhook(hook)}
+                        style={{
+                          padding: 10,
+                          background: selectedWebhook.id === hook.id ? 'rgba(245,197,24,0.06)' : 'rgba(255,255,255,0.01)',
+                          border: selectedWebhook.id === hook.id ? '1px solid #F5C518' : '1px solid rgba(255,255,255,0.04)',
+                          borderRadius: 6,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <strong style={{ display: 'block', fontSize: 11, color: selectedWebhook.id === hook.id ? '#F5C518' : '#fff' }}>{hook.name}</strong>
+                        <span style={{ fontSize: 9, color: '#888' }}>{hook.description}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <button 
+                  onClick={handleTriggerWebhook}
+                  className="btn-gold"
+                  style={{ width: '100%', padding: 10, fontSize: 12, marginTop: 8 }}
+                  disabled={triggering}
+                >
+                  {triggering ? '⚡ Dispatched Payload...' : '🔌 Dispatch Webhook Payload'}
+                </button>
               </div>
 
-              {/* Inspector Output */}
-              {inspectPayload && (
-                <div style={{ marginTop: 12 }}>
-                  <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Dispatched JSON Payload Inspector</span>
-                  <pre 
-                    style={{
-                      padding: 12,
-                      background: '#030303',
-                      border: '1px solid rgba(245,197,24,0.25)',
-                      borderRadius: 8,
-                      fontSize: 11,
-                      fontFamily: 'monospace',
-                      color: '#F5C518',
-                      overflowX: 'auto',
-                      maxHeight: 180
-                    }}
-                  >
-                    {inspectPayload}
-                  </pre>
-                </div>
-              )}
+              {/* Inspect Webhook Panel */}
+              <div style={{ background: '#020202', padding: 14, border: '1px solid rgba(255,255,255,0.04)', borderRadius: 6, display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>Payload Schema Inspector</span>
+                <pre style={{ flex: 1, margin: 0, padding: 8, background: '#050505', color: '#F5C518', fontSize: 10, fontFamily: 'monospace', overflowX: 'auto', borderRadius: 4, minHeight: 200 }}>
+                  {inspectPayload || selectedWebhook.payload}
+                </pre>
+              </div>
+
             </div>
           </article>
 
-          {/* Live Event Simulator Form */}
-          <article className="card" style={{ padding: 18 }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>⚙️ Real-time Event Simulator</h3>
+          {/* PHASE 13 — MULTI-AGENT DEVELOPER REPLAY & DEBUGGER SANDBOX */}
+          <article className="card" style={{ padding: 18, border: '1px solid rgba(245,197,24,0.3)', background: 'rgba(0,0,0,0.3)' }}>
+            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700, color: '#F5C518' }}>🏛️ Multi-Agent Developer Replay & Debugger Sandbox</h3>
             <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-              Publish custom event payloads directly onto the authoritative Global Event Bus.
+              Simulate inter-agent event dispatches, verify negotiation payloads, and debug multi-agent coalition matrices statefully.
             </p>
 
-            <form onSubmit={handleDispatchCustomEvent} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 16 }}>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                
+                {/* Agent Selector Tree */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>Event Type</label>
+                  <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>Select Agent Replay Context</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                    {agents.map((agent) => (
+                      <div
+                        key={agent.id}
+                        onClick={() => setSelectedSandboxAgent(agent)}
+                        style={{
+                          padding: '6px 8px',
+                          background: selectedSandboxAgent.id === agent.id ? 'rgba(245,197,24,0.06)' : 'rgba(255,255,255,0.01)',
+                          border: selectedSandboxAgent.id === agent.id ? '1px solid #F5C518' : '1px solid rgba(255,255,255,0.03)',
+                          borderRadius: 4,
+                          cursor: 'pointer',
+                          textAlign: 'center',
+                          fontSize: 10
+                        }}
+                      >
+                        <span style={{ color: selectedSandboxAgent.id === agent.id ? '#F5C518' : '#fff', fontWeight: 'bold' }}>{agent.name.split(' ')[0]}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Diplomatic Event Dispatch Form */}
+                <div style={{ padding: 10, background: '#020202', borderRadius: 6, border: '1px solid rgba(255,255,255,0.03)' }}>
+                  <span style={{ display: 'block', fontSize: 10, color: '#888', marginBottom: 6 }}>Trigger Diplomatic Event Simulation</span>
+                  
+                  <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+                    <select
+                      value={simEventType}
+                      onChange={(e: any) => setSimEventType(e.target.value)}
+                      style={{ flex: 1, padding: '4px 8px', background: '#050505', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', fontSize: 10, borderRadius: 4, outline: 'none' }}
+                    >
+                      <option value="kubryx_agent_negotiation">kubryx_agent_negotiation</option>
+                      <option value="kubryx_agent_conflict">kubryx_agent_conflict</option>
+                      <option value="kubryx_coalition_update">kubryx_coalition_update</option>
+                      <option value="kubryx_diplomatic_shift">kubryx_diplomatic_shift</option>
+                      <option value="kubryx_recovery_alignment">kubryx_recovery_alignment</option>
+                      <option value="kubryx_institutional_alert">kubryx_institutional_alert</option>
+                      <option value="kubryx_sovereign_recommendation">kubryx_sovereign_recommendation</option>
+                    </select>
+
+                    <button onClick={handleDispatchDiplomaticEvent} className="btn-gold" style={{ padding: '4px 10px', fontSize: 9 }}>🚀 Dispatch</button>
+                  </div>
+
+                  <input
+                    type="text"
+                    value={simEventDesc}
+                    onChange={(e) => setSimEventDesc(e.target.value)}
+                    placeholder="Describe custom sandbox trigger context..."
+                    style={{ width: '100%', padding: '4px 8px', background: '#050505', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', fontSize: 10, borderRadius: 4, outline: 'none' }}
+                  />
+                </div>
+
+                {/* Coalition Debugger Log */}
+                <div style={{ padding: 10, background: '#020202', borderRadius: 6, border: '1px solid rgba(255,255,255,0.03)', fontSize: 11 }}>
+                  <span style={{ display: 'block', fontSize: 10, color: '#888', marginBottom: 6 }}>Coalition Debugger State Dump</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span>Active Dispute Conflict:</span>
+                    <strong style={{ color: activeConflict ? '#EF4444' : '#10B981' }}>{activeConflict ? 'YES' : 'NONE'}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Coalition Consensus Index:</span>
+                    <strong style={{ color: '#F5C518' }}>{coalitionScore}% Score</strong>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Negotiation & Telemetry Explorer Panel */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                
+                {/* Negotiation Payload selector */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>Active Negotiations List</label>
+                  <select
+                    value={selectedSandboxNeg.id}
+                    onChange={(e) => {
+                      const matched = negotiations.find(n => n.id === e.target.value)
+                      if (matched) setSelectedSandboxNeg(matched)
+                    }}
+                    style={{ width: '100%', padding: '6px 10px', background: '#040404', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', fontSize: 11, borderRadius: 6, outline: 'none', marginBottom: 8 }}
+                  >
+                    {negotiations.map((neg) => (
+                      <option key={neg.id} value={neg.id}>{neg.topic.slice(0, 30)}...</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Negotiation Payload Inspector */}
+                <div style={{ flex: 1, background: '#020202', padding: 10, border: '1px solid rgba(255,255,255,0.04)', borderRadius: 6, display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: 9, color: '#888', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Negotiation Payload Inspector</span>
+                  <pre style={{ flex: 1, margin: 0, padding: 6, background: '#050505', color: '#10B981', fontSize: 9, fontFamily: 'monospace', overflowX: 'auto', borderRadius: 4 }}>
+{JSON.stringify({
+  negotiationId: selectedSandboxNeg.id,
+  topic: selectedSandboxNeg.topic,
+  proposer: selectedSandboxNeg.proposer,
+  responder: selectedSandboxNeg.responder,
+  alignmentRatio: `${selectedSandboxNeg.currentAlignment}%`,
+  requiredConsensus: `${selectedSandboxNeg.consensusRequired}%`,
+  agreementStatus: selectedSandboxNeg.status,
+  timestamp: selectedSandboxNeg.timestamp
+}, null, 2)}
+                  </pre>
+                </div>
+
+              </div>
+
+            </div>
+          </article>
+
+          {/* Webhook API dispatch playground */}
+          <article className="card" style={{ padding: 18 }}>
+            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>⛓️ Custom Event Dispatch Playground</h3>
+            <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
+              Craft custom events and dispatches to test localized network state listeners and boundary checks.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 16 }}>
+              
+              <form onSubmit={(e) => { e.preventDefault(); handleSendCustom(); }} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>Select Target Event Type</label>
                   <select
                     value={customEventType}
                     onChange={(e) => setCustomEventType(e.target.value as KubryxEventType)}
-                    style={{ width: '100%', padding: '8px 12px', background: '#040404', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: 12, borderRadius: 6, outline: 'none' }}
+                    style={{ width: '100%', padding: '6px 10px', background: '#040404', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', fontSize: 11, borderRadius: 6, outline: 'none' }}
                   >
                     <option value="kubryx_ecosystem_alert">kubryx_ecosystem_alert</option>
+                    <option value="kubryx_region_outage">kubryx_region_outage</option>
+                    <option value="kubryx_recovery_trigger">kubryx_recovery_trigger</option>
+                    <option value="kubryx_governance_vote">kubryx_governance_vote</option>
                     <option value="kubryx_treasury_shift">kubryx_treasury_shift</option>
                     <option value="kubryx_policy_update">kubryx_policy_update</option>
                     <option value="kubryx_cognition_signal">kubryx_cognition_signal</option>
@@ -301,182 +482,69 @@ export default function EcosystemPage() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>Description</label>
+                  <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>Event Description</label>
                   <input 
                     type="text"
                     value={customEventDesc}
                     onChange={(e) => setCustomEventDesc(e.target.value)}
-                    placeholder="Short description..."
                     required
-                    style={{ width: '100%', padding: '8px 12px', background: '#040404', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: 12, borderRadius: 6, outline: 'none' }}
+                    style={{ width: '100%', padding: '6px 10px', background: '#040404', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', fontSize: 11, borderRadius: 6, outline: 'none' }}
                   />
                 </div>
-              </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>JSON Payload</label>
+                <button type="submit" className="btn-outline" style={{ padding: 10, fontSize: 12, marginTop: 8 }}>⚡ Propagate Custom Event</button>
+              </form>
+
+              <div style={{ background: '#020202', padding: 14, border: '1px solid rgba(255,255,255,0.04)', borderRadius: 6, display: 'flex', flexDirection: 'column' }}>
+                <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>Custom Payload (JSON)</label>
                 <textarea 
                   value={customPayload}
                   onChange={(e) => setCustomPayload(e.target.value)}
-                  rows={4}
-                  required
-                  style={{ width: '100%', padding: '8px 12px', background: '#040404', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: 12, borderRadius: 6, outline: 'none', fontFamily: 'monospace', resize: 'none' }}
+                  rows={6}
+                  style={{ flex: 1, padding: 8, background: '#050505', color: '#10B981', fontSize: 10, fontFamily: 'monospace', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 4, outline: 'none', resize: 'none' }}
                 />
               </div>
 
-              <button type="submit" className="btn-gold" style={{ padding: 10, fontSize: 12, fontWeight: 'bold' }}>⚡ Publish to Event Bus</button>
-            </form>
-          </article>
-
-          {/* Integration SDK Code Examples */}
-          <article className="card" style={{ padding: 18 }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>💻 Enterprise SDK & REST Integration models</h3>
-            <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-              Simple code integration blocks to connect to the dynamic Sovereign infrastructure fabric.
-            </p>
-
-            <pre 
-              style={{
-                padding: 14,
-                background: '#030303',
-                border: '1px solid rgba(255,255,255,0.03)',
-                borderRadius: 8,
-                fontSize: 11,
-                fontFamily: 'monospace',
-                color: '#ccc',
-                overflowX: 'auto'
-              }}
-            >
-{`// Initialize Sovereign Ops SDK Connection
-import { KubryxClient } from '@kubryx/sovereign-sdk';
-
-const client = new KubryxClient({
-  endpoint: "https://api.kubryx.network",
-  signingKey: "secp256k1_private_key_auth"
-});
-
-// Stream active validator quorums
-client.on('consensus.drift_detected', (event) => {
-  console.log(\`[SLA ALARM] Node \${event.nodeId} drift latency: \${event.driftLatencyMs}ms\`);
-  
-  // Automate regional cache rerouting fallback
-  client.governance.proposeMigration({
-    targetRegion: "Singapore ap-southeast-1",
-    reason: "EVM consensus latency partition drift mitigation"
-  });
-});`}
-            </pre>
+            </div>
           </article>
 
         </div>
 
-        {/* Right Side: Replay Debugger, Snapshot Inspector, API topologies */}
+        {/* Right Side: Global strategic memory archives, checkpoints, recovery */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           
-          {/* Operational Recommendation Stream */}
+          {/* Active Global Operations Event Bus Timelines */}
           <article className="card" style={{ padding: 18 }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>🤖 AI Recommendation Stream</h3>
+            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>⛓️ Global Operations State Stream</h3>
             <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-              Trace real-time operational optimizations dispatched from our strategic layer.
+              Real-time dispatches routed across the central global event synchronization layer.
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {recommendations.map((rec) => (
-                <div key={rec.id} style={{ padding: 10, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-                    <strong style={{ color: '#fff' }}>{rec.title}</strong>
-                    <span style={{ color: '#F5C518' }}>+{rec.estimatedGain}%</span>
-                  </div>
-                  <span style={{ display: 'block', fontSize: 10, color: '#888', marginTop: 2 }}>{rec.description}</span>
-                </div>
-              ))}
-            </div>
-          </article>
-
-          {/* Forecast Payload Explorer & strategic event inspector */}
-          <article className="card" style={{ padding: 18 }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>🔮 Forecast Payload Explorer</h3>
-            <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-              Inspect deterministic API response schema outputs for chosen strategic forecasting boundaries.
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>Forecasting Horizon</label>
-                <select
-                  value={selectedForecastTimeframe}
-                  onChange={(e) => setSelectedForecastTimeframe(e.target.value as any)}
-                  style={{ width: '100%', padding: '8px 12px', background: '#040404', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: 12, borderRadius: 6, outline: 'none' }}
-                >
-                  <option value="1-hour">1-Hour Forecast</option>
-                  <option value="24-hour">24-Hour Forecast</option>
-                  <option value="7-day">7-Day Forecast</option>
-                </select>
-              </div>
-
-              {selectedForecast && (
-                <div>
-                  <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>REST API JSON Output</span>
-                  <pre 
-                    style={{
-                      padding: 12,
-                      background: '#030303',
-                      border: '1px solid rgba(255,255,255,0.03)',
-                      borderRadius: 8,
-                      fontSize: 10,
-                      fontFamily: 'monospace',
-                      color: '#F5C518',
-                      overflowX: 'auto',
-                      maxHeight: 180
-                    }}
-                  >
-                    {JSON.stringify(selectedForecast, null, 2)}
-                  </pre>
-                </div>
-              )}
-            </div>
-          </article>
-
-          {/* Live Event Replay Debugger */}
-          <article className="card" style={{ padding: 18 }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>🐞 Event Replay Debugger</h3>
-            <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-              Re-propagate or debug past event transactions to trace system response.
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 220, overflowY: 'auto', paddingRight: 6 }}>
-              {globalEvents.map((evt) => (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 300, overflowY: 'auto' }}>
+              {globalEvents.slice(0, 10).map((evt) => (
                 <div 
-                  key={evt.id}
+                  key={evt.id} 
                   style={{
-                    padding: 10,
+                    padding: '8px 12px',
                     background: 'rgba(255,255,255,0.01)',
-                    border: '1px solid rgba(255,255,255,0.03)',
-                    borderRadius: 6,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
+                    borderLeft: '2px solid #F5C518',
+                    borderRadius: '0 4px 4px 0',
+                    fontSize: 11
                   }}
                 >
-                  <div style={{ flex: 1, marginRight: 8 }}>
-                    <span style={{ fontSize: 9, color: '#F5C518', fontFamily: 'monospace' }}>[{evt.type}]</span>
-                    <span style={{ display: 'block', fontSize: 11, color: '#fff', marginTop: 2 }}>{evt.description}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 8, color: '#666', marginBottom: 2 }}>
+                    <span>[{evt.type}]</span>
+                    <span>{new Date(evt.timestamp).toLocaleTimeString()}</span>
                   </div>
-                  <button 
-                    onClick={() => handleReplayEvent(evt.payload, evt.description, evt.type)}
-                    className="btn-outline" 
-                    style={{ padding: '3px 8px', fontSize: 10, height: 'auto' }}
-                  >
-                    🔄 Replay
-                  </button>
+                  <span style={{ color: '#fff', fontSize: 11 }}>{evt.description}</span>
                 </div>
               ))}
             </div>
           </article>
 
-          {/* Operational Snapshot Inspector */}
+          {/* Historical state snapshots */}
           <article className="card" style={{ padding: 18 }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>💾 Operational Snapshot Inspector</h3>
+            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>💾 Historic State Restore Console</h3>
             <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
               Compare and restore historical consensus checkpoint parameters statefully.
             </p>

@@ -11,6 +11,7 @@ import { useCognition } from '../../lib/cognition-engine'
 import { useFabric } from '../../lib/fabric-engine'
 import { useGlobalOperations } from '../../lib/global-operations-engine'
 import { useStrategicIntelligence } from '../../lib/strategic-intelligence-engine'
+import { useCivilizationOrchestration } from '../../lib/civilization-orchestration-engine'
 import ExecutiveWalkthrough from '../components/ExecutiveWalkthrough'
 import CommandPalette from '../components/CommandPalette'
 
@@ -48,6 +49,23 @@ export default function ExecutivePage() {
     strategicConfidence,
     archiveEpoch
   } = useStrategicIntelligence()
+
+  // Civilization Orchestration Hook
+  const {
+    agents,
+    negotiations,
+    diplomaticRelations,
+    coalitionScore,
+    negotiationConfidence,
+    stabilizationAlignment,
+    activeConflict,
+    triggerInstability,
+    simulateDeadlock,
+    initiateNegotiation,
+    replayCrisis,
+    stabilizeTrust,
+    restoreEquilibrium
+  } = useCivilizationOrchestration()
 
   const [selectedSnapshotId, setSelectedSnapshotId] = useState<string | null>(null)
   
@@ -102,7 +120,7 @@ export default function ExecutivePage() {
           </h1>
         </div>
 
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button
             onClick={triggerSelfHealing}
             className="btn-outline"
@@ -212,6 +230,163 @@ export default function ExecutivePage() {
         </div>
       </section>
 
+      {/* PHASE 13 - EXECUTIVE CIVILIZATION COMMAND CENTER */}
+      <section className="card" style={{ padding: 18, marginBottom: 24, border: '1px solid rgba(245,197,24,0.3)', background: 'rgba(0,0,0,0.4)' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: 12, marginBottom: 16 }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#F5C518', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>🏛️</span> Executive Civilization Command Center
+            </h2>
+            <p style={{ margin: '2px 0 0', fontSize: 12, color: '#aaa' }}>
+              Civilization-scale multi-agent coordination system. 6 institutional agents harmonizing protocol-scale economies and infrastructures statefully.
+            </p>
+          </div>
+
+          {/* Interactive Simulation Panel */}
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <button onClick={initiateNegotiation} className="btn-outline" style={{ padding: '6px 12px', fontSize: 10 }}>🤝 Propose Action</button>
+            <button onClick={simulateDeadlock} className="btn-outline" style={{ padding: '6px 12px', fontSize: 10, color: '#EF4444', borderColor: 'rgba(239,68,68,0.2)' }}>⚠️ Deadlock</button>
+            <button onClick={triggerInstability} className="btn-outline" style={{ padding: '6px 12px', fontSize: 10, color: '#EF4444', borderColor: 'rgba(239,68,68,0.2)' }}>💥 Trigger Drift</button>
+            <button onClick={replayCrisis} className="btn-outline" style={{ padding: '6px 12px', fontSize: 10, color: '#F5C518', borderColor: 'rgba(245,197,24,0.2)' }}>⚡ Replay Crisis</button>
+            <button onClick={stabilizeTrust} className="btn-outline" style={{ padding: '6px 12px', fontSize: 10, color: '#10B981', borderColor: 'rgba(16,185,129,0.2)' }}>🛡️ Stabilize Trust</button>
+            <button onClick={restoreEquilibrium} className="btn-gold" style={{ padding: '6px 12px', fontSize: 10 }}>🔄 Restore Equilibrium</button>
+          </div>
+        </header>
+
+        {/* Global Coalition Stability Metrics */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12, marginBottom: 18 }}>
+          <div style={{ padding: 12, background: '#020202', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>Coalition Stability Score</span>
+            <strong style={{ display: 'block', fontSize: 24, color: '#F5C518', marginTop: 4 }}>{coalitionScore}%</strong>
+            <span style={{ fontSize: 8, color: '#666', display: 'block', marginTop: 4 }}>Harmonized agent alignment</span>
+          </div>
+
+          <div style={{ padding: 12, background: '#020202', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>Negotiation Confidence</span>
+            <strong style={{ display: 'block', fontSize: 24, color: '#10B981', marginTop: 4 }}>{negotiationConfidence}%</strong>
+            <span style={{ fontSize: 8, color: '#666', display: 'block', marginTop: 4 }}>Agreement threshold safety</span>
+          </div>
+
+          <div style={{ padding: 12, background: '#020202', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>Stabilization Alignment</span>
+            <strong style={{ display: 'block', fontSize: 24, color: '#fff', marginTop: 4 }}>{stabilizationAlignment}%</strong>
+            <span style={{ fontSize: 8, color: '#666', display: 'block', marginTop: 4 }}>Policy check integrity</span>
+          </div>
+
+          <div style={{ padding: 12, background: '#020202', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>Active Crisis Conflict</span>
+            <strong style={{ display: 'block', fontSize: 11, color: activeConflict ? '#EF4444' : '#10B981', marginTop: 8, minHeight: 30, overflow: 'hidden' }}>
+              {activeConflict || 'Nominal Equilibrium Secured'}
+            </strong>
+          </div>
+        </div>
+
+        {/* Autonomous Agent Command Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 14, marginBottom: 18 }}>
+          {agents.map((agent) => (
+            <div 
+              key={agent.id}
+              style={{
+                padding: 14,
+                background: '#020202',
+                border: '1px solid rgba(255,255,255,0.03)',
+                borderTop: agent.status === 'active_dispute' ? '2px solid #EF4444' : '2px solid #F5C518',
+                borderRadius: 6
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <div>
+                  <strong style={{ fontSize: 13, color: '#fff', display: 'block' }}>{agent.name}</strong>
+                  <span style={{ fontSize: 9, color: '#666' }}>{agent.role}</span>
+                </div>
+                <span 
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 'bold',
+                    padding: '2px 6px',
+                    borderRadius: 4,
+                    textTransform: 'uppercase',
+                    background: agent.status === 'active_dispute' ? 'rgba(239,68,68,0.1)' : 'rgba(245,197,24,0.1)',
+                    color: agent.status === 'active_dispute' ? '#EF4444' : '#F5C518'
+                  }}
+                >
+                  {agent.status}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, margin: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.02)', paddingBottom: 6 }}>
+                <span>Confidence: <strong style={{ color: '#fff' }}>{agent.confidence}%</strong></span>
+                <span>Trust: <strong style={{ color: '#fff' }}>{agent.trustWeight}%</strong></span>
+                <span>Influence: <strong style={{ color: '#fff' }}>{agent.influenceRate}%</strong></span>
+              </div>
+
+              <span style={{ display: 'block', fontSize: 10, color: '#888', fontStyle: 'italic', marginBottom: 8 }}>
+                Intent: {agent.intent}
+              </span>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                {agent.responsibility.map((resp, idx) => (
+                  <span key={idx} style={{ fontSize: 8, background: 'rgba(255,255,255,0.03)', color: '#aaa', padding: '1px 4px', borderRadius: 3 }}>
+                    {resp}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Dynamic Diplomacy Stream & Sovereign Negotiation Feed */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 16 }}>
+          
+          <div style={{ background: '#020202', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6, padding: 14 }}>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 8 }}>Sovereign Negotiation Feed</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 180, overflowY: 'auto' }}>
+              {negotiations.map((neg) => (
+                <div key={neg.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)', paddingBottom: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+                    <strong style={{ color: '#fff' }}>{neg.topic}</strong>
+                    <span 
+                      style={{ 
+                        fontSize: 8, 
+                        fontWeight: 'bold', 
+                        color: neg.status === 'agreed' ? '#10B981' : neg.status === 'disputed' ? '#EF4444' : '#F5C518',
+                        textTransform: 'uppercase'
+                      }}
+                    >
+                      {neg.status}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#666', marginTop: 4 }}>
+                    <span>Proposer: <strong style={{ color: '#aaa' }}>{neg.proposer}</strong> • Responder: <strong style={{ color: '#aaa' }}>{neg.responder}</strong></span>
+                    <span>Alignment: {neg.currentAlignment}% / {neg.consensusRequired}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ background: '#020202', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6, padding: 14 }}>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 8 }}>Institutional Diplomacy Stream</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 180, overflowY: 'auto' }}>
+              {diplomaticRelations.slice(0, 8).map((rel, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 10, borderBottom: '1px solid rgba(255,255,255,0.02)', paddingBottom: 4 }}>
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    <strong style={{ color: '#fff' }}>{rel.fromAgent.split(' ')[0]}</strong>
+                    <span style={{ color: '#666' }}>⇄</span>
+                    <strong style={{ color: '#fff' }}>{rel.toAgent.split(' ')[0]}</strong>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <span>Trust: <strong style={{ color: '#F5C518' }}>{rel.trustScore}%</strong></span>
+                    <span>Align: <strong style={{ color: '#10B981' }}>{rel.alignmentScore}%</strong></span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       {/* Global Consensus Monitor & Stability Meter Dashboard */}
       <section style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 16, marginBottom: 24 }}>
         
@@ -240,7 +415,7 @@ export default function ExecutivePage() {
               <span style={{ fontSize: 9, background: 'rgba(239,68,68,0.08)', color: '#EF4444', padding: '2px 6px', borderRadius: 4 }}>ACTIVE WAVE</span>
             </div>
             <strong style={{ display: 'block', fontSize: 26, fontWeight: 800, marginTop: 6, color: '#fff' }}>
-              ...{driftIndex}% drift rate
+              ±{driftIndex}% drift rate
             </strong>
           </div>
           <span style={{ fontSize: 10, color: '#888' }}>Sinusoidal fluctuation targeting APY sweep boundaries.</span>
@@ -450,148 +625,64 @@ export default function ExecutivePage() {
               </div>
 
               <div style={{ background: '#030303', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 6, padding: 12 }}>
-                <span style={{ fontSize: 10, color: '#888' }}>RPC Fluctuation Rate</span>
+                <span style={{ fontSize: 10, color: '#888' }}>RPC Ingestion Congestion</span>
                 <strong style={{ display: 'block', fontSize: 20, color: '#fff', margin: '4px 0' }}>
-                  +{livingTelemetry.rpcFluctuationRate}ms drift
+                  {livingTelemetry.rpcFluctuationRate}ms
                 </strong>
                 <div style={{ height: 4, background: '#0a0a0a', borderRadius: 2, overflow: 'hidden' }}>
-                  <div style={{ width: `${Math.min(100, livingTelemetry.rpcFluctuationRate * 1.5)}%`, background: '#EF4444', height: '100%' }} />
+                  <div style={{ width: `${Math.min(100, livingTelemetry.rpcFluctuationRate / 5)}%`, background: '#EF4444', height: '100%' }} />
                 </div>
               </div>
 
             </div>
           </article>
 
-          {/* Chronicle timeline explorer */}
-          <article className="card" style={{ padding: 18 }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>📖 Global Operational Chronicle Explorer</h3>
-            <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-              Immortal system maturity log detailing major organizational epochs and governance sweeps.
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {chronicle.map((epoch) => (
-                <div 
-                  key={epoch.id}
-                  style={{
-                    padding: 14,
-                    background: 'rgba(255,255,255,0.01)',
-                    border: '1px solid rgba(255,255,255,0.03)',
-                    borderRadius: 6
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <strong style={{ fontSize: 13, color: '#fff' }}>{epoch.epochName}</strong>
-                    <span style={{ fontSize: 9, color: '#888' }}>{new Date(epoch.timestamp).toLocaleString()}</span>
-                  </div>
-
-                  <p style={{ margin: '4px 0 8px', fontSize: 12, color: '#ccc', lineHeight: 1.4 }}>{epoch.eventSummary}</p>
-
-                  <div style={{ display: 'flex', gap: 16, fontSize: 10, color: '#777' }}>
-                    <span>Sovereignty: <strong style={{ color: '#aaa' }}>{epoch.sovereigntyLevel}%</strong></span>
-                    <span>Clarity: <strong style={{ color: '#aaa' }}>{epoch.cognitiveClarity}%</strong></span>
-                    <span>Active Threats: <strong style={{ color: '#aaa' }}>{epoch.activeThreatCount}</strong></span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </article>
-
         </div>
 
-        {/* Right Side: Threat forecasting, compatibility registry */}
+        {/* Right Side: Snapshots, security simulations */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           
-          {/* Protocol Compatibility Registry */}
+          {/* Active security threat simulations */}
           <article className="card" style={{ padding: 18 }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>🔗 Ecosystem Trust Compatibility Matrix</h3>
+            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>🛡️ Active Security & Telemetry Threat Simulations</h3>
             <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-              Institutional readiness certification weights and auditing matrix.
+              Simulate threat scenarios statefully to evaluate automatic boundary recovery and security policy locks.
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {compatibility.map((item) => (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {threats.map((threat) => (
                 <div 
-                  key={item.protocolName}
+                  key={threat.vector} 
                   style={{
                     padding: 12,
-                    background: 'rgba(255,255,255,0.01)',
-                    border: '1px solid rgba(255,255,255,0.03)',
-                    borderRadius: 6
+                    background: threat.compromiseSimulationActive ? 'rgba(239,68,68,0.03)' : 'rgba(255,255,255,0.01)',
+                    border: threat.compromiseSimulationActive ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.03)',
+                    borderRadius: 6,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <strong style={{ fontSize: 12, color: '#fff' }}>{item.protocolName}</strong>
-                    <span 
-                      style={{ 
-                        fontSize: 9, 
-                        background: item.readinessState === 'certified' ? 'rgba(16,185,129,0.06)' : 'rgba(245,197,24,0.06)', 
-                        color: item.readinessState === 'certified' ? '#10B981' : '#F5C518', 
-                        padding: '2px 6px', 
-                        borderRadius: 4,
-                        textTransform: 'uppercase'
-                      }}
-                    >
-                      {item.readinessState}
+                  <div>
+                    <strong style={{ fontSize: 12, color: '#fff' }}>{threat.vector}</strong>
+                    <span style={{ display: 'block', fontSize: 8, color: '#888', marginTop: 2 }}>
+                      Severity: {threat.severity} • Likelihood: {threat.likelihood}%
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#888', marginTop: 6 }}>
-                    <span>Ecosystem Trust Score:</span>
-                    <strong style={{ color: '#fff' }}>{item.trustWeight}%</strong>
-                  </div>
-
-                  <div style={{ fontSize: 9, color: '#666', marginTop: 4, fontFamily: 'monospace' }}>
-                    Last Security Audit: {item.lastAudited}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </article>
-
-          {/* Active threat matrix */}
-          <article className="card" style={{ padding: 18 }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>🛡️ Advanced Threat Forecast Matrix</h3>
-            <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-              Simulate security breaches and forecast infrastructure defense confidence.
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {threats.map((threat) => (
-                <div 
-                  key={threat.vector}
-                  style={{
-                    padding: 12,
-                    background: 'rgba(255,255,255,0.01)',
-                    border: '1px solid rgba(255,255,255,0.03)',
-                    borderRadius: 6
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <strong style={{ fontSize: 12, color: '#fff' }}>{threat.vector}</strong>
-                    <button
-                      onClick={() => toggleThreat(threat.vector)}
-                      className="btn-outline"
-                      style={{
-                        padding: '3px 8px',
-                        fontSize: 10,
-                        height: 'auto',
-                        borderColor: threat.compromiseSimulationActive ? '#EF4444' : 'rgba(255,255,255,0.1)',
-                        color: threat.compromiseSimulationActive ? '#EF4444' : '#aaa'
-                      }}
-                    >
-                      {threat.compromiseSimulationActive ? 'Stop Sim' : 'Trigger Sim'}
-                    </button>
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#888', marginTop: 4 }}>
-                    <span>Forecast Likelihood:</span>
-                    <strong style={{ color: '#ccc' }}>{threat.likelihood}%</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#888', marginTop: 4 }}>
-                    <span>Severity Impact:</span>
-                    <strong style={{ color: threat.severity === 'critical' ? '#EF4444' : '#F5C518', textTransform: 'uppercase' }}>{threat.severity}</strong>
-                  </div>
+                  <button
+                    onClick={() => toggleThreat(threat.vector)}
+                    className="btn-outline"
+                    style={{
+                      padding: '4px 10px',
+                      fontSize: 10,
+                      height: 'auto',
+                      borderColor: threat.compromiseSimulationActive ? '#10B981' : 'rgba(239,68,68,0.25)',
+                      color: threat.compromiseSimulationActive ? '#10B981' : '#EF4444'
+                    }}
+                  >
+                    {threat.compromiseSimulationActive ? 'Resolve threat' : 'Trigger Threat'}
+                  </button>
                 </div>
               ))}
             </div>

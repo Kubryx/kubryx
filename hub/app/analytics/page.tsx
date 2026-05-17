@@ -6,6 +6,7 @@ import { usePlatformState } from '../../lib/platform-engine'
 import { useGlobalOperations } from '../../lib/global-operations-engine'
 import { useFabric } from '../../lib/fabric-engine'
 import { useStrategicIntelligence } from '../../lib/strategic-intelligence-engine'
+import { useCivilizationOrchestration } from '../../lib/civilization-orchestration-engine'
 import { toast } from '../../lib/toast'
 import ExecutiveWalkthrough from '../components/ExecutiveWalkthrough'
 import CommandPalette from '../components/CommandPalette'
@@ -34,6 +35,16 @@ export default function AnalyticsPage() {
   // Connect to Strategic Intelligence Layer
   const { forecasts, strategicConfidence } = useStrategicIntelligence()
 
+  // Connect to Civilization Orchestration Layer
+  const {
+    agents,
+    diplomaticRelations,
+    coalitionScore,
+    negotiationConfidence,
+    stabilizationAlignment,
+    activeConflict
+  } = useCivilizationOrchestration()
+
   const [ticks, setTicks] = useState<number>(0)
   
   // Rolling latency datasets
@@ -53,6 +64,16 @@ export default function AnalyticsPage() {
     { name: '6s ago', QIE: 13, Solana: 284, Stellar: 82, Arbitrum: 47 },
     { name: '4s ago', QIE: 14, Solana: 290, Stellar: 86, Arbitrum: 50 },
     { name: 'Now', QIE: 14.5, Solana: 285.2, Stellar: 84.8, Arbitrum: 48.6 }
+  ])
+
+  // Rolling Coalition Stability data
+  const [coalitionData, setCoalitionData] = useState<{ name: string; coalition: number; alignment: number }[]>([
+    { name: '10s ago', coalition: 98.4, alignment: 98.2 },
+    { name: '8s ago', coalition: 98.2, alignment: 98.1 },
+    { name: '6s ago', coalition: 98.5, alignment: 98.3 },
+    { name: '4s ago', coalition: 98.3, alignment: 98.2 },
+    { name: '2s ago', coalition: 98.4, alignment: 98.2 },
+    { name: 'Now', coalition: 98.4, alignment: 98.2 }
   ])
 
   // AI distributions dataset
@@ -98,16 +119,25 @@ export default function AnalyticsPage() {
             Arbitrum: rates['Arbitrum'] || 48.6
           }
         ]
-        return next.slice(-8) // Keep rolling 8
+        return next.slice(-8)
+      })
+
+      // Update Coalition Chart
+      setCoalitionData((prev) => {
+        const next = [
+          ...prev,
+          {
+            name: timeStr,
+            coalition: coalitionScore,
+            alignment: stabilizationAlignment
+          }
+        ]
+        return next.slice(-8)
       })
     }, 4000)
 
     return () => clearInterval(interval)
-  }, [analytics])
-
-  function handleExport() {
-    toast.success('Analytics dataset exported successfully as CSV.')
-  }
+  }, [analytics, coalitionScore, stabilizationAlignment])
 
   return (
     <main className="dashboard-layout" style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 24px' }}>
@@ -116,139 +146,158 @@ export default function AnalyticsPage() {
       <header style={{ width: '100%', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: 16, marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <Link className="gold-text" href="/dashboard" style={{ fontSize: 13, textDecoration: 'none' }}>◀ Back to Dashboard</Link>
+            <Link className="gold-text" href="/dashboard" style={{ fontSize: 13, textDecoration: 'none' }}>◀ Dashboard</Link>
             <span style={{ color: '#666', fontSize: 12 }}>/</span>
-            <span style={{ fontSize: 13, color: '#aaa' }}>Analytics Lab</span>
+            <span style={{ fontSize: 13, color: '#aaa' }}>Predictive Analytics Lab</span>
           </div>
           <h1 style={{ margin: '6px 0 0', fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span>📊</span> Advanced Analytics Lab
+            <span>📈</span> Predictive Analytics & Volatility Lab
           </h1>
         </div>
-        
-        <button 
-          onClick={handleExport}
-          className="btn-gold" 
-          style={{ padding: '8px 16px', fontSize: 12, height: 'auto' }}
-        >
-          📥 Export Dataset
-        </button>
+
+        <div style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 6 }}>
+          <span style={{ fontSize: 10, color: '#888', display: 'block' }}>Operational Resiliency</span>
+          <strong style={{ fontSize: 16, color: '#F5C518' }}>{strategicConfidence}%</strong>
+        </div>
       </header>
 
-      {/* Synchronized operational consensus & drift metrics */}
+      {/* Volatility Overview Panels */}
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12, marginBottom: 24 }}>
         
-        <article className="card">
-          <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>Consensus Index</span>
-          <strong style={{ display: 'block', fontSize: 24, color: '#F5C518', marginTop: 4 }}>{consensusIndex}%</strong>
-          <span style={{ fontSize: 9, color: '#666', display: 'block', marginTop: 6 }}>Sovereign quorum state</span>
+        <article className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>Consensus Trajectory</span>
+            <strong style={{ display: 'block', fontSize: 28, fontWeight: 800, marginTop: 4, color: '#F5C518' }}>
+              {consensusIndex}%
+            </strong>
+          </div>
+          <span style={{ fontSize: 9, color: '#888', marginTop: 10 }}>Continuous RPC voting synchronization rate</span>
         </article>
 
-        <article className="card">
-          <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>Strategic Confidence</span>
-          <strong style={{ display: 'block', fontSize: 24, color: '#F5C518', marginTop: 4 }}>{strategicConfidence}%</strong>
-          <span style={{ fontSize: 9, color: '#666', display: 'block', marginTop: 6 }}>Predictive planning index</span>
+        <article className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>Operational Drift Rate</span>
+            <strong style={{ display: 'block', fontSize: 28, fontWeight: 800, marginTop: 4, color: '#fff' }}>
+              ±{driftIndex}%
+            </strong>
+          </div>
+          <span style={{ fontSize: 9, color: '#888', marginTop: 10 }}>Sinusoidal latency entropy fluctuations</span>
         </article>
 
-        <article className="card">
-          <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>Sinusoidal Drift Rate</span>
-          <strong style={{ display: 'block', fontSize: 24, color: '#fff', marginTop: 4 }}>±{driftIndex}%</strong>
-          <span style={{ fontSize: 9, color: '#666', display: 'block', marginTop: 6 }}>Real-time telemetry waves</span>
+        <article className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>AI Confidence Threshold</span>
+            <strong style={{ display: 'block', fontSize: 28, fontWeight: 800, marginTop: 4, color: '#10B981' }}>
+              {aiConfidence}%
+            </strong>
+          </div>
+          <span style={{ fontSize: 9, color: '#888', marginTop: 10 }}>Cognitive threat scoring accuracy index</span>
         </article>
 
-        <article className="card">
-          <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>AI Confidence Score</span>
-          <strong style={{ display: 'block', fontSize: 24, color: '#10B981', marginTop: 4 }}>{aiConfidence}%</strong>
-          <span style={{ fontSize: 9, color: '#666', display: 'block', marginTop: 6 }}>Heuristic consensus validator</span>
+        <article className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase' }}>Regional Resilience</span>
+            <strong style={{ display: 'block', fontSize: 28, fontWeight: 800, marginTop: 4, color: '#F5C518' }}>
+              {forecasts[0]?.regionalResilience || 99.2}%
+            </strong>
+          </div>
+          <span style={{ fontSize: 9, color: '#888', marginTop: 10 }}>Multi-region RPC failover readiness rate</span>
         </article>
 
       </section>
 
-      {/* Predictive Stability Projections Grid */}
-      <section className="card" style={{ padding: 18, marginBottom: 24 }}>
-        <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700 }}>🔮 Predictive Operational Scenario Projections</h3>
+      {/* PHASE 13 — COALITION STABILITY & DIPLOMATIC VOLATILITY ANALYTICS */}
+      <section className="card" style={{ padding: 18, marginBottom: 24, border: '1px solid rgba(245,197,24,0.3)', background: 'rgba(0,0,0,0.3)' }}>
+        <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700, color: '#F5C518' }}>🏛️ Coalition Stability & Diplomatic Volatility</h3>
         <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-          Deterministic forecasts computed continuously across standard 1-hour, 24-hour, and 7-day trajectories.
+          Visualizes real-time coalition metrics, multi-agent resilience scoring, conflict forecasting, and detailed institutional trust heatmaps.
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-          {forecasts.map((f) => (
-            <div 
-              key={f.timeframe}
-              style={{
-                padding: 14,
-                background: 'rgba(255,255,255,0.01)',
-                border: '1px solid rgba(255,255,255,0.03)',
-                borderRadius: 6
-              }}
-            >
-              <strong style={{ display: 'block', fontSize: 13, color: '#F5C518', marginBottom: 8, textTransform: 'uppercase' }}>{f.timeframe} Forecast</strong>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 11 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#888' }}>Consensus Index:</span>
-                  <strong style={{ color: '#fff' }}>{f.consensusTrajectory}%</strong>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 16 }}>
+          
+          {/* Coalition Stability Trends */}
+          <div style={{ height: 260, background: '#020202', padding: 14, border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6, display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 8 }}>Coalition Stability Trajectory</span>
+            <div style={{ flex: 1, minHeight: 0 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={coalitionData}>
+                  <defs>
+                    <linearGradient id="coalitionGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#F5C518" stopOpacity={0.25}/>
+                      <stop offset="95%" stopColor="#F5C518" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                  <XAxis dataKey="name" stroke="#666" fontSize={9} />
+                  <YAxis stroke="#666" fontSize={9} domain={[30, 100]} />
+                  <Tooltip contentStyle={{ background: '#0a0a0a', border: '1px solid rgba(245,197,24,0.3)', color: '#fff', fontSize: 10 }} />
+                  <Area type="monotone" dataKey="coalition" name="Stability" stroke="#F5C518" fillOpacity={1} fill="url(#coalitionGrad)" />
+                  <Area type="monotone" dataKey="alignment" name="Alignment" stroke="#10B981" fillOpacity={0} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Institutional Trust Heatmap */}
+          <div style={{ background: '#020202', padding: 14, border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 8 }}>Institutional Trust & Diplomacy Matrix</span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+              {diplomaticRelations.slice(0, 9).map((rel, idx) => {
+                const isLow = rel.trustScore < 75
+                return (
+                  <div 
+                    key={idx} 
+                    style={{
+                      padding: 8,
+                      background: isLow ? 'rgba(239,68,68,0.04)' : 'rgba(245,197,24,0.01)',
+                      border: isLow ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(255,255,255,0.02)',
+                      borderRadius: 4,
+                      textAlign: 'center'
+                    }}
+                  >
+                    <span style={{ display: 'block', fontSize: 9, color: '#fff', fontWeight: 'bold' }}>
+                      {rel.fromAgent.split(' ')[0]} ⇄ {rel.toAgent.split(' ')[0]}
+                    </span>
+                    <strong style={{ display: 'block', fontSize: 12, color: isLow ? '#EF4444' : '#F5C518', margin: '4px 0' }}>
+                      {rel.trustScore}% Trust
+                    </strong>
+                    <span style={{ display: 'block', fontSize: 8, color: '#666' }}>Align: {rel.alignmentScore}%</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Conflict Forecasting & Multi-Agent Resilience Scoring */}
+          <div style={{ background: '#020202', padding: 14, border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 8 }}>Agent Conflict Forecasting</span>
+              <div style={{ padding: 10, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6, marginBottom: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+                  <span>Veto Probability Risk:</span>
+                  <strong style={{ color: activeConflict ? '#EF4444' : '#10B981' }}>{activeConflict ? '94.2% (HIGH)' : '4.5% (LOW)'}</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#888' }}>Treasury Stress Index:</span>
-                  <strong style={{ color: '#10B981' }}>{f.treasuryStability}% Stability</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#888' }}>Governance Volatility:</span>
-                  <strong style={{ color: '#EF4444' }}>{f.governanceVolatility}% Volatility</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#888' }}>Regional Resilience:</span>
-                  <strong style={{ color: '#ccc' }}>{f.regionalResilience}%</strong>
+                <div style={{ height: 4, background: '#0a0a0a', borderRadius: 2, marginTop: 4 }}>
+                  <div style={{ width: activeConflict ? '94.2%' : '4.5%', background: activeConflict ? '#EF4444' : '#10B981', height: '100%' }} />
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* Regional Volatility Map Grid */}
-      <section className="card" style={{ padding: 18, marginBottom: 24 }}>
-        <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700 }}>🌍 Regional Volatility & Geo-Latency Map</h3>
-        <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-          Real-time geo-balancing tracking showing active communication backoffs and latency flutters across regions.
-        </p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
-          {regions.map((region) => (
-            <div 
-              key={region.name}
-              style={{
-                padding: 12,
-                background: 'rgba(255,255,255,0.01)',
-                border: '1px solid rgba(255,255,255,0.03)',
-                borderRadius: 6
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong style={{ fontSize: 12, color: '#fff' }}>{region.name}</strong>
-                <span 
-                  style={{ 
-                    fontSize: 8, 
-                    background: region.status === 'outage' ? 'rgba(239,68,68,0.06)' : 'rgba(16,185,129,0.06)', 
-                    color: region.status === 'outage' ? '#EF4444' : '#10B981',
-                    padding: '1px 4px',
-                    borderRadius: 3
-                  }}
-                >
-                  {region.status}
-                </span>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, marginTop: 8 }}>
-                <span style={{ color: '#888' }}>RPC Ping:</span>
-                <strong style={{ color: '#ccc' }}>{region.status === 'outage' ? 'TIMEOUT' : `${region.latency}ms`}</strong>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, marginTop: 4 }}>
-                <span style={{ color: '#888' }}>Drift Volatility:</span>
-                <strong style={{ color: '#999' }}>{(region.latency * 0.05).toFixed(1)}%</strong>
+            <div>
+              <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 4 }}>Multi-Agent Resilience Scoring</span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <div style={{ padding: 8, background: '#050505', borderRadius: 4, border: '1px solid rgba(255,255,255,0.02)' }}>
+                  <span style={{ fontSize: 8, color: '#666', display: 'block' }}>Alignment Gating</span>
+                  <strong style={{ fontSize: 14, color: '#fff' }}>{stabilizationAlignment}%</strong>
+                </div>
+                <div style={{ padding: 8, background: '#050505', borderRadius: 4, border: '1px solid rgba(255,255,255,0.02)' }}>
+                  <span style={{ fontSize: 8, color: '#666', display: 'block' }}>Quorum Negotiation</span>
+                  <strong style={{ fontSize: 14, color: '#F5C518' }}>{negotiationConfidence}%</strong>
+                </div>
               </div>
             </div>
-          ))}
+          </div>
+
         </div>
       </section>
 

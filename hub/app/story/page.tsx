@@ -16,8 +16,6 @@ interface NarrativeSlide {
 export default function StoryPage() {
   const [activeSlideIndex, setActiveSlideIndex] = useState<number>(0)
 
-
-
   const slides: NarrativeSlide[] = [
     {
       id: 'works',
@@ -312,6 +310,76 @@ export default function StoryPage() {
         { label: 'Adjustment Cycle', value: 'Continuous Sine' },
         { label: 'Resilience Score', value: '99.4%' }
       ]
+    },
+    {
+      id: 'civilization-coordination',
+      title: 'The Civilization Coordination Layer',
+      subtitle: 'Transforming sovereign nodes into a civilization-scale multi-agent operational network.',
+      paragraphs: [
+        'The conventional view of blockchain operations limits itself to simple REST queries, retrospective accounting, and singular wallets. As global operations scale, systems demand an infrastructure capable of coordination at the speed of thought.',
+        'Kubryx moves past these constraints by orchestrating a civilization-scale network where autonomous institutional entities coordinate, negotiate, and align statefully.',
+        'Every participant is bound by rigorous, decentralized consensus rules, creating a permanent layer of protocol trust and sovereign operational stability.'
+      ],
+      metrics: [
+        { label: 'Coordinating Agents', value: '6 Sovereign Nodes' },
+        { label: 'Ecosystem Alignment', value: 'Stateful Consensus' }
+      ]
+    },
+    {
+      id: 'autonomous-agents',
+      title: 'Autonomous Institutional Agents',
+      subtitle: 'Decentralizing operational logic across specialized, self-governing agents.',
+      paragraphs: [
+        'Monolithic operational controls are single points of failure. In Kubryx, coordination is delegated to six autonomous institutional agents.',
+        'The Treasury Sovereign governs asset flows, the Governance Chancellor propagates policies, the Infrastructure Sentinel protects regions, and the Ecosystem Diplomat harmonizes protocols.',
+        'Together with the Cognition Oracle and Recovery Director, they coordinate actions in real-time, matching high-throughput execution with complete logical integrity.'
+      ],
+      metrics: [
+        { label: 'Agent Roles', value: 'Specialized Gating' },
+        { label: 'Active Intent Rate', value: 'Continuous Cycle' }
+      ]
+    },
+    {
+      id: 'protocol-diplomacy',
+      title: 'Protocol Diplomacy Systems',
+      subtitle: 'Negotiating asset allocations, consensus weightings, and regional quorums statefully.',
+      paragraphs: [
+        'When network friction occurs, standard protocols fail back to rigid outages or human manual overrides. Kubryx introduces Protocol Diplomacy.',
+        'Agents statefully propose, evaluate, and finalize negotiations on yield sweeps, RPC balancing, and security hardening on a centralized event stream.',
+        'By weighting trust matrices and diplomatic alignments dynamically, the platform resolves inter-agent disputes before they affect core business operations.'
+      ],
+      metrics: [
+        { label: 'Diplomatic Streams', value: 'Real-time Event Bus' },
+        { label: 'Dispute Safety Limit', value: 'Automated Recovery' }
+      ]
+    },
+    {
+      id: 'distributed-cognition',
+      title: 'Distributed Sovereign Cognition',
+      subtitle: 'Enforcing zero-knowledge policy boundaries across parallel multi-agent quorums.',
+      paragraphs: [
+        'Machine-speed optimization without policy gating creates vulnerability. In Kubryx, all agent decisions must align with strict, zero-knowledge constraints.',
+        'The Distributed Cognition Engine continuously evaluates regional anomalies and applies rules to prevent state drifts or unauthorized balance reallocations.',
+        'This Synergizes maximum logical autonomy with absolute operator control, providing premium safety for enterprise digital assets.'
+      ],
+      metrics: [
+        { label: 'Cognition Confidence', value: '98.5% Accuracy' },
+        { label: 'Decision Trace Gating', value: 'ZK Rationale' }
+      ]
+    },
+    {
+      id: 'self-governing-economies',
+      title: 'Self-Governing Operational Economies',
+      subtitle: 'The culmination of the single-product operational operating system.',
+      paragraphs: [
+        'With permanently synchronized global engines, predictive forecasting layers, and a multi-agent civilization mesh, Kubryx completes its vision.',
+        'We have transformed corporate finance from fragmented SaaS widgets into a living, resilient, sovereign operational intelligence network.',
+        'Fully optimized, certified accelerator-ready, and strategically fortified, Kubryx is prepared to govern the decentralized future.'
+      ],
+      metrics: [
+        { label: 'Ecosystem Status', value: 'Post-SaaS Sovereign' },
+        { label: 'Investor Showcase Uptime', value: '100% Certified' }
+      ]
     }
   ]
 
@@ -421,7 +489,7 @@ export default function StoryPage() {
       </section>
 
       {/* Slide Navigation Dots */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20, flexWrap: 'wrap' }}>
         {slides.map((s, idx) => (
           <button
             key={s.id}

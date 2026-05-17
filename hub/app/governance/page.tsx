@@ -6,6 +6,7 @@ import { useSovereignOps, ProposalType } from '../../lib/sovereign-ops'
 import { useOrgContext } from '../../lib/org-context'
 import { useGlobalOperations } from '../../lib/global-operations-engine'
 import { useStrategicIntelligence } from '../../lib/strategic-intelligence-engine'
+import { useCivilizationOrchestration } from '../../lib/civilization-orchestration-engine'
 import ExecutiveWalkthrough from '../components/ExecutiveWalkthrough'
 import CommandPalette from '../components/CommandPalette'
 
@@ -18,6 +19,22 @@ export default function GovernancePage() {
 
   // Sync to Strategic Intelligence layer
   const { forecasts } = useStrategicIntelligence()
+
+  // Sync to Civilization Orchestration layer
+  const {
+    agents,
+    negotiations,
+    coalitionScore,
+    negotiationConfidence,
+    stabilizationAlignment,
+    activeConflict,
+    triggerInstability,
+    simulateDeadlock,
+    initiateNegotiation,
+    replayCrisis,
+    stabilizeTrust,
+    restoreEquilibrium
+  } = useCivilizationOrchestration()
 
   // Form State
   const [propTitle, setPropTitle] = useState('')
@@ -119,7 +136,7 @@ export default function GovernancePage() {
         <article className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Consensus Stability</span>
-            <strong style={{ display: 'block', fontSize: 28, fontWeight: 800, marginTop: 4, color: consensusStability > 80 ? '#10B981' : '#EF4444' }}>
+            <strong style={{ display: 'block', fontSize: 28, fontWeight: 800, color: consensusStability > 80 ? '#10B981' : '#EF4444', marginTop: 4 }}>
               {consensusStability}%
             </strong>
           </div>
@@ -136,6 +153,87 @@ export default function GovernancePage() {
           <span style={{ fontSize: 9, color: '#888', marginTop: 10 }}>Decentralized Multi-Sig quorum health</span>
         </article>
 
+      </section>
+
+      {/* PHASE 13 — COALITION GOVERNANCE SIMULATION & DISPUTE MONITOR */}
+      <section className="card" style={{ padding: 18, marginBottom: 24, border: '1px solid rgba(245,197,24,0.3)', background: 'rgba(0,0,0,0.3)' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: 10, marginBottom: 14 }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#F5C518' }}>🏛️ Multi-Agent Coalition Governance Simulation</h3>
+            <p style={{ margin: '2px 0 0', fontSize: 12, color: '#aaa' }}>
+              Simulate legislative partitions, vote influence scaling, and diplomatic dispute resolution statefully.
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button onClick={simulateDeadlock} className="btn-outline" style={{ padding: '4px 10px', fontSize: 9, color: '#EF4444', borderColor: 'rgba(239,68,68,0.2)' }}>💥 Deadlock Crisis</button>
+            <button onClick={triggerInstability} className="btn-outline" style={{ padding: '4px 10px', fontSize: 9, color: '#EF4444', borderColor: 'rgba(239,68,68,0.2)' }}>⚡ Trigger Drift</button>
+            <button onClick={stabilizeTrust} className="btn-outline" style={{ padding: '4px 10px', fontSize: 9, color: '#10B981', borderColor: 'rgba(16,185,129,0.2)' }}>🛡️ Realign Coalition</button>
+            <button onClick={restoreEquilibrium} className="btn-gold" style={{ padding: '4px 10px', fontSize: 9 }}>🔄 Reset Baseline</button>
+          </div>
+        </header>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+          
+          {/* Institutional Negotiation Chains */}
+          <div style={{ background: '#020202', padding: 14, border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 8 }}>Institutional Negotiation Chains</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 180, overflowY: 'auto' }}>
+              {negotiations.map((neg) => (
+                <div key={neg.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)', paddingBottom: 6 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+                    <strong style={{ color: '#fff' }}>{neg.topic}</strong>
+                    <span style={{ fontSize: 9, color: '#F5C518', fontWeight: 'bold' }}>{neg.status}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 8, color: '#666', marginTop: 4 }}>
+                    <span>Proposer: {neg.proposer} ⇄ Responder: {neg.responder}</span>
+                    <span>Consensus target: {neg.currentAlignment}%/{neg.consensusRequired}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Policy Diplomacy Weighting */}
+          <div style={{ background: '#020202', padding: 14, border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 8 }}>Sovereign Influence Propagation</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {agents.slice(0, 4).map((agent) => (
+                <div key={agent.id} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                    <span style={{ color: '#fff' }}>{agent.name} Weight</span>
+                    <strong style={{ color: '#F5C518' }}>{agent.influenceRate}% Influence</strong>
+                  </div>
+                  <div style={{ height: 4, background: '#0a0a0a', borderRadius: 2 }}>
+                    <div style={{ width: `${agent.influenceRate}%`, background: agent.status === 'active_dispute' ? '#EF4444' : '#F5C518', height: '100%' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Multi-Agent Quorum Forecasting */}
+          <div style={{ background: '#020202', padding: 14, border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
+            <span style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 8 }}>Multi-Agent Quorum Forecasting</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 11 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#aaa' }}>Coalition Quorum Safety Rate:</span>
+                <strong style={{ color: coalitionScore > 70 ? '#10B981' : '#EF4444' }}>{coalitionScore}%</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#aaa' }}>Veto Volatility Danger:</span>
+                <strong style={{ color: activeConflict ? '#EF4444' : '#10B981' }}>{activeConflict ? 'HIGH (Disputed)' : 'LOW (Stabilized)'}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#aaa' }}>Negotiation Compliance Gating:</span>
+                <strong style={{ color: '#fff' }}>{negotiationConfidence}% Confidence</strong>
+              </div>
+              <span style={{ display: 'block', fontSize: 8, color: '#666', marginTop: 4, fontStyle: 'italic' }}>
+                *Quorums re-calculate at 4000ms intervals based on inter-agent telemetry bus state.
+              </span>
+            </div>
+          </div>
+
+        </div>
       </section>
 
       {/* Quorum Probability Forecasts Checklist Section */}
@@ -205,7 +303,7 @@ export default function GovernancePage() {
 
           <div style={{ padding: 12, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-              <strong style={{ color: '#fff' }}>Tokyo (ap-northeast-1)</strong>
+              <strong style={{ color: '#fff' }}>Virginia (us-east-1)</strong>
               <span style={{ color: '#F5C518' }}>20% Weight</span>
             </div>
             <div style={{ height: 4, background: '#0a0a0a', borderRadius: 2, marginTop: 6 }}>
@@ -215,7 +313,7 @@ export default function GovernancePage() {
 
           <div style={{ padding: 12, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-              <strong style={{ color: '#fff' }}>Virginia (us-east-1)</strong>
+              <strong style={{ color: '#fff' }}>Tokyo (ap-northeast-1)</strong>
               <span style={{ color: '#F5C518' }}>15% Weight</span>
             </div>
             <div style={{ height: 4, background: '#0a0a0a', borderRadius: 2, marginTop: 6 }}>
@@ -225,7 +323,7 @@ export default function GovernancePage() {
 
           <div style={{ padding: 12, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 6 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-              <strong style={{ color: '#fff' }}>Mumbai (ap-south-1)</strong>
+              <strong style={{ color: '#fff' }}>Sydney (ap-southeast-2)</strong>
               <span style={{ color: '#F5C518' }}>10% Weight</span>
             </div>
             <div style={{ height: 4, background: '#0a0a0a', borderRadius: 2, marginTop: 6 }}>
@@ -278,65 +376,53 @@ export default function GovernancePage() {
                         </div>
 
                         <div style={{ display: 'flex', gap: 6 }}>
-                          <button
+                          <button 
                             onClick={() => handleVote(prop.id, true)}
-                            className="btn-gold"
-                            style={{ padding: '4px 10px', fontSize: 11, height: 'auto' }}
+                            className="btn-gold" 
+                            style={{ padding: '4px 10px', fontSize: 10, height: 'auto' }}
+                            disabled={prop.status !== 'voting'}
                           >
-                            Vote For
+                            👍 Approve
                           </button>
-                          <button
+                          <button 
                             onClick={() => handleVote(prop.id, false)}
-                            className="btn-outline"
-                            style={{ padding: '4px 10px', fontSize: 11, height: 'auto' }}
+                            className="btn-outline" 
+                            style={{ padding: '4px 10px', fontSize: 10, height: 'auto' }}
+                            disabled={prop.status !== 'voting'}
                           >
-                            Vote Against
+                            👎 Reject
                           </button>
-                          <button
+                          <button 
                             onClick={() => handleSimulate(prop.id)}
-                            className="btn-outline"
-                            style={{ padding: '4px 10px', fontSize: 11, height: 'auto', color: '#F5C518', borderColor: 'rgba(245,197,24,0.3)' }}
+                            className="btn-outline" 
+                            style={{ padding: '4px 10px', fontSize: 10, height: 'auto', borderColor: 'rgba(245,197,24,0.3)', color: '#F5C518' }}
+                            disabled={prop.status !== 'voting'}
                           >
-                            ⚡ Fast-Forward
+                            ⚡ Fast-Forward Quorum
                           </button>
                         </div>
                       </div>
 
-                      <p style={{ margin: '0 0 12px', fontSize: 12, color: '#ccc', lineHeight: 1.4 }}>{prop.description}</p>
+                      <p style={{ margin: '8px 0', fontSize: 12, color: '#ccc', lineHeight: 1.4 }}>{prop.description}</p>
                       
-                      {/* Strategic Recommendation Analyst Box */}
-                      <div style={{ padding: 10, background: 'rgba(245,197,24,0.03)', border: '1px solid rgba(245,197,24,0.15)', borderRadius: 6, margin: '8px 0', fontSize: 10 }}>
-                        <span style={{ display: 'block', color: '#F5C518', fontWeight: 'bold', textTransform: 'uppercase', fontSize: 9 }}>🤖 AI Strategic Proposal Assessment</span>
-                        <p style={{ margin: '4px 0 0', color: '#ccc' }}>
-                          Stabilization Gain: <strong style={{ color: '#fff' }}>+6.8% Global Consensus gain</strong>. Affected nodes: Validator Quorums. Estimated Quorum Probability: 95.4%.
-                        </p>
+                      <div style={{ fontSize: 10, color: '#888', fontStyle: 'italic', marginBottom: 12 }}>
+                        Rationale: {prop.rationale}
                       </div>
 
-                      {/* Voting progress bar */}
-                      <div style={{ margin: '12px 0 8px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#aaa', marginBottom: 4 }}>
-                          <span>Votes FOR: {prop.votesFor.toLocaleString()} ({forPercent.toFixed(1)}%)</span>
-                          <span>Quorum: {totalVotes.toLocaleString()} / {prop.quorumRequired.toLocaleString()}</span>
+                      {/* Vote progress indicators */}
+                      <div style={{ background: '#040404', borderRadius: 6, padding: '8px 12px', border: '1px solid rgba(255,255,255,0.02)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, marginBottom: 4 }}>
+                          <span>Ballots Cast: <strong style={{ color: '#fff' }}>{totalVotes} ballots</strong></span>
+                          <span>Outcome: <strong style={{ color: forPercent >= 60 ? '#10B981' : '#EF4444' }}>{forPercent.toFixed(1)}% Support</strong></span>
                         </div>
-                        <div style={{ height: 6, background: '#0a0a0a', borderRadius: 3, overflow: 'hidden', display: 'flex' }}>
+                        <div style={{ height: 4, background: '#0a0a0a', borderRadius: 2, overflow: 'hidden' }}>
                           <div style={{ width: `${forPercent}%`, background: '#F5C518', height: '100%' }} />
-                          <div style={{ width: `${100 - forPercent}%`, background: 'rgba(255,255,255,0.05)', height: '100%' }} />
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 8, color: '#666', marginTop: 4 }}>
+                          <span>YEA: {prop.votesFor} • NAY: {prop.votesAgainst}</span>
+                          <span>Quorum required: 60%</span>
                         </div>
                       </div>
-
-                      {/* Rationale & Lineage */}
-                      <div style={{ padding: '8px 12px', background: '#040404', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 6, fontSize: 10, marginTop: 10 }}>
-                        <strong style={{ color: '#888', textTransform: 'uppercase', fontSize: 9 }}>ZK Policy Rationale</strong>
-                        <p style={{ margin: '2px 0 8px', color: '#aaa' }}>{prop.rationale}</p>
-                        
-                        <strong style={{ color: '#888', textTransform: 'uppercase', fontSize: 9, display: 'block', marginBottom: 4 }}>Decision Lineage</strong>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 3, color: '#666', fontFamily: 'monospace' }}>
-                          {prop.decisionLineage.map((step, idx) => (
-                            <span key={idx}>✔ {step}</span>
-                          ))}
-                        </div>
-                      </div>
-
                     </div>
                   )
                 })
@@ -346,16 +432,42 @@ export default function GovernancePage() {
 
         </div>
 
-        {/* Right Side: Propose form and Historical Governance Audit Logs */}
+        {/* Right Side: Historical proposals & telemetry */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           
+          {/* Active Workspaces Info */}
           <article className="card" style={{ padding: 18 }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>🔍 Governance History & Audits</h3>
+            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>🏢 Active Organizational Gating</h3>
             <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
-              Historical records of passed and executed corporate policy triggers.
+              Current secure multi-user context designated for governance checks.
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ background: '#020202', padding: 12, borderRadius: 6, border: '1px solid rgba(255,255,255,0.03)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 6 }}>
+                <span style={{ color: '#888' }}>Active Organization:</span>
+                <strong style={{ color: '#F5C518' }}>{activeOrg?.name || 'Sovereign Network'}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 6 }}>
+                <span style={{ color: '#888' }}>Workspace Zone:</span>
+                <strong style={{ color: '#fff' }}>{activeWorkspace?.name || 'Main Zone'}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+                <span style={{ color: '#888' }}>Vault Key:</span>
+                <strong style={{ color: '#aaa', fontFamily: 'monospace' }}>
+                  {activeWorkspace ? `0x${activeWorkspace.id.replace('ws-', '').slice(0, 6)}...${activeWorkspace.id.slice(-4)}` : '0x71b9...f2d4'}
+                </strong>
+              </div>
+            </div>
+          </article>
+
+          {/* Historical proposals list */}
+          <article className="card" style={{ padding: 18 }}>
+            <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>💾 Historical Policy Archive</h3>
+            <p style={{ margin: '0 0 16px', fontSize: 12, color: '#888' }}>
+              Historic policy checkpoints archived under the global sovereign consensus layer.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 300, overflowY: 'auto' }}>
               {historicalProposals.map((prop) => (
                 <div 
                   key={prop.id}
@@ -363,28 +475,26 @@ export default function GovernancePage() {
                     padding: 12,
                     background: 'rgba(255,255,255,0.01)',
                     border: '1px solid rgba(255,255,255,0.03)',
-                    borderRadius: 6,
-                    fontSize: 11
+                    borderRadius: 6
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <strong style={{ color: '#fff' }}>KIP {prop.id.split('-')[1]}</strong>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
+                    <strong style={{ color: '#fff' }}>{prop.title}</strong>
                     <span 
                       style={{ 
                         fontSize: 8, 
-                        background: prop.status === 'executed' ? 'rgba(16,185,129,0.06)' : 'rgba(245,197,24,0.06)', 
-                        color: prop.status === 'executed' ? '#10B981' : '#F5C518', 
+                        fontWeight: 'bold', 
                         padding: '1px 5px', 
-                        borderRadius: 4,
-                        fontWeight: 'bold',
+                        borderRadius: 3,
+                        background: prop.status === 'passed' || prop.status === 'executed' ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
+                        color: prop.status === 'passed' || prop.status === 'executed' ? '#10B981' : '#EF4444',
                         textTransform: 'uppercase'
                       }}
                     >
                       {prop.status}
                     </span>
                   </div>
-                  <span style={{ display: 'block', color: '#aaa', fontSize: 11 }}>{prop.title}</span>
-                  <span style={{ display: 'block', fontSize: 9, color: '#555', marginTop: 4 }}>Executed on {new Date(prop.timestamp).toLocaleDateString()}</span>
+                  <p style={{ margin: 0, fontSize: 10, color: '#888' }}>{prop.description}</p>
                 </div>
               ))}
             </div>
@@ -394,7 +504,7 @@ export default function GovernancePage() {
 
       </section>
 
-      {/* Submit Proposal Modal overlay */}
+      {/* Submit Proposal Modal */}
       {showCreateModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
           <div className="card" style={{ width: '90%', maxWidth: 500, padding: 24, border: '1px solid rgba(245,197,24,0.4)' }}>

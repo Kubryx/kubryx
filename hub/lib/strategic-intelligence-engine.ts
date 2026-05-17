@@ -233,11 +233,16 @@ export function useStrategicIntelligence() {
         // Evaluate strategic confidence
         const strategicConfidence = Math.max(40, parseFloat((98.5 - outages.length * 15.0 + Math.sin(Date.now() / 12000) * 1.0).toFixed(1)))
 
+        // Hydrate persistent epochs safely
+        const savedEpochs = localStorage.getItem('kubryx_strategic_intelligence_epochs')
+        const epochs = savedEpochs ? JSON.parse(savedEpochs) : [...DEFAULT_EPOCHS]
+
         setState(prev => ({
           ...prev,
           recommendations: recs,
           forecasts: fc,
           activeMitigationPlan: plan,
+          memoryEpochs: epochs,
           strategicConfidence
         }))
       } catch {
@@ -278,6 +283,9 @@ export function useStrategicIntelligence() {
 
     setState(prev => {
       const nextEpochs = [newEpoch, ...prev.memoryEpochs]
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('kubryx_strategic_intelligence_epochs', JSON.stringify(nextEpochs))
+      }
       recordOSEvent('Strategic Intelligence', `Archived strategic learning epoch: "${summary}"`, 'Strategic Memory')
       return {
         ...prev,

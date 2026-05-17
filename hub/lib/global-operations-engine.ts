@@ -15,6 +15,13 @@ export type KubryxEventType =
   | 'kubryx_policy_update'
   | 'kubryx_cognition_signal'
   | 'kubryx_protocol_sync'
+  | 'kubryx_agent_negotiation'
+  | 'kubryx_agent_conflict'
+  | 'kubryx_coalition_update'
+  | 'kubryx_diplomatic_shift'
+  | 'kubryx_recovery_alignment'
+  | 'kubryx_institutional_alert'
+  | 'kubryx_sovereign_recommendation'
 
 export interface OperationalEvent {
   id: string

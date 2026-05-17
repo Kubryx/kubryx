@@ -5,6 +5,14 @@ import { useRouter } from 'next/navigation'
 import { useCrossToolIntelligence, updateIntelligenceState } from '../../lib/cross-tool-intelligence'
 import { clearTelemetryErrors } from '../../lib/telemetry'
 import { toast } from '../../lib/toast'
+import {
+  triggerCoalitionInstability,
+  simulateGovernanceDeadlock,
+  initiateSovereignNegotiation,
+  replayDiplomaticCrisis,
+  stabilizeInstitutionalTrust,
+  restoreCoalitionEquilibrium
+} from '../../lib/civilization-orchestration-engine'
 
 interface CommandItem {
   id: string
@@ -248,6 +256,60 @@ export default function CommandPalette() {
           window.dispatchEvent(new Event('kubryx_fabric_update'))
           toast.success('Global operational equilibrium successfully secured!')
         }
+      }
+    },
+    {
+      id: 'civ-instability',
+      title: 'trigger coalition instability',
+      subtitle: 'Simulate a diplomatic dispute that degrades the coalition stability rate',
+      category: 'Actions',
+      action: () => {
+        triggerCoalitionInstability()
+      }
+    },
+    {
+      id: 'civ-deadlock',
+      title: 'simulate governance deadlock',
+      subtitle: 'Veto automated APY sweeps to trigger legislative deadlocks',
+      category: 'Actions',
+      action: () => {
+        simulateGovernanceDeadlock()
+      }
+    },
+    {
+      id: 'civ-negotiate',
+      title: 'initiate sovereign negotiation',
+      subtitle: 'Dispatch a pending proposal to optimize NCRD staking yields',
+      category: 'Actions',
+      action: () => {
+        initiateSovereignNegotiation()
+      }
+    },
+    {
+      id: 'civ-crisis',
+      title: 'replay diplomatic crisis',
+      subtitle: 'Degrade inter-agent trust parameters statefully to replay a crisis',
+      category: 'Actions',
+      action: () => {
+        replayDiplomaticCrisis()
+      }
+    },
+    {
+      id: 'civ-stabilize',
+      title: 'stabilize institutional trust',
+      subtitle: 'Realign all disputed agents and restore nominal diplomatic scores',
+      category: 'Actions',
+      action: () => {
+        stabilizeInstitutionalTrust()
+      }
+    },
+    {
+      id: 'civ-equilibrium',
+      title: 'restore coalition equilibrium',
+      subtitle: 'Re-sync all autonomous agents back to nominal baseline equilibrium',
+      category: 'Actions',
+      action: () => {
+        restoreCoalitionEquilibrium()
       }
     }
   ]
