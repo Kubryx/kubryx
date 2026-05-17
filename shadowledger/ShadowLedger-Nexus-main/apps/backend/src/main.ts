@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { TrpcRouter } from './trpc/trpc.router';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
@@ -12,9 +13,13 @@ async function bootstrap() {
     console.warn('⚠️  OPENAI_API_KEY not set — AI orchestration features will be degraded.');
   }
 
-  const app = await NestFactory.create(AppModule, {
-    logger: new NexusLogger(),
-  });
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+    new ExpressAdapter(),
+    {
+      logger: new NexusLogger(),
+    },
+  );
   app.useGlobalFilters(new AllExceptionsFilter());
   app.use(helmet());
   app.use(compression());

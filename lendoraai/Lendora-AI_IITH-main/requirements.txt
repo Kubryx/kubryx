@@ -25,5 +25,3 @@ pydantic>=2.5.0
 
 # Requests for API calls (Oracle, general HTTP)
 requests>=2.31.0
-
-langtrace-python-sdk==3.8.9
