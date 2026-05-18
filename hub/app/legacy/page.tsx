@@ -1,293 +1,378 @@
 'use client'
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react'
-import { fallbackVaults } from '../../lib/fallback'
+import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
+import {
+  isMetaMaskInstalled,
+  truncateAddress,
+  switchToQIE,
+  loadWallet,
+  persistWallet,
+  clearWallet,
+  WALLET_INSTALL_LINKS,
+  QIE_MAINNET,
+} from '../../lib/wallet-utils'
 import { toast } from '../../lib/toast'
-import { loadWallet, persistWallet } from '../../lib/wallet-utils'
-import { getExplorerUrl } from '../../lib/explorer'
-import DemoBanner from '../components/DemoBanner'
-import { SkeletonRow } from '../components/Skeleton'
-import EmptyState from '../components/EmptyState'
-import CopyButton from '../components/CopyButton'
-import ExecutiveWalkthrough from '../components/ExecutiveWalkthrough'
-import CommandPalette from '../components/CommandPalette'
 
-type EthereumProvider = {
-  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>
+// ─── Style helpers ────────────────────────────────────────────
+const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif'
+
+const card: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.04)',
+  border: '1px solid rgba(245,197,24,0.1)',
+  borderRadius: 14,
+  padding: '20px 22px',
 }
 
-declare global {
-  interface Window {
-    ethereum?: EthereumProvider
-  }
+const btnGold: React.CSSProperties = {
+  background: 'linear-gradient(135deg, #D97706, #F5C518)',
+  color: '#0d0e11',
+  border: 'none',
+  borderRadius: 30,
+  padding: '12px 28px',
+  fontSize: 15,
+  fontWeight: 700,
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
+  textDecoration: 'none',
 }
 
-type Vault = {
-  id?: string
-  vaultId?: string
-  heir?: string
-  owner?: string
-  unlockDate?: string
-  status?: 'locked' | 'unlocked' | 'claimed' | string
-  fileName?: string
-  createdAt?: string
+const btnOutline: React.CSSProperties = {
+  background: 'transparent',
+  color: '#F5C518',
+  border: '1px solid rgba(245,197,24,0.4)',
+  borderRadius: 30,
+  padding: '11px 28px',
+  fontSize: 15,
+  fontWeight: 600,
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
+  textDecoration: 'none',
 }
 
-const QIE_MAINNET = {
-  chainId: '0x7C6',
-  chainName: 'QIE Mainnet',
-  rpcUrls: ['https://rpc.qie.digital'],
-  nativeCurrency: { name: 'QIE', symbol: 'QIE', decimals: 18 },
-  blockExplorerUrls: ['https://mainnet.qie.digital'],
+const btnDark: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.06)',
+  color: 'rgba(255,255,255,0.8)',
+  border: '1px solid rgba(255,255,255,0.15)',
+  borderRadius: 30,
+  padding: '11px 28px',
+  fontSize: 15,
+  fontWeight: 600,
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
 }
 
-const apiBase = process.env.NEXT_PUBLIC_ETERNALVAULT_URL || process.env.NEXT_PUBLIC_ETERNALVAULT_API || ''
-
-function shortAddress(address: string) {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`
-}
-
-function ChainBadge() {
-  return (
-    <span className="chain-badge">
-      <span className="chain-dot" />
-      QIE Mainnet
-    </span>
-  )
-}
-
-export default function LegacyPage() {
+export default function LegacyLandingPage() {
   const [wallet, setWallet] = useState('')
-  const [heir, setHeir] = useState('')
-  const [unlockDate, setUnlockDate] = useState('')
-  const [unlockCondition, setUnlockCondition] = useState('date')
-  const [file, setFile] = useState<File | null>(null)
-  const [vaults, setVaults] = useState<Vault[]>([])
-  const [health, setHealth] = useState<'checking' | 'ok' | 'down'>('checking')
-  const [loading, setLoading] = useState(false)
-  const [isDemo, setIsDemo] = useState(false)
   const [error, setError] = useState('')
-  const [message, setMessage] = useState('')
 
-  const hasApi = useMemo(() => Boolean(apiBase), [])
+  const installed = useMemo(() => (typeof window === 'undefined' ? true : isMetaMaskInstalled()), [])
 
   useEffect(() => {
     const saved = loadWallet('evm')
     if (saved) setWallet(saved)
   }, [])
 
-  async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {
-    if (!apiBase) throw new Error('NEXT_PUBLIC_ETERNALVAULT_API is not configured.')
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 10000)
+  async function connect() {
+    setError('')
     try {
-      const response = await fetch(`${apiBase}${path}`, {
-        ...options,
-        signal: controller.signal,
-        headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) },
-      })
-      if (!response.ok) throw new Error(`Request failed: ${response.status}`)
-      return await response.json() as Promise<T>
-    } finally {
-      clearTimeout(timeout)
-    }
-  }
-
-  async function connectWallet() {
-    try {
-      setError('')
-      if (!window.ethereum) throw new Error('MetaMask is not installed.')
-      await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [QIE_MAINNET] })
-      const accounts = (await window.ethereum.request({ method: 'eth_requestAccounts' })) as string[]
+      if (!isMetaMaskInstalled()) throw new Error('MetaMask is not installed.')
+      await switchToQIE()
+      const accounts = (await (window as any).ethereum.request({ method: 'eth_requestAccounts' })) as string[]
       const address = accounts[0] || ''
       setWallet(address)
       persistWallet('evm', address)
-      toast.success('MetaMask connected')
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unable to connect MetaMask.'
+      toast.success('Connected to QIE Mainnet')
+    } catch (err: any) {
+      const msg = err?.message || 'Unable to connect.'
       setError(msg)
       toast.error(msg)
     }
   }
 
-  async function loadVaults(address: string) {
-    try {
-      setLoading(true)
-      setError('')
-      const data = await requestJson<Vault[] | { vaults?: Vault[] }>(`/api/vaults/${address}`)
-      setVaults(Array.isArray(data) ? data : data.vaults || [])
-      setIsDemo(false)
-    } catch {
-      setVaults(fallbackVaults as unknown as Vault[])
-      setIsDemo(true)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function encryptFile(selected: File) {
-    const bytes = await selected.arrayBuffer()
-    const key = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt'])
-    const iv = crypto.getRandomValues(new Uint8Array(12))
-    const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, bytes)
-    const rawKey = await crypto.subtle.exportKey('raw', key)
-    return {
-      name: selected.name,
-      type: selected.type,
-      size: selected.size,
-      iv: Array.from(iv),
-      key: btoa(String.fromCharCode(...new Uint8Array(rawKey))),
-      ciphertext: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
-    }
-  }
-
-  async function createVault(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    try {
-      setLoading(true)
-      setError('')
-      setMessage('')
-      if (!wallet) throw new Error('Connect MetaMask before creating a vault.')
-      if (!file) throw new Error('Choose a file to encrypt.')
-      if (!heir) throw new Error('Enter an heir wallet address.')
-      const encryptedFile = await encryptFile(file)
-      await requestJson('/api/vaults/create', {
-        method: 'POST',
-        body: JSON.stringify({ owner: wallet, heir, file: encryptedFile, unlockDate, unlockCondition }),
-      })
-      setMessage('Encrypted vault created.')
-      toast.success('Vault created on QIE Mainnet')
-      setFile(null)
-      await loadVaults(wallet)
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unable to create vault.'
-      setError(msg)
-      toast.error(msg)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function claimVault(vault: Vault) {
-    try {
-      setLoading(true)
-      setError('')
-      await requestJson('/api/vaults/claim', {
-        method: 'POST',
-        body: JSON.stringify({ vaultId: vault.id || vault.vaultId, heir: wallet }),
-      })
-      setMessage('Claim submitted.')
-      toast.success('Vault claim submitted')
-      await loadVaults(wallet)
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unable to claim vault.'
-      setError(msg)
-      toast.error(msg)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    async function checkHealth() {
-      try {
-        if (!apiBase) throw new Error('Missing API')
-        const data = await requestJson<{ status?: string }>('/health')
-        setHealth(data.status === 'ok' ? 'ok' : 'down')
-      } catch {
-        setHealth('down')
-      }
-    }
-    checkHealth()
-  }, [])
-
-  useEffect(() => {
-    if (wallet) loadVaults(wallet)
-  }, [wallet])
-
-  function onFileChange(event: ChangeEvent<HTMLInputElement>) {
-    setFile(event.target.files?.[0] || null)
+  function disconnect() {
+    setWallet('')
+    clearWallet('evm')
+    toast.success('Wallet disconnected')
   }
 
   return (
-    <main className="dashboard-page">
-      <section className="dashboard-hero" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
-        <div>
-          <p className="eyebrow">EternalVault</p>
-          <h1>Legacy Vault</h1>
-          <p className="silver-text">Encrypt inheritance files in-browser, assign heirs, and monitor QIE unlock status.</p>
-          
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 12 }}>
-            <span style={{ fontSize: 10, background: isDemo ? 'rgba(255, 255, 255, 0.03)' : 'rgba(34, 197, 94, 0.05)', border: isDemo ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(34, 197, 94, 0.3)', color: isDemo ? '#bbb' : '#22C55E', padding: '4px 10px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: isDemo ? '#bbb' : '#22C55E' }} />
-              {isDemo ? 'Demo Mode' : 'Live Connection'}
-            </span>
-            <span style={{ fontSize: 10, background: 'rgba(245, 197, 24, 0.05)', border: '1px solid rgba(245, 197, 24, 0.25)', color: '#F5C518', padding: '4px 10px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#F5C518' }} />
-              Connected to QIE Mainnet
-            </span>
-          </div>
+    <main style={{ padding: '0' }}>
+      {/* ── Hero ── */}
+      <section
+        style={{
+          minHeight: '75vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          padding: '80px 24px 60px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Background glow */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '30%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 600,
+            height: 400,
+            background: 'radial-gradient(ellipse, rgba(217,119,6,0.12) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Status badges */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 32, flexWrap: 'wrap', justifyContent: 'center', position: 'relative' }}>
+          <span
+            style={{
+              fontSize: 11,
+              padding: '4px 12px',
+              borderRadius: 20,
+              background: 'rgba(34,197,94,0.08)',
+              border: '1px solid rgba(34,197,94,0.3)',
+              color: '#22C55E',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              fontWeight: 600,
+            }}
+          >
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', boxShadow: '0 0 6px rgba(34,197,94,0.6)' }} />
+            QIE Mainnet enabled
+          </span>
+          <span
+            style={{
+              fontSize: 11,
+              padding: '4px 12px',
+              borderRadius: 20,
+              background: 'rgba(59,130,246,0.08)',
+              border: '1px solid rgba(59,130,246,0.3)',
+              color: '#60A5FA',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              fontWeight: 600,
+            }}
+          >
+            🔒 Encryption: AES-GCM-256
+          </span>
         </div>
-        <div className="hero-actions" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <ChainBadge />
-          <span className={`health-badge ${health === 'ok' ? 'is-live' : 'is-down'}`}><span className="chain-dot" />{health === 'ok' ? 'Healthy' : health === 'checking' ? 'Checking' : 'Offline'}</span>
-          <button className="btn-gold" onClick={connectWallet} aria-label={wallet ? `Connected as ${shortAddress(wallet)}` : 'Connect MetaMask Wallet'}>{wallet ? shortAddress(wallet) : 'Connect MetaMask'}</button>
+
+        {/* Heading */}
+        <h1
+          style={{
+            fontFamily: SERIF,
+            fontSize: 'clamp(28px, 5vw, 52px)',
+            fontWeight: 900,
+            lineHeight: 1.15,
+            maxWidth: 780,
+            margin: '0 0 20px',
+            background: 'linear-gradient(135deg, #F5C518 20%, #FDE68A 60%, #F5C518 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            position: 'relative',
+          }}
+        >
+          EternaVault – Where Identity Meets Eternity
+        </h1>
+
+        <p
+          style={{
+            fontSize: 17,
+            color: 'rgba(255,255,255,0.65)',
+            maxWidth: 620,
+            lineHeight: 1.65,
+            margin: '0 0 16px',
+            position: 'relative',
+          }}
+        >
+          Encrypt your memories client-side, anchor them on QIE Mainnet, and empower your heirs to access them only when the time is right.
+        </p>
+        <p
+          style={{
+            fontSize: 14,
+            color: 'rgba(255,255,255,0.35)',
+            maxWidth: 540,
+            lineHeight: 1.6,
+            margin: '0 0 40px',
+            position: 'relative',
+          }}
+        >
+          Your memories are encrypted in your browser before ever leaving your device. Only your heirs can decrypt them when the time is right.
+        </p>
+
+        {/* CTA buttons */}
+        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 20, position: 'relative' }}>
+          <Link href="/legacy/upload" style={btnGold}>
+            📁 Upload Memories
+          </Link>
+          <Link href="/legacy/heir" style={btnOutline}>
+            🔐 Heir Dashboard
+          </Link>
+        </div>
+
+        <div style={{ position: 'relative' }}>
+          {wallet ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
+              <span
+                style={{
+                  fontFamily: 'monospace',
+                  fontSize: 13,
+                  color: 'rgba(255,255,255,0.6)',
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: 20,
+                  padding: '8px 16px',
+                }}
+              >
+                {truncateAddress(wallet)} · {QIE_MAINNET.chainName}
+              </span>
+              <button
+                onClick={disconnect}
+                style={{ ...btnDark, padding: '8px 16px', fontSize: 12 }}
+              >
+                Disconnect
+              </button>
+            </div>
+          ) : (
+            <button onClick={connect} style={btnDark}>
+              🔗 Connect Wallet
+            </button>
+          )}
+          {error && (
+            <p style={{ color: '#F87171', fontSize: 13, marginTop: 8, textAlign: 'center' }}>{error}</p>
+          )}
+          {!installed && (
+            <a
+              href={WALLET_INSTALL_LINKS.metamask}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ ...btnDark, marginTop: 8, fontSize: 13 }}
+            >
+              Install MetaMask
+            </a>
+          )}
         </div>
       </section>
 
-      {isDemo && <DemoBanner />}
-      {error && <div className="card error-card">{error}</div>}
-      {message && <div className="card success-card">{message}</div>}
-      {!wallet && <div className="card">Connect MetaMask to create encrypted vaults and see heir claims.</div>}
-
-      <section className="dashboard-grid">
-        <form className="card form-panel" onSubmit={createVault}>
-          <h2>Create encrypted vault</h2>
-          <label>Encrypted file</label>
-          <input type="file" onChange={onFileChange} />
-          <label>Heir wallet</label>
-          <input value={heir} onChange={(event) => setHeir(event.target.value)} placeholder="0x..." />
-          <label>Unlock condition</label>
-          <select value={unlockCondition} onChange={(event) => setUnlockCondition(event.target.value)}>
-            <option value="date">Date based</option>
-            <option value="validator">Validator attestation</option>
-          </select>
-          <label>Unlock date</label>
-          <input type="date" value={unlockDate} onChange={(event) => setUnlockDate(event.target.value)} />
-          <button className="btn-gold" disabled={loading || !wallet}>{loading ? <span className="spinner" /> : 'Create vault'}</button>
-        </form>
-
-        <div className="card">
-          <h2>Your vaults</h2>
-          <div className="stack-list">
-            {loading ? (
-              <><SkeletonRow /><SkeletonRow /><SkeletonRow /></>
-            ) : vaults.length === 0 ? (
-              <EmptyState icon="🔒" title="No vaults yet" subtitle="Create your first encrypted vault above." />
-            ) : vaults.map((vault, index) => (
-              <article className="mini-card" key={vault.id || vault.vaultId || index}>
-                <div>
-                  <p className="gold-text">{vault.fileName || `Vault ${index + 1}`}</p>
-                  <p className="silver-text" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    Heir: {vault.heir ? shortAddress(vault.heir) : 'Not assigned'}
-                    {vault.heir && <CopyButton text={vault.heir} />}
-                    {vault.heir && (
-                      <a href={getExplorerUrl('qie', 'address', vault.heir)} target="_blank" rel="noopener noreferrer" className="gold-text" style={{ fontSize: 11 }}>↗</a>
-                    )}
-                  </p>
-                  <p className="silver-text">Unlock: {vault.unlockDate || 'Validator attestation'}</p>
-                </div>
-                <div className="item-actions">
-                  <span className="status-pill">{vault.status || 'locked'}</span>
-                  <button className="btn-outline" onClick={() => claimVault(vault)} disabled={!wallet || loading}>Claim</button>
-                </div>
-              </article>
-            ))}
-          </div>
+      {/* ── Feature cards ── */}
+      <section style={{ padding: '0 24px 60px', maxWidth: 1000, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+          {[
+            {
+              icon: '🔒',
+              title: 'Client-Side Encryption',
+              desc: 'AES-GCM-256 with PBKDF2/SHA-256 key derivation. Your passphrase never leaves your browser.',
+              color: '#60A5FA',
+            },
+            {
+              icon: '⛓',
+              title: 'On-Chain Anchoring',
+              desc: 'File references anchored on QIE Mainnet via LegacyVault.sol. Tamper-proof audit trail.',
+              color: '#22C55E',
+            },
+            {
+              icon: '👨‍👩‍👧‍👦',
+              title: 'Heir Governance',
+              desc: 'Register heirs and validators on-chain. Access unlocks only when legacy is activated.',
+              color: '#F5C518',
+            },
+            {
+              icon: '🧬',
+              title: 'AI Legacy Stories',
+              desc: 'AI generates a personal narrative from your memory metadata for your heirs to cherish.',
+              color: '#A78BFA',
+            },
+          ].map((feat) => (
+            <div
+              key={feat.title}
+              style={{
+                ...card,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+              }}
+            >
+              <span style={{ fontSize: 28 }}>{feat.icon}</span>
+              <p style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 700, color: feat.color, margin: 0 }}>
+                {feat.title}
+              </p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.5 }}>
+                {feat.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
-      <ExecutiveWalkthrough />
-      <CommandPalette />
+
+      {/* ── Quick navigation ── */}
+      <section style={{ padding: '0 24px 60px', maxWidth: 1000, margin: '0 auto' }}>
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.3)', marginBottom: 14 }}>
+          VAULT SECTIONS
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+          {[
+            { href: '/legacy/upload', icon: '📁', label: 'Upload Memories', desc: 'Encrypt & store files' },
+            { href: '/legacy/timeline', icon: '📋', label: 'Timeline', desc: 'All your encrypted files' },
+            { href: '/legacy/heir', icon: '🔐', label: 'Heir Access', desc: 'Unlock inherited vault' },
+            { href: '/legacy/validator', icon: '⚖️', label: 'Validator', desc: 'Register & verify events' },
+            { href: '/legacy/tokenization', icon: '🪙', label: 'DLT Token', desc: 'Link QIEDEX token' },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              style={{
+                ...card,
+                textDecoration: 'none',
+                color: 'inherit',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '14px 16px',
+                transition: 'border-color 0.2s',
+              }}
+            >
+              <span style={{ fontSize: 22, flexShrink: 0 }}>{item.icon}</span>
+              <div>
+                <p style={{ fontWeight: 600, fontSize: 13, margin: 0, color: '#F5C518' }}>{item.label}</p>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>{item.desc}</p>
+              </div>
+              <span style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.15)', fontSize: 16 }}>›</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Disclaimer ── */}
+      <section style={{ padding: '0 24px 60px', maxWidth: 800, margin: '0 auto' }}>
+        <div
+          style={{
+            background: 'rgba(245,197,24,0.04)',
+            border: '1px solid rgba(245,197,24,0.12)',
+            borderRadius: 12,
+            padding: '16px 20px',
+          }}
+        >
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: 0, lineHeight: 1.7 }}>
+            ⚠️ This application uses client-side encryption (AES-GCM-256) for all memories. Your vault key is your
+            responsibility — back it up securely (password manager, physical backup). In a full deployment,
+            connecting your QIE wallet lets you register heirs and anchor file references on-chain via
+            LegacyVault.sol.
+          </p>
+        </div>
+      </section>
     </main>
   )
 }
