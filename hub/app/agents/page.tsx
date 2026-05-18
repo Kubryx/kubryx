@@ -1,315 +1,200 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
-import { fallbackAgents } from '../../lib/fallback'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { fetchJobs } from '../../lib/trustmesh-api'
+import {
+  fallbackJobs,
+  type JobsResponse,
+} from '../../lib/trustmesh-fallbacks'
 import { toast } from '../../lib/toast'
 import { loadWallet, persistWallet } from '../../lib/wallet-utils'
-import { getExplorerUrl } from '../../lib/explorer'
-import DemoBanner from '../components/DemoBanner'
-import { SkeletonRow } from '../components/Skeleton'
-import EmptyState from '../components/EmptyState'
-import CopyButton from '../components/CopyButton'
-import ExecutiveWalkthrough from '../components/ExecutiveWalkthrough'
-import CommandPalette from '../components/CommandPalette'
-import { resilientRequest } from '../../lib/api-resilience'
-import { logTelemetryError } from '../../lib/telemetry'
+import LiveBadge from './_components/LiveBadge'
 
-type PhantomProvider = {
+type PhantomLike = {
+  isPhantom?: boolean
   connect: () => Promise<{ publicKey: { toString: () => string } }>
-  signMessage?: (message: Uint8Array, encoding: string) => Promise<{ signature: Uint8Array }>
 }
 
-declare global {
-  interface Window {
-    solana?: PhantomProvider & { isPhantom?: boolean }
-  }
+function getPhantom(): PhantomLike | undefined {
+  if (typeof window === 'undefined') return undefined
+  return (window as unknown as { solana?: PhantomLike }).solana
 }
 
-type Agent = {
-  id?: string
-  agentId?: string
-  name?: string
-  role?: string
-  status?: string
-  lastAction?: string
-}
-
-type Activity = {
-  id?: string
-  action?: string
-  signature?: string
-  timestamp?: string
-}
-
-const apiBase = process.env.NEXT_PUBLIC_TRUSTMESH_URL || process.env.NEXT_PUBLIC_TRUSTMESH_API || ''
-const PROGRAM_ID = '66DXeSqBccWxWWw9S21vxe2Mvvqqkmw5KsK5jqA42quz'
+const SECTIONS = [
+  {
+    href: '/agents/explorer',
+    title: 'Jobs Explorer',
+    desc: 'Browse every coordination job and see the live agent mesh as an interactive graph.',
+    badge: 'Live',
+  },
+  {
+    href: '/agents/nodes',
+    title: 'Node Registry',
+    desc: 'Search and filter every agent. Click any row to jump to its job graph.',
+    badge: 'Searchable',
+  },
+  {
+    href: '/agents/deploy',
+    title: 'Deploy Wizard',
+    desc: 'Three-step flow — configure, name identities, review — then sign and ship.',
+    badge: '3 steps',
+  },
+  {
+    href: '/agents/analytics',
+    title: 'Analytics',
+    desc: 'Throughput, status mix, hourly activity, and integrity violations at a glance.',
+    badge: 'Charts',
+  },
+] as const
 
 function shortAddress(address: string) {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`
+  return `${address.slice(0, 6)}…${address.slice(-4)}`
 }
 
-function ChainBadge() {
-  return (
-    <span className="chain-badge">
-      <span className="chain-dot" />
-      Solana Devnet
-    </span>
-  )
-}
-
-export default function AgentsPage() {
+export default function AgentsOverviewPage() {
   const [wallet, setWallet] = useState('')
-  const [name, setName] = useState('')
-  const [role, setRole] = useState('')
-  const [permissions, setPermissions] = useState('')
-  const [task, setTask] = useState('')
-  const [selectedAgent, setSelectedAgent] = useState('')
-  const [agents, setAgents] = useState<Agent[]>([])
-  const [activity, setActivity] = useState<Activity[]>([])
-  const [health, setHealth] = useState<'checking' | 'ok' | 'down'>('checking')
-  const [loading, setLoading] = useState(false)
-  const [isDemo, setIsDemo] = useState(false)
-  const [error, setError] = useState('')
-  const [message, setMessage] = useState('')
+  const [stats, setStats] = useState<JobsResponse['stats']>(fallbackJobs.stats)
+  const [isLive, setIsLive] = useState(false)
 
   useEffect(() => {
     const saved = loadWallet('solana')
     if (saved) setWallet(saved)
   }, [])
 
-  async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {
-    if (!apiBase) throw new Error('NEXT_PUBLIC_TRUSTMESH_API is not configured.')
-    const sanitizedPath = path.replace(/[^a-zA-Z0-9]/g, '_')
-    return resilientRequest<T>(`${apiBase}${path}`, options, `agents_${sanitizedPath}`)
-  }
+  useEffect(() => {
+    let cancelled = false
+    fetchJobs().then((res) => {
+      if (cancelled) return
+      setStats(res.data.stats)
+      setIsLive(res.isLive)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   async function connectWallet() {
     try {
-      setError('')
-      if (!window.solana?.isPhantom) throw new Error('Phantom is not installed.')
-      const result = await window.solana.connect()
-      const address = result.publicKey.toString()
-      setWallet(address)
-      persistWallet('solana', address)
+      const phantom = getPhantom()
+      if (!phantom?.isPhantom) {
+        toast.info('Phantom not detected — Explorer will run in demo mode')
+        return
+      }
+      const result = await phantom.connect()
+      const addr = result.publicKey.toString()
+      setWallet(addr)
+      persistWallet('solana', addr)
       toast.success('Phantom connected')
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unable to connect Phantom.'
-      setError(msg)
-      toast.error(msg)
+      toast.error(err instanceof Error ? err.message : 'Could not connect Phantom')
     }
   }
-
-  async function loadAgents(pubkey: string) {
-    try {
-      setLoading(true)
-      setError('')
-      const [agentData, activityData] = await Promise.all([
-        requestJson<Agent[] | { agents?: Agent[] }>(`/api/agents/${pubkey}`),
-        requestJson<Activity[] | { activity?: Activity[] }>(`/api/activity/${pubkey}`),
-      ])
-      setAgents(Array.isArray(agentData) ? agentData : agentData.agents || [])
-      setActivity(Array.isArray(activityData) ? activityData : activityData.activity || [])
-      setIsDemo(false)
-    } catch {
-      setAgents(fallbackAgents as unknown as Agent[])
-      setIsDemo(true)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function deployAgent(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    try {
-      setLoading(true)
-      setError('')
-      if (!wallet) throw new Error('Connect Phantom before deploying an agent.')
-      await requestJson('/api/agents/deploy', {
-        method: 'POST',
-        body: JSON.stringify({ owner: wallet, name, role, permissions: permissions.split(',').map((item) => item.trim()).filter(Boolean) }),
-      })
-      setMessage('Agent deployed.')
-      toast.success(`Agent "${name}" deployed on Solana`)
-      await loadAgents(wallet)
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unable to deploy agent.'
-      setError(msg)
-      toast.error(msg)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function delegateTask(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    try {
-      setLoading(true)
-      setError('')
-      if (!wallet || !selectedAgent) throw new Error('Select an agent and connect Phantom.')
-      const encoded = new TextEncoder().encode(task)
-      const signed = await window.solana?.signMessage?.(encoded, 'utf8')
-      const signature = signed ? Array.from(signed.signature).join(',') : 'unsigned-preview'
-      await requestJson('/api/agents/delegate', {
-        method: 'POST',
-        body: JSON.stringify({ agentId: selectedAgent, task, signature }),
-      })
-      setMessage('Task delegated with Ed25519 signature.')
-      toast.success('Task delegated and signed')
-      await loadAgents(wallet)
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unable to delegate task.'
-      setError(msg)
-      toast.error(msg)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function revokeAgent(agent: Agent) {
-    try {
-      setLoading(true)
-      setError('')
-      await requestJson('/api/agents/revoke', {
-        method: 'POST',
-        body: JSON.stringify({ agentId: agent.id || agent.agentId }),
-      })
-      setMessage('Agent revoked.')
-      toast.success('Agent revoked')
-      if (wallet) await loadAgents(wallet)
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unable to revoke agent.'
-      setError(msg)
-      toast.error(msg)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    async function checkHealth() {
-      try {
-        const data = await requestJson<{ status?: string }>('/health')
-        setHealth(data.status === 'ok' ? 'ok' : 'down')
-      } catch {
-        setHealth('down')
-      }
-    }
-    checkHealth()
-  }, [])
-
-  useEffect(() => {
-    if (wallet) loadAgents(wallet)
-  }, [wallet])
 
   return (
-    <main className="dashboard-page">
-      <section className="dashboard-hero" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
+    <main>
+      <section
+        className="dashboard-hero"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: 16,
+        }}
+      >
         <div>
-          <p className="eyebrow">TrustMesh</p>
-          <h1>Agent Mesh</h1>
-          <p className="silver-text">Deploy signed Solana agents, delegate work, inspect activity, and revoke access.</p>
-          
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 12 }}>
-            <span style={{ fontSize: 10, background: isDemo ? 'rgba(255, 255, 255, 0.03)' : 'rgba(34, 197, 94, 0.05)', border: isDemo ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(34, 197, 94, 0.3)', color: isDemo ? '#bbb' : '#22C55E', padding: '4px 10px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: isDemo ? '#bbb' : '#22C55E' }} />
-              {isDemo ? 'Demo Mode' : 'Live Connection'}
-            </span>
-            <span style={{ fontSize: 10, background: 'rgba(168, 85, 247, 0.05)', border: '1px solid rgba(168, 85, 247, 0.25)', color: '#C084FC', padding: '4px 10px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#A855F7' }} />
-              Solana Devnet
-            </span>
-          </div>
-        </div>
-        <div className="hero-actions" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <ChainBadge />
-          <span className={`health-badge ${health === 'ok' ? 'is-live' : 'is-down'}`}><span className="chain-dot" />{health === 'ok' ? 'Live' : 'Offline'}</span>
-          <button className="btn-gold" onClick={connectWallet} aria-label={wallet ? `Connected as ${shortAddress(wallet)}` : 'Connect Phantom Wallet'}>{wallet ? shortAddress(wallet) : 'Connect Phantom'}</button>
-        </div>
-      </section>
-
-      {isDemo && <DemoBanner />}
-      {error && <div className="card error-card">{error}</div>}
-      {message && <div className="card success-card">{message}</div>}
-      {!wallet && <div className="card">Connect Phantom to deploy and manage Solana agents.</div>}
-
-      <section className="dashboard-grid">
-        <form className="card form-panel" onSubmit={deployAgent}>
-          <h2>Deploy agent</h2>
-          <label>Name</label>
-          <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Treasury Scout" />
-          <label>Role</label>
-          <input value={role} onChange={(event) => setRole(event.target.value)} placeholder="Monitor payments" />
-          <label>Permissions</label>
-          <input value={permissions} onChange={(event) => setPermissions(event.target.value)} placeholder="read, delegate, notify" />
-          <p className="silver-text" style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
-            Program: {PROGRAM_ID.slice(0, 8)}…
-            <CopyButton text={PROGRAM_ID} />
-            <a href={getExplorerUrl('solana', 'address', PROGRAM_ID)} target="_blank" rel="noopener noreferrer" className="gold-text" style={{ fontSize: 11 }}>↗</a>
+          <p className="eyebrow">TrustMesh on Kubryx</p>
+          <h1>Every agent. Every decision. On chain.</h1>
+          <p className="silver-text" style={{ maxWidth: 620 }}>
+            Spawn signed Solana agents, chain delegation through a verifiable
+            mesh, and audit every message on devnet. Five surfaces, one source
+            of truth.
           </p>
-          <button className="btn-gold" disabled={loading || !wallet}>{loading ? <span className="spinner" /> : 'Deploy agent'}</button>
-        </form>
-
-        <form className="card form-panel" onSubmit={delegateTask}>
-          <h2>Delegate task</h2>
-          <label>Agent</label>
-          <select value={selectedAgent} onChange={(event) => setSelectedAgent(event.target.value)}>
-            <option value="">Select agent</option>
-            {agents.map((agent, index) => <option key={agent.id || agent.agentId || index} value={agent.id || agent.agentId}>{agent.name || `Agent ${index + 1}`}</option>)}
-          </select>
-          <label>Task</label>
-          <textarea value={task} onChange={(event) => setTask(event.target.value)} placeholder="Reconcile today's treasury activity" />
-          <button className="btn-gold" disabled={loading || !wallet}>{loading ? <span className="spinner" /> : 'Delegate'}</button>
-        </form>
-      </section>
-
-      <section className="dashboard-grid">
-        <div className="card">
-          <h2>Active agents</h2>
-          <div className="stack-list">
-            {loading ? (
-              <><SkeletonRow /><SkeletonRow /><SkeletonRow /></>
-            ) : agents.length === 0 ? (
-              <EmptyState icon="🤖" title="No agents deployed" subtitle="Deploy your first agent above." />
-            ) : agents.map((agent, index) => (
-              <article className="mini-card" key={agent.id || agent.agentId || index}>
-                <div>
-                  <p className="gold-text" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    {agent.name || `Agent ${index + 1}`}
-                    {(agent.id || agent.agentId) && <CopyButton text={agent.id || agent.agentId || ''} />}
-                  </p>
-                  <p>{agent.role || 'Autonomous delegate'}</p>
-                  <p className="silver-text">{agent.lastAction || 'No recent action'}</p>
-                </div>
-                <div className="item-actions">
-                  <span className="status-pill">{agent.status || 'active'}</span>
-                  <button className="btn-outline" onClick={() => revokeAgent(agent)} disabled={loading}>Revoke</button>
-                </div>
-              </article>
-            ))}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 12 }}>
+            <LiveBadge isLive={isLive} />
+            <span style={{ fontSize: 11, color: '#fff', opacity: 0.7 }}>
+              {stats.activeCount} active · {stats.agentCount} agents · {stats.breachCount} breaches
+            </span>
           </div>
         </div>
-        <div className="card">
-          <h2>Signed activity</h2>
-          {activity.length === 0 ? (
-            <EmptyState icon="📋" title="No activity yet" subtitle="Ed25519 signed actions appear here." />
-          ) : activity.map((item, index) => (
-            <article className="mini-card" key={item.id || index} style={{ marginBottom: 12 }}>
-              <p className="gold-text" style={{ margin: 0 }}>{item.action || 'Agent action'}</p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
-                <span className="silver-text" style={{ fontSize: 11, fontFamily: 'monospace' }}>
-                  {item.signature ? item.signature.slice(0, 24) + '…' : 'signature pending'}
-                </span>
-                {item.signature && (
-                  <a href={`https://solscan.io/tx/${item.signature}?cluster=devnet`} target="_blank" rel="noopener noreferrer" className="gold-text" style={{ fontSize: 11 }}>Verify ↗</a>
-                )}
-              </div>
-              <p className="silver-text" style={{ fontSize: 11, marginTop: 4, opacity: 0.7 }}>{item.timestamp || 'Just now'}</p>
-            </article>
-          ))}
+        <div className="hero-actions" style={{ display: 'flex', gap: 8 }}>
+          <button
+            type="button"
+            className="btn-gold"
+            onClick={connectWallet}
+            aria-label={wallet ? `Connected as ${shortAddress(wallet)}` : 'Connect Phantom Wallet'}
+          >
+            {wallet ? shortAddress(wallet) : 'Connect Phantom'}
+          </button>
+          <Link href="/agents/deploy" className="btn-outline">
+            Deploy mesh →
+          </Link>
         </div>
       </section>
-      <ExecutiveWalkthrough />
-      <CommandPalette />
+
+      <section
+        className="dashboard-grid"
+        style={{
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+        }}
+      >
+        {SECTIONS.map((s) => (
+          <Link
+            key={s.href}
+            href={s.href}
+            className="card"
+            style={{
+              textDecoration: 'none',
+              color: 'inherit',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+              transition: 'border-color 0.15s',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ margin: 0 }}>{s.title}</h2>
+              <span
+                style={{
+                  fontSize: 10,
+                  padding: '3px 8px',
+                  borderRadius: 12,
+                  background: 'rgba(245,197,24,0.06)',
+                  color: '#F5C518',
+                  border: '1px solid rgba(245,197,24,0.25)',
+                }}
+              >
+                {s.badge}
+              </span>
+            </div>
+            <p className="silver-text" style={{ margin: 0, fontSize: 13 }}>
+              {s.desc}
+            </p>
+            <span className="gold-text" style={{ fontSize: 12, marginTop: 8 }}>
+              Open →
+            </span>
+          </Link>
+        ))}
+      </section>
+
+      <section className="card">
+        <h2 style={{ marginTop: 0 }}>How TrustMesh works on Solana</h2>
+        <ol style={{ paddingLeft: 18, fontSize: 13, lineHeight: 1.7, color: '#ddd', margin: 0 }}>
+          <li>
+            <strong style={{ color: '#F5C518' }}>Deploy.</strong> An owner spawns a mandate with an Anchor program; each agent gets a deterministic SNS sub-name.
+          </li>
+          <li>
+            <strong style={{ color: '#F5C518' }}>Delegate.</strong> Every agent-to-agent message is Ed25519-signed and posted to a coordination log on chain.
+          </li>
+          <li>
+            <strong style={{ color: '#F5C518' }}>Verify.</strong> Anyone can replay the log, audit the decision tree, and confirm no unauthorized actions occurred.
+          </li>
+          <li>
+            <strong style={{ color: '#F5C518' }}>Revoke.</strong> An owner can revoke the entire mesh in a single transaction; downstream agents stop accepting work.
+          </li>
+        </ol>
+      </section>
     </main>
   )
 }
