@@ -23,13 +23,25 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
   app.use(helmet());
   app.use(compression());
-  app.enableCors({ origin: [
+  const STATIC_ORIGINS = [
     'https://kubryx.vercel.app',
+    'https://kubryx-2xclq5gjr-vsrupeshoffl-5415s-projects.vercel.app',
     'http://localhost:3000',
     'http://localhost:5173',
     'http://127.0.0.1:3000',
-    'http://127.0.0.1:5173'
-  ] });
+    'http://127.0.0.1:5173',
+  ];
+  const VERCEL_PREVIEW_RE = /^https:\/\/kubryx-[a-z0-9-]+\.vercel\.app$/i;
+  app.enableCors({
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      if (STATIC_ORIGINS.includes(origin)) return cb(null, true);
+      if (VERCEL_PREVIEW_RE.test(origin)) return cb(null, true);
+      return cb(null, false);
+    },
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
   const trpcRouter = app.get(TrpcRouter);
   

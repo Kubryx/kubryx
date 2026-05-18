@@ -80,12 +80,12 @@ export const fallbackShadowAgents = [
 export const fallbackSplits = [
   {
     id: 'split-demo-1',
-    total: 100,
+    amount: 100,
     currency: 'XLM',
     participants: ['G...AAA', 'G...BBB', 'G...CCC'],
     sharePerPerson: 33.33,
     status: 'pending',
-    paid: 1,
+    paid: ['G...AAA'],
     createdAt: new Date().toISOString(),
   },
 ]

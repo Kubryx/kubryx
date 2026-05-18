@@ -210,10 +210,14 @@ export default function SplitPage() {
       } catch {
         // Freighter failed / sandbox — keep local optimistic update
       }
-      setSplits((current) => current.map((item) => item.id === split.id ? { ...item, paid: Array.from(new Set([...item.paid, wallet])) } : item))
-      setHistory((current) => [`Paid ${split.amount / split.participants.length} XLM via ${signedSummary.slice(0, 18)} (Tx: ${txHash.slice(0, 10)}...)`, ...current])
+      const safeAmount = Number(split.amount ?? 0)
+      const safeParticipants = Array.isArray(split.participants) ? split.participants : []
+      const safePaid = Array.isArray(split.paid) ? split.paid : []
+      const perShare = safeParticipants.length > 0 ? safeAmount / safeParticipants.length : 0
+      setSplits((current) => current.map((item) => item.id === split.id ? { ...item, paid: Array.from(new Set([...safePaid, wallet])) } : item))
+      setHistory((current) => [`Paid ${perShare} XLM via ${signedSummary.slice(0, 18)} (Tx: ${txHash.slice(0, 10)}...)`, ...current])
       setMessage(`Share payment signed for SyncSplit. Tx: ${txHash}`)
-      toast.success(`Paid ${(split.amount / split.participants.length).toFixed(2)} XLM`)
+      toast.success(`Paid ${perShare.toFixed(2)} XLM`)
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unable to pay share.'
       setError(msg)
@@ -224,8 +228,10 @@ export default function SplitPage() {
   }
 
   function statusFor(split: SplitRecord) {
-    if (split.paid.length === 0) return 'pending'
-    if (split.paid.length >= split.participants.length) return 'settled'
+    const paidCount = Array.isArray(split.paid) ? split.paid.length : 0
+    const totalCount = Array.isArray(split.participants) ? split.participants.length : 0
+    if (paidCount === 0) return 'pending'
+    if (totalCount > 0 && paidCount >= totalCount) return 'settled'
     return 'partially paid'
   }
 
@@ -290,19 +296,25 @@ export default function SplitPage() {
               <><SkeletonRow /><SkeletonRow /></>
             ) : splits.length === 0 ? (
               <EmptyState icon="⚖️" title="No splits yet" subtitle="Create your first split above." />
-            ) : splits.map((split) => (
-              <article className="mini-card" key={split.id}>
-                <div>
-                  <p className="gold-text">{split.amount.toFixed(2)} total</p>
-                  <p className="silver-text">{split.participants.length} participants · {(split.amount / split.participants.length).toFixed(2)} each</p>
-                  <p className="silver-text">{split.paid.length} paid</p>
-                </div>
-                <div className="item-actions">
-                  <span className="status-pill">{statusFor(split)}</span>
-                  <button className="btn-outline" onClick={() => payShare(split)} disabled={!wallet || loading}>Pay your share</button>
-                </div>
-              </article>
-            ))}
+            ) : splits.map((split) => {
+              const amount = Number(split.amount ?? 0)
+              const participants = Array.isArray(split.participants) ? split.participants : []
+              const paid = Array.isArray(split.paid) ? split.paid : []
+              const perHead = participants.length > 0 ? amount / participants.length : 0
+              return (
+                <article className="mini-card" key={split.id}>
+                  <div>
+                    <p className="gold-text">{amount.toFixed(2)} total</p>
+                    <p className="silver-text">{participants.length} participants · {perHead.toFixed(2)} each</p>
+                    <p className="silver-text">{paid.length} paid</p>
+                  </div>
+                  <div className="item-actions">
+                    <span className="status-pill">{statusFor(split)}</span>
+                    <button className="btn-outline" onClick={() => payShare(split)} disabled={!wallet || loading}>Pay your share</button>
+                  </div>
+                </article>
+              )
+            })}
           </div>
         </div>
       </section>
