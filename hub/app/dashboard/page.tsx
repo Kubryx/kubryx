@@ -10,6 +10,8 @@ import {
   ACTIVITY_30D, ACTIVITY_7D, ACTIVITY_1D, ACTIVITY_ALL, DASH_STATS,
 } from '@/lib/dashboard-fallbacks'
 import type { ChartPoint } from '@/lib/dashboard-fallbacks'
+import ActivityFeed from '@/components/ActivityFeed'
+import ToolQuickAccess from '@/components/ToolQuickAccess'
 
 /* ── Theme ──────────────────────────────────────────── */
 const BG      = '#0a0e27'
@@ -558,6 +560,12 @@ export default function DashboardPage() {
 
           {/* Protocol activity chart */}
           <ProtocolActivity />
+
+          {/* Live activity feed */}
+          <ActivityFeed />
+
+          {/* Tool quick-access grid */}
+          <ToolQuickAccess />
         </div>
       </div>
 
