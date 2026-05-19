@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import AgentsTabs from './_components/AgentsTabs'
 
 const title = 'TrustMesh — Kubryx'
 const description =
@@ -27,10 +26,5 @@ export const metadata: Metadata = {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="dashboard-page">
-      <AgentsTabs />
-      {children}
-    </div>
-  )
+  return <>{children}</>
 }
