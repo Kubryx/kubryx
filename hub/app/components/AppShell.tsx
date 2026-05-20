@@ -7,7 +7,7 @@ import TopBar from '../../components/TopBar'
 
 /* Paths that render inside the hub shell (sidebar + topbar).
    /dashboard is self-contained — it owns its own sidebar. */
-const HUB_PREFIXES = ['/split']
+const HUB_PREFIXES: string[] = []
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
