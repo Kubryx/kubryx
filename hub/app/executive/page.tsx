@@ -18,7 +18,7 @@ import CommandPalette from '../components/CommandPalette'
 
 export default function ExecutivePage() {
   const { proposals, sovereigntyIndex, consensusStability, quorumIntegrity, threats, toggleThreat } = useSovereignOps()
-  const { Yield Operations HubEquilibriumIndex, Yield Operations HubPressureLevel, rebalanceIncentives } = useEconomicOps()
+  const { treasuryEquilibriumIndex, treasuryPressureLevel, rebalanceIncentives } = useEconomicOps()
   const { snapshots: memSnapshots, restoreSnapshot: memRestore } = useGlobalMemory()
   const { activeScenario, currentMode } = usePlatformState()
   const { operationalRiskScore, infrastructureConfidenceScore } = useAutonomousOps()

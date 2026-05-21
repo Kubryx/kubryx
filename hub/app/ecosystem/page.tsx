@@ -219,7 +219,7 @@ export default function EcosystemPage() {
             </div>
             <div style={{ padding: 10, background: '#020202', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 6 }}>
               <span style={{ fontSize: 9, color: '#888' }}>Yield Operations Hub Stability</span>
-              <strong style={{ display: 'block', fontSize: 18, color: '#fff', marginTop: 4 }}>{activeForecast?.Yield Operations HubStability}%</strong>
+              <strong style={{ display: 'block', fontSize: 18, color: '#fff', marginTop: 4 }}>{activeForecast?.treasuryStability}%</strong>
             </div>
             <div style={{ padding: 10, background: '#020202', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 6 }}>
               <span style={{ fontSize: 9, color: '#888' }}>Governance Volatility</span>
@@ -247,7 +247,7 @@ export default function EcosystemPage() {
   timeframe: selectedForecastTimeframe,
   metrics: {
     consensusTrajectory: activeForecast?.consensusTrajectory,
-    Yield Operations HubStability: activeForecast?.Yield Operations HubStability,
+    treasuryStability: activeForecast?.treasuryStability,
     governanceVolatility: activeForecast?.governanceVolatility,
     regionalResilience: activeForecast?.regionalResilience,
     ecosystemTrust: activeForecast?.ecosystemTrust,
