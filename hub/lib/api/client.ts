@@ -25,7 +25,7 @@ export const API_ENDPOINTS = {
 // 2. RPC Nodes with Native Failovers
 export const RPC_NODES: Record<ChainType, RPCNode[]> = {
   QIE: [
-    { url: process.env.NEXT_PUBLIC_QIE_RPC || 'https://rpc.qie.space', latency: 0, healthy: true },
+    { url: process.env.NEXT_PUBLIC_QIE_RPC || 'https://mainnet.qie.digital/api/eth-rpc', latency: 0, healthy: true },
     { url: 'https://rpc2.qie.space', latency: 0, healthy: true }
   ],
   SOLANA: [

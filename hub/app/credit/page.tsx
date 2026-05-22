@@ -26,7 +26,7 @@ import { toast } from '../../lib/toast'
 import { useWalletForTool } from '../../hooks/useWalletForTool'
 import { useWallet } from '../../context/WalletContext'
 import { ConnectButton } from '../../components/wallet/ConnectButton'
-import { readCreditScore } from '../../lib/contracts/creditPassport'
+import { readCreditScore, readPassportExists } from '../../lib/contracts/creditPassport'
 
 // ─── Gauge math ──────────────────────────────────────────────
 const GAUGE_R = 90
@@ -244,6 +244,7 @@ export default function CreditDashboard() {
   const [loading, setLoading] = useState(false)
   const [isDemo, setIsDemo] = useState(false)
   const [onChain, setOnChain] = useState(false)
+  const [passportExists, setPassportExists] = useState<boolean | null>(null)
   const [error, setError] = useState('')
   const [mounted, setMounted] = useState(false)
 
@@ -297,6 +298,7 @@ export default function CreditDashboard() {
       setPrediction(null)
       setIsDemo(false)
       setOnChain(false)
+      setPassportExists(null)
       return
     }
     loadDashboard(wallet)
@@ -312,8 +314,11 @@ export default function CreditDashboard() {
     setBreakdown(bd)
     setScore(bd.score)
     setIsDemo(bd.score === fallbackBreakdown.score && bd.baseScore === fallbackBreakdown.baseScore)
+    // Check whether the Kubryx backend has minted a passport for this wallet.
+    const exists = await readPassportExists(addr)
+    setPassportExists(exists)
     // Prefer the real on-chain credit score from CreditPassportNFT (QIE Mainnet).
-    const chainScore = await readCreditScore(addr)
+    const chainScore = exists ? await readCreditScore(addr) : 0
     if (chainScore > 0) {
       setScore(chainScore)
       setOnChain(true)
@@ -712,6 +717,22 @@ export default function CreditDashboard() {
                 Disconnect
               </button>
             </div>
+
+            {/* No on-chain passport yet for this wallet */}
+            {passportExists === false && (
+              <div className="bento-card" style={{
+                marginBottom: 24, padding: '16px 24px',
+                background: 'rgba(245,166,35,0.06)', border: '1px solid rgba(245,166,35,0.3)',
+                display: 'flex', alignItems: 'flex-start', gap: 12,
+              }}>
+                <span style={{ fontSize: 18, flexShrink: 0 }}>ℹ️</span>
+                <p style={{ fontSize: 13, color: 'rgba(45,26,38,0.7)', margin: 0, lineHeight: 1.6 }}>
+                  No credit passport found for this wallet. Credit scores are issued by the
+                  Kubryx backend after on-chain activity is detected — the score below is a
+                  demo preview until your passport is minted.
+                </p>
+              </div>
+            )}
 
             {/* ── Main 2-col layout ── */}
             <div className="bento-grid" style={{ marginBottom: 24 }}>

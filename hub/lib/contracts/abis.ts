@@ -12,18 +12,22 @@ export const CONTRACTS = {
 // Only the functions Kubryx actually calls are included.
 
 export const CREDIT_PASSPORT_ABI = [
-  'function getCreditScore(address user) view returns (uint256)',
-  'function generateScore()',
+  // getScore returns ScoreView { uint16 score; uint8 riskBand; uint64 lastUpdated }
+  'function getScore(address user) view returns (uint16 score, uint8 riskBand, uint64 lastUpdated)',
+  'function passportIdOf(address user) view returns (uint256)',
   'function balanceOf(address owner) view returns (uint256)',
 ] as const
 
 export const NEUROCRED_STAKING_ABI = [
-  'function getStakeInfo(address user) view returns (uint256 amount, uint8 tier, uint256 rewards)',
+  'function stakedAmount(address user) view returns (uint256)',
+  'function integrationTier(address staker) view returns (uint8)',
   'function stake(uint256 amount)',
   'function unstake(uint256 amount)',
-  'function claimRewards()',
 ] as const
 
+// ⚠ NCRD TOKEN NOT DEPLOYED — the NeuroCredStaking contract points at an
+// address with no contract code. All NCRD token calls (and stake/unstake,
+// which call transferFrom) are mock-only until a real NCRD address exists.
 export const NCRD_TOKEN_ABI = [
   'function balanceOf(address owner) view returns (uint256)',
   'function allowance(address owner, address spender) view returns (uint256)',
