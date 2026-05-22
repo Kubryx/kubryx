@@ -18,7 +18,9 @@ import { toast } from '../../../lib/toast'
 import { useWalletForTool } from '../../../hooks/useWalletForTool'
 import { useWallet } from '../../../context/WalletContext'
 import { ConnectButton } from '../../../components/wallet/ConnectButton'
-import { readStakingInfo, stakeTokens, unstakeTokens } from '../../../lib/contracts/creditPassport'
+import { readStakedAmount, readIntegrationTier, stakeTokens, unstakeTokens } from '../../../lib/contracts/creditPassport'
+
+const TIER_NAMES = ['None', 'Bronze', 'Silver', 'Gold'] as const
 
 // ─── Style helpers ────────────────────────────────────────────
 const card: React.CSSProperties = {
@@ -145,11 +147,19 @@ export default function StakePage() {
     setLoading(true)
     const d = await fetchStaking(addr)
     setData(d)
-    // Overlay real on-chain staking state from NeuroCredStaking (QIE Mainnet).
-    const chain = await readStakingInfo(addr)
-    const chainStaked = parseFloat(chain.stakedAmount)
-    if (chainStaked > 0 || chain.tier !== 'None') {
-      setData((prev) => ({ ...prev, stakedAmount: chainStaked, tier: chain.tier }))
+    // Overlay real on-chain staking state from NeuroCredStaking (QIE Mainnet):
+    // stakedAmount(address) for the amount, integrationTier(address) for the tier.
+    const [amtStr, tierIdx] = await Promise.all([
+      readStakedAmount(addr),
+      readIntegrationTier(addr),
+    ])
+    const chainStaked = parseFloat(amtStr)
+    if (chainStaked > 0 || tierIdx > 0) {
+      setData((prev) => ({
+        ...prev,
+        stakedAmount: chainStaked,
+        tier: TIER_NAMES[tierIdx] ?? 'None',
+      }))
     }
     setLoading(false)
   }
@@ -168,6 +178,9 @@ export default function StakePage() {
     setLoading(true)
     setTxHash('')
     // Try the real on-chain stake first; fall back to the mock simulation.
+    // ⚠ NOTE: stake() reverts on-chain until a real NCRD ERC-20 token is
+    // deployed — NeuroCredStaking points at an address with no contract code.
+    // Until then this always falls through to the mock simulation below.
     let hash = await stakeTokens(wallet, stakeAmt, sendTx)
     if (!hash) {
       const res = await stakeNCRD(wallet, amount)
@@ -193,6 +206,8 @@ export default function StakePage() {
     setLoading(true)
     setTxHash('')
     // Try the real on-chain unstake first; fall back to the mock simulation.
+    // ⚠ NOTE: unstake() reverts on-chain until a real NCRD ERC-20 token is
+    // deployed (see handleStake). Until then this falls through to the mock.
     let hash = await unstakeTokens(wallet, unstakeAmt, sendTx)
     if (!hash) {
       const res = await unstakeNCRD(wallet, amount)
