@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ConnectButton } from '@/components/wallet/ConnectButton'
+import { PriceBadge } from '@/components/ui/PriceBadge'
 
 const FEATURES = [
   {
@@ -605,6 +606,7 @@ export default function TreasuryLanding() {
 
             {/* CTAs */}
             <div className="hero-buttons">
+              <PriceBadge coinId="solana" label="SOL" />
               <ConnectButton type="solana" size="lg" />
               <Link href="/treasury/dashboard">
                 <motion.button

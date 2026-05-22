@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useWalletForTool } from '@/hooks/useWalletForTool'
 import { ConnectButton } from '@/components/wallet/ConnectButton'
+import { PriceBadge } from '@/components/ui/PriceBadge'
 
 import VaultDashboard from '@/components/vault/VaultDashboard'
 import CollateralManager from '@/components/vault/CollateralManager'
@@ -238,7 +239,11 @@ function VaultInner() {
           </span>
           <span className="badge badge-private">FHE Private</span>
         </div>
-        <ConnectButton type="evm" size="lg" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <PriceBadge coinId="ethereum" label="ETH" />
+          <PriceBadge coinId="arbitrum" label="ARB" />
+          <ConnectButton type="evm" size="lg" />
+        </div>
       </header>
 
       <section className="hero-section">

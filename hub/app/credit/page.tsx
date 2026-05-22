@@ -27,6 +27,7 @@ import { useWalletForTool } from '../../hooks/useWalletForTool'
 import { useWallet } from '../../context/WalletContext'
 import { ConnectButton } from '../../components/wallet/ConnectButton'
 import { readCreditScore, readPassportExists } from '../../lib/contracts/creditPassport'
+import { usePrices } from '../../hooks/usePrices'
 
 // ─── Gauge math ──────────────────────────────────────────────
 const GAUGE_R = 90
@@ -184,6 +185,49 @@ function ProgressBar({
           }}
         />
       </div>
+    </div>
+  )
+}
+
+// ─── Market context card (live ETH price) ───────────────────
+function MarketCard() {
+  const { prices, loading } = usePrices(['ethereum'])
+  const eth = prices['ethereum']
+  const up = eth ? eth.change24h >= 0 : true
+
+  return (
+    <div className="bento-card" style={{
+      marginBottom: 24, display: 'flex', justifyContent: 'space-between',
+      alignItems: 'center', flexWrap: 'wrap', gap: 12, padding: '16px 24px',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{
+          width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+          background: 'rgba(98,126,234,0.12)', border: '1px solid rgba(98,126,234,0.3)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
+        }}>◆</div>
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(45,26,38,0.45)', margin: 0 }}>
+            ETHEREUM · COLLATERAL &amp; GAS CONTEXT
+          </p>
+          {eth ? (
+            <p style={{ fontSize: 20, fontWeight: 700, color: '#2D1A26', margin: '4px 0 0', fontFamily: "'Syne', sans-serif" }}>
+              ${eth.usd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              <span style={{ fontSize: 13, fontWeight: 600, marginLeft: 8, color: up ? '#16A34A' : '#EF4444' }}>
+                {up ? '▲' : '▼'} {Math.abs(eth.change24h).toFixed(2)}%
+              </span>
+            </p>
+          ) : (
+            <div className={loading ? 'animate-pulse' : ''} style={{
+              height: 22, width: 140, borderRadius: 6,
+              background: 'rgba(45,26,38,0.08)', marginTop: 6,
+            }} />
+          )}
+        </div>
+      </div>
+      <span style={{ fontSize: 12, color: 'rgba(45,26,38,0.4)' }}>
+        Live market data · Updated every 60s
+      </span>
     </div>
   )
 }
@@ -814,6 +858,9 @@ export default function CreditDashboard() {
                 </div>
               </div>
             </div>
+
+            {/* ── Live market context ── */}
+            <MarketCard />
 
             {/* ── Score Breakdown + Predictor row ── */}
             <div className="bento-grid">

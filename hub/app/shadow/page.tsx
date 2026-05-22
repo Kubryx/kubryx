@@ -6,6 +6,7 @@ import { fallbackShadowAgents } from '../../lib/fallback'
 import { toast } from '../../lib/toast'
 import { useWalletForTool } from '../../hooks/useWalletForTool'
 import { ConnectButton } from '../../components/wallet/ConnectButton'
+import { PriceBadge } from '../../components/ui/PriceBadge'
 import ExecutiveWalkthrough from '../components/ExecutiveWalkthrough'
 import CommandPalette from '../components/CommandPalette'
 
@@ -334,6 +335,7 @@ export default function ShadowPage() {
             {stealth?'🔴 STEALTH ON':'⚫ Stealth Off'}
           </button>
           {/* Wallet */}
+          <PriceBadge coinId="solana" label="SOL" />
           <ConnectButton type="solana" size="lg" />
         </div>
       </header>

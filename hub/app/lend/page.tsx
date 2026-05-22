@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useWalletForTool } from '@/hooks/useWalletForTool'
 import { ConnectButton } from '@/components/wallet/ConnectButton'
+import { usePrices } from '@/hooks/usePrices'
 
 // Child components that handle the actual logic and forms
 import LendDashboard from '@/components/lend/LendDashboard'
@@ -60,6 +61,52 @@ function SectionDivider({ bg = '#EEF2FF' }: { bg?: string }) {
       <div className="divider-star-container" style={{ backgroundColor: bg }}>
         <span className="divider-star">✧</span>
       </div>
+    </div>
+  )
+}
+
+// Live collateral market prices (ETH primary collateral, ARB for L2 context).
+function LendMarketRow() {
+  const { prices } = usePrices(['ethereum', 'arbitrum'])
+  const items = [
+    { id: 'ethereum', label: 'ETH', note: 'Primary collateral' },
+    { id: 'arbitrum', label: 'ARB', note: 'Arbitrum L2' },
+  ]
+  return (
+    <div style={{
+      maxWidth: 1200, margin: '0 auto', padding: '0 40px 4px',
+      position: 'relative', zIndex: 10, display: 'flex',
+      alignItems: 'center', gap: 16, flexWrap: 'wrap',
+    }}>
+      {items.map((it) => {
+        const p = prices[it.id]
+        const up = p ? p.change24h >= 0 : true
+        return (
+          <div key={it.id} style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: 'rgba(255,255,255,0.7)', border: '1px solid #E0E7FF',
+            borderRadius: 9999, padding: '8px 16px',
+          }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#4338CA' }}>{it.label}</span>
+            {p ? (
+              <>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#1E1B4B' }}>
+                  ${p.usd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: up ? '#059669' : '#DC2626' }}>
+                  {up ? '▲' : '▼'} {Math.abs(p.change24h).toFixed(2)}%
+                </span>
+              </>
+            ) : (
+              <span className="animate-pulse" style={{ height: 14, width: 64, borderRadius: 6, background: 'rgba(99,102,241,0.15)' }} />
+            )}
+            <span style={{ fontSize: 11, color: 'rgba(30,27,75,0.4)' }}>{it.note}</span>
+          </div>
+        )
+      })}
+      <span style={{ fontSize: 12, fontWeight: 600, color: '#6366F1' }}>
+        Collateral market prices · Live
+      </span>
     </div>
   )
 }
@@ -486,6 +533,9 @@ function LendInner() {
           </button>
         </div>
       </section>
+
+      {/* Live collateral market prices */}
+      <LendMarketRow />
 
       {/* Bento Stats Grid */}
       <div className="stats-grid-container">

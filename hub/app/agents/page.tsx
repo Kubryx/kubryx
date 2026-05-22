@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useWalletForTool } from '@/hooks/useWalletForTool'
 import { ConnectButton } from '@/components/wallet/ConnectButton'
+import { PriceBadge } from '@/components/ui/PriceBadge'
 
 // Sub-components for tabs
 import AgentDashboard from '@/components/agents/AgentDashboard'
@@ -374,7 +375,8 @@ function AgentsPageInner() {
           Deploy, manage, and scale AI agents on the Solana network. Experience seamless on-chain execution with our premium orchestration layer.
         </p>
         
-        <div style={{ position: 'relative', zIndex: 10 }}>
+        <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <PriceBadge coinId="solana" label="SOL" />
           <ConnectButton type="solana" size="lg" />
         </div>
       </div>

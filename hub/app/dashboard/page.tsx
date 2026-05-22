@@ -13,6 +13,7 @@ import {
 import type { ChartPoint } from '@/lib/dashboard-fallbacks'
 import ActivityFeed from '@/components/ActivityFeed'
 import ToolQuickAccess from '@/components/ToolQuickAccess'
+import { PriceTicker } from '@/components/ui/PriceTicker'
 import { ConnectButton } from '@/components/wallet/ConnectButton'
 import { WrongNetworkBanner } from '@/components/wallet/WrongNetwork'
 
@@ -554,6 +555,11 @@ export default function DashboardPage() {
 
           {/* Wrong-network warning (dashboard expects QIE Mainnet) */}
           <WrongNetworkBanner />
+
+          {/* Live market price ticker */}
+          <div style={{ padding: '20px 24px 0' }}>
+            <PriceTicker />
+          </div>
 
           {/* Stats row */}
           <div style={{
