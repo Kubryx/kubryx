@@ -21,7 +21,7 @@ function short(addr: string, head = 8, tail = 6) {
   return addr.length > head + tail + 1 ? `${addr.slice(0, head)}…${addr.slice(-tail)}` : addr
 }
 
-export default function DWalletManager() {
+export default function DWalletManager({ walletAddress }: { walletAddress?: string }) {
   const [wallets, setWallets] = useState<DWallet[]>(FALLBACK_DWALLETS)
   const [copiedId, setCopiedId] = useState<number | null>(null)
 
@@ -214,7 +214,9 @@ export default function DWalletManager() {
               </Field>
 
               <button onClick={simulateRegister} disabled={submitting} style={{ ...primaryBtn, opacity: submitting ? 0.5 : 1 }}>
-                {submitting ? 'Generating MPC shares…' : 'Simulate Registration (Demo)'}
+                {submitting
+                  ? 'Generating MPC shares…'
+                  : walletAddress ? 'Register dWallet' : 'Simulate Registration (Demo)'}
               </button>
             </div>
           )}

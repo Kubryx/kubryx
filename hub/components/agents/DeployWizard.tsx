@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { deployJob } from '@/lib/trustmesh-api'
 import { toast } from '@/lib/toast'
-import { loadWallet } from '@/lib/wallet-utils'
 import { TRUSTMESH_ACCENT } from '@/lib/agents-fallbacks'
 
 const ACCENT = TRUSTMESH_ACCENT
@@ -31,10 +30,11 @@ function randomHex(length: number) {
   return out
 }
 
-export default function DeployWizard() {
+export default function DeployWizard({ walletAddress }: { walletAddress?: string }) {
   const router = useRouter()
   const [step, setStep] = useState<Step>(1)
-  const [wallet, setWallet] = useState('')
+  // Wallet address comes from the global wallet context (passed by the page).
+  const wallet = walletAddress ?? ''
 
   // Step 1
   const [name, setName] = useState('')
@@ -52,10 +52,6 @@ export default function DeployWizard() {
   // Step 3
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<{ jobId: string; tx: string; sns: string } | null>(null)
-
-  useEffect(() => {
-    setWallet(loadWallet('solana') || '')
-  }, [])
 
   useEffect(() => {
     if (!snsSubdomain) { setAvailable('idle'); return }

@@ -4,6 +4,8 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useState } from 'react'
+import { ConnectButton } from './wallet/ConnectButton'
+import { NetworkBadge } from './wallet/NetworkBadge'
 
 const GOLD = '#F5C518'
 const BG = '#080808'
@@ -28,8 +30,6 @@ const BREADCRUMB_NAMES: Record<string, string> = {
   settings: 'Settings',
 }
 
-const NETWORKS = ['QIE Mainnet', 'Solana', 'Stellar', 'ETH L2']
-
 interface Props {
   onMobileToggle: () => void
   isMobile: boolean
@@ -37,7 +37,6 @@ interface Props {
 
 export default function TopBar({ onMobileToggle, isMobile }: Props) {
   const pathname = usePathname()
-  const [network, setNetwork] = useState('QIE Mainnet')
   const [notifOpen, setNotifOpen] = useState(false)
 
   const parts = pathname.split('/').filter(Boolean)
@@ -98,22 +97,8 @@ export default function TopBar({ onMobileToggle, isMobile }: Props) {
       {/* Right side */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
 
-        {/* Network selector */}
-        {!isMobile && (
-          <select value={network} onChange={e => setNetwork(e.target.value)} style={{
-            padding: '5px 10px',
-            borderRadius: 8,
-            border: `1px solid ${BORDER}`,
-            background: 'rgba(255,255,255,0.04)',
-            color: 'rgba(255,255,255,0.55)',
-            fontSize: 11,
-            fontFamily: MONO,
-            outline: 'none',
-            cursor: 'pointer',
-          }}>
-            {NETWORKS.map(n => <option key={n} value={n} style={{ background: '#0C0C0C' }}>{n}</option>)}
-          </select>
-        )}
+        {/* Live network badge — reflects the wallet's actual chain */}
+        {!isMobile && <NetworkBadge />}
 
         {/* System status */}
         {!isMobile && (
@@ -182,19 +167,8 @@ export default function TopBar({ onMobileToggle, isMobile }: Props) {
           )}
         </div>
 
-        {/* Wallet indicator */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          padding: '6px 12px', borderRadius: 8,
-          border: `1px solid ${BORDER}`,
-          background: 'rgba(255,255,255,0.04)',
-          cursor: 'pointer',
-        }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: GOLD, flexShrink: 0 }} />
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', fontFamily: MONO }}>
-            {isMobile ? '0x9F…' : '0x9F3C…E3A1'}
-          </span>
-        </div>
+        {/* Wallet connect / connected pill */}
+        <ConnectButton type="auto" size="sm" />
       </div>
     </header>
   )

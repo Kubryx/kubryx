@@ -5,18 +5,19 @@ import Link from 'next/link'
 import {
   isMetaMaskInstalled,
   truncateAddress,
-  switchToQIE,
-  loadWallet,
-  persistWallet,
-  clearWallet,
   WALLET_INSTALL_LINKS,
-  QIE_MAINNET,
 } from '../../lib/wallet-utils'
 import { toast } from '../../lib/toast'
+import { useWalletForTool } from '../../hooks/useWalletForTool'
+import { useWallet } from '../../context/WalletContext'
+import { ConnectButton } from '../../components/wallet/ConnectButton'
 
 export default function LegacyLandingPage() {
-  const [wallet, setWallet] = useState('')
-  const [error, setError] = useState('')
+  // Wallet state now comes from the global wallet context.
+  const { address } = useWalletForTool()
+  const { disconnectEVM } = useWallet()
+  const wallet = address ?? ''
+
   const [mounted, setMounted] = useState(false)
 
   // Cursor position
@@ -27,8 +28,6 @@ export default function LegacyLandingPage() {
 
   useEffect(() => {
     setMounted(true)
-    const saved = loadWallet('evm')
-    if (saved) setWallet(saved)
 
     // Custom cursor mechanics
     const moveCursor = (e: MouseEvent) => {
@@ -57,26 +56,8 @@ export default function LegacyLandingPage() {
     return () => cancelAnimationFrame(animationFrameId)
   }, [cursorPos, mounted])
 
-  async function connect() {
-    setError('')
-    try {
-      if (!isMetaMaskInstalled()) throw new Error('MetaMask is not installed.')
-      await switchToQIE()
-      const accounts = (await (window as any).ethereum.request({ method: 'eth_requestAccounts' })) as string[]
-      const address = accounts[0] || ''
-      setWallet(address)
-      persistWallet('evm', address)
-      toast.success('Connected to QIE Mainnet')
-    } catch (err: any) {
-      const msg = err?.message || 'Unable to connect.'
-      setError(msg)
-      toast.error(msg)
-    }
-  }
-
   function disconnect() {
-    setWallet('')
-    clearWallet('evm')
+    disconnectEVM()
     toast.success('Wallet disconnected')
   }
 
@@ -364,12 +345,9 @@ export default function LegacyLandingPage() {
                 </button>
               </div>
             ) : (
-              <button onClick={connect} className="btn-outline-gold" style={{ padding: '8px 24px' }}>
-                🔗 Connect Wallet
-              </button>
+              <ConnectButton type="evm" size="lg" />
             )}
           </div>
-          {error && <p style={{ color: '#EF4444', fontSize: 14, marginTop: 12 }}>{error}</p>}
           {!installed && (
             <a href={WALLET_INSTALL_LINKS.metamask} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginTop: 12, color: '#D97706', fontSize: 14, fontWeight: 500 }}>
               Install MetaMask to connect

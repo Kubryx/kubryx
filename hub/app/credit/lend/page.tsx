@@ -11,14 +11,12 @@ import { getRating, fallbackBreakdown, CHAT_GREETING } from '../../../lib/neuroc
 import {
   isMetaMaskInstalled,
   truncateAddress,
-  switchToQIE,
-  loadWallet,
-  persistWallet,
-  clearWallet,
   WALLET_INSTALL_LINKS,
-  QIE_MAINNET,
 } from '../../../lib/wallet-utils'
 import { toast } from '../../../lib/toast'
+import { useWalletForTool } from '../../../hooks/useWalletForTool'
+import { useWallet } from '../../../context/WalletContext'
+import { ConnectButton } from '../../../components/wallet/ConnectButton'
 
 // ─── Gauge math ───────────────────────────────────────────────
 const GAUGE_R = 56
@@ -129,27 +127,28 @@ function MiniGauge({ score }: { score: number }) {
 }
 
 export default function LendPage() {
-  const [wallet, setWallet] = useState('')
+  // Wallet state now comes from the global wallet context (EVM / QIE Mainnet).
+  const { address } = useWalletForTool()
+  const { disconnectEVM } = useWallet()
+  const wallet = address ?? ''
   const [score, setScore] = useState(650)
   const [msgs, setMsgs] = useState<ChatMsg[]>([])
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const [convId, setConvId] = useState<string | undefined>(undefined)
-  const [error, setError] = useState('')
   const chatEndRef = useRef<HTMLDivElement>(null)
 
   const installed = useMemo(() => (typeof window === 'undefined' ? true : isMetaMaskInstalled()), [])
 
   useEffect(() => {
-    const saved = loadWallet('evm')
-    if (saved) {
-      setWallet(saved)
-      initChat(saved)
-    } else {
-      // Show greeting without wallet
-      addAIMsg(CHAT_GREETING)
-    }
+    addAIMsg(CHAT_GREETING)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Load the score breakdown whenever a wallet is connected.
+  useEffect(() => {
+    if (wallet) fetchScoreBreakdown(wallet).then((bd) => setScore(bd.score)).catch(() => {})
+  }, [wallet])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -159,33 +158,8 @@ export default function LendPage() {
     setMsgs((prev) => [...prev, { role: 'ai', content, ts: new Date() }])
   }
 
-  async function initChat(addr: string) {
-    const bd = await fetchScoreBreakdown(addr)
-    setScore(bd.score)
-    addAIMsg(CHAT_GREETING)
-  }
-
-  async function connect() {
-    setError('')
-    try {
-      if (!isMetaMaskInstalled()) throw new Error('MetaMask is not installed.')
-      await switchToQIE()
-      const accounts = (await (window as any).ethereum.request({ method: 'eth_requestAccounts' })) as string[]
-      const address = accounts[0] || ''
-      setWallet(address)
-      persistWallet('evm', address)
-      toast.success('Connected to QIE Mainnet')
-      initChat(address)
-    } catch (err: any) {
-      const msg = err?.message || 'Unable to connect.'
-      setError(msg)
-      toast.error(msg)
-    }
-  }
-
   function disconnectWallet() {
-    setWallet('')
-    clearWallet('evm')
+    disconnectEVM()
     setScore(650)
     setMsgs([])
     setConvId(undefined)
@@ -249,10 +223,7 @@ export default function LendPage() {
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
                 Connect wallet for personalized rates
               </p>
-              <button style={{ ...btnPrimary, width: '100%', justifyContent: 'center' }} onClick={connect}>
-                Connect MetaMask
-              </button>
-              {error && <p style={{ color: '#F87171', marginTop: 8, fontSize: 12 }}>{error}</p>}
+              <ConnectButton type="evm" size="lg" />
             </div>
           ) : wallet ? (
             <div style={{ ...card, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px' }}>

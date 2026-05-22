@@ -2,8 +2,9 @@
 
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { toast } from '../../lib/toast'
-import { loadWallet, persistWallet, isFreighterInstalled } from '../../lib/wallet-utils'
 import { getExplorerUrl } from '../../lib/explorer'
+import { useWalletForTool } from '../../hooks/useWalletForTool'
+import { ConnectButton } from '../../components/wallet/ConnectButton'
 
 type SplitRecord = {
   id: string
@@ -113,8 +114,9 @@ function CountUpDecimal({ end, decimals = 1, prefix = '', suffix = '' }: { end: 
 }
 
 export default function SyncSplitPage() {
-  const [wallet, setWallet] = useState('')
-  const [isDemo, setIsDemo] = useState(false)
+  // Wallet state now comes from the global wallet context (EVM / QIE Mainnet).
+  const { address, isConnected } = useWalletForTool()
+  const wallet = address ?? ''
   const [mounted, setMounted] = useState(false)
 
   // Cursor position
@@ -189,20 +191,6 @@ export default function SyncSplitPage() {
   // Setup mount flags and custom cursor trackers
   useEffect(() => {
     setMounted(true)
-    
-    // Connect initial wallet if saved
-    const saved = loadWallet('stellar')
-    if (saved) {
-      setWallet(saved)
-      if (saved.startsWith('GB5WSTELLAR')) {
-        setIsDemo(true)
-      }
-    } else {
-      // Default to simulator wallet if none exists
-      const mockAddr = 'GB5WSTELLAR7PLITSPLITPASSPOKEDEMOMODEACTIVE'
-      setWallet(mockAddr)
-      setIsDemo(true)
-    }
 
     // Custom cursor mechanics
     const moveCursor = (e: MouseEvent) => {
@@ -235,24 +223,6 @@ export default function SyncSplitPage() {
   const scrollTo = (id: string) => {
     const el = document.getElementById(id)
     if (el) el.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  // Connect wallet action
-  const connectWallet = () => {
-    if (isFreighterInstalled()) {
-      toast.info('Connecting Freighter Wallet...')
-      // Simulate successful Freighter lock
-      setTimeout(() => {
-        setWallet('GB5WSTELLAR7PLITSPLITPASSPOKEDEMOMODEACTIVE')
-        setIsDemo(false)
-        toast.success('✦ Freighter connected successfully!')
-      }, 600)
-    } else {
-      // Fallback to Sandbox Wallet
-      setWallet('GB5WSTELLAR7PLITSPLITPASSPOKEDEMOMODEACTIVE')
-      setIsDemo(true)
-      toast.info('Freighter extension not active. Initialized Sandbox Mock Wallet.')
-    }
   }
 
   // Participants logic (auto-includes wallet as Participant 1 "You ✦")
@@ -301,8 +271,8 @@ export default function SyncSplitPage() {
   // Trigger form submission split flow simulation
   const handleCreateBillSubmit = (e: FormEvent) => {
     e.preventDefault()
-    if (!wallet) {
-      toast.error('Connect your Stellar wallet to authorize Soroban escrows.')
+    if (!isConnected) {
+      toast.error('Connect your wallet to authorize escrows.')
       return
     }
     if (!billName) {
@@ -383,8 +353,8 @@ export default function SyncSplitPage() {
 
   // Pay share on a bill
   const payBillShare = (billId: string) => {
-    if (!wallet) {
-      toast.error('Connect wallet first!')
+    if (!isConnected) {
+      toast.error('Connect your wallet first!')
       return
     }
     
@@ -1882,9 +1852,7 @@ export default function SyncSplitPage() {
           <a href={getExplorerUrl('stellar', 'address', 'CCEIBX7TF3OY5CWE5GDGZPFNNTIRTLLHDYJ4NQG4YLWYTNURUZ4YGKGF')} target="_blank" rel="noopener noreferrer" className="nav-link">Stellar Network</a>
         </nav>
         <div>
-          <button className="btn-pill-pink" onClick={connectWallet}>
-            {wallet ? `${wallet.slice(0, 6)}...${wallet.slice(-4)}` : 'Connect Wallet'}
-          </button>
+          <ConnectButton type="evm" size="lg" />
         </div>
       </header>
 
@@ -2122,14 +2090,20 @@ export default function SyncSplitPage() {
                 <input type="date" className="input-text" style={{ padding: '10px 16px' }} />
               </div>
 
-              <div className="btn-submit-container" onClick={handleCreateBillSubmit}>
-                <button type="submit" className="btn-submit-left">
-                  Create Bill on Stellar
-                </button>
-                <div className="btn-submit-right">
-                  →
+              {isConnected ? (
+                <div className="btn-submit-container" onClick={handleCreateBillSubmit}>
+                  <button type="submit" className="btn-submit-left">
+                    Create Bill on Stellar
+                  </button>
+                  <div className="btn-submit-right">
+                    →
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '4px 0' }}>
+                  <ConnectButton type="evm" size="lg" />
+                </div>
+              )}
               <span className="secured-note">Secured by Stellar Soroban escrow contract</span>
             </form>
           )}
@@ -2279,7 +2253,11 @@ export default function SyncSplitPage() {
                 <div className="bill-card-bottom">
                   <span className="bill-dates-mono">Created May 15 · Due Jun 01</span>
                   {status === 'You owe' ? (
-                    <button className="btn-pay-share" onClick={() => payBillShare(bill.id)}>Pay My Share →</button>
+                    isConnected ? (
+                      <button className="btn-pay-share" onClick={() => payBillShare(bill.id)}>Pay My Share →</button>
+                    ) : (
+                      <ConnectButton type="evm" size="sm" />
+                    )
                   ) : (
                     <button className="btn-view-details">View Details</button>
                   )}

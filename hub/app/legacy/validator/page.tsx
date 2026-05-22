@@ -1,16 +1,10 @@
 // Built by vsrupeshkumar
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import {
-  isMetaMaskInstalled,
-  truncateAddress,
-  switchToQIE,
-  loadWallet,
-  persistWallet,
-  WALLET_INSTALL_LINKS,
-  QIE_MAINNET,
-} from '../../../lib/wallet-utils'
+import { useState } from 'react'
+import { truncateAddress } from '../../../lib/wallet-utils'
+import { useWalletForTool } from '../../../hooks/useWalletForTool'
+import { ConnectButton } from '../../../components/wallet/ConnectButton'
 import { registerValidator } from '../../../lib/eternavault-api'
 import { toast } from '../../../lib/toast'
 
@@ -51,29 +45,11 @@ const ROLES = [
 ]
 
 export default function ValidatorPage() {
-  const [wallet, setWallet] = useState('')
+  // Wallet state now comes from the global wallet context (EVM / QIE Mainnet).
+  const { address } = useWalletForTool()
+  const wallet = address ?? ''
   const [registering, setRegistering] = useState(false)
   const [txHash, setTxHash] = useState('')
-  const installed = useMemo(() => (typeof window === 'undefined' ? true : isMetaMaskInstalled()), [])
-
-  useEffect(() => {
-    const saved = loadWallet('evm')
-    if (saved) setWallet(saved)
-  }, [])
-
-  async function connectWallet() {
-    try {
-      if (!isMetaMaskInstalled()) throw new Error('MetaMask is not installed.')
-      await switchToQIE()
-      const accounts = (await (window as any).ethereum.request({ method: 'eth_requestAccounts' })) as string[]
-      const address = accounts[0] || ''
-      setWallet(address)
-      persistWallet('evm', address)
-      toast.success('Connected to QIE Mainnet')
-    } catch (err: any) {
-      toast.error(err?.message || 'Could not connect wallet')
-    }
-  }
 
   async function handleRegister() {
     if (!wallet) { toast.error('Connect your wallet first'); return }
@@ -127,34 +103,7 @@ export default function ValidatorPage() {
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: '0 0 16px', lineHeight: 1.5 }}>
               Connect your QIE wallet to register your address in LegacyVault.sol as a trusted validator.
             </p>
-            {installed ? (
-              <button
-                onClick={connectWallet}
-                style={{
-                  background: 'linear-gradient(135deg, #D97706, #F5C518)',
-                  color: '#0d0e11', border: 'none', borderRadius: 8,
-                  padding: '11px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                }}
-              >
-                🔗 Connect MetaMask
-              </button>
-            ) : (
-              <a
-                href={WALLET_INSTALL_LINKS.metamask}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  color: 'rgba(255,255,255,0.7)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  borderRadius: 8, padding: '11px 24px',
-                  fontSize: 14, fontWeight: 600, textDecoration: 'none',
-                  display: 'inline-block',
-                }}
-              >
-                Install MetaMask
-              </a>
-            )}
+            <ConnectButton type="evm" size="lg" />
           </>
         ) : (
           <>
@@ -169,7 +118,7 @@ export default function ValidatorPage() {
               <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>
                 {truncateAddress(wallet)}
               </span>
-              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>· {QIE_MAINNET.chainName}</span>
+              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>· QIE Mainnet</span>
             </div>
 
             {txHash ? (
@@ -185,7 +134,7 @@ export default function ValidatorPage() {
                   TX: {txHash}
                 </p>
                 <a
-                  href={`${QIE_MAINNET.blockExplorerUrls[0]}/tx/${txHash}`}
+                  href={`https://mainnet.qie.digital/tx/${txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ fontSize: 11, color: '#F5C518', marginTop: 8, display: 'inline-block' }}

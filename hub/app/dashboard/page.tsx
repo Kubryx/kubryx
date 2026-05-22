@@ -13,6 +13,8 @@ import {
 import type { ChartPoint } from '@/lib/dashboard-fallbacks'
 import ActivityFeed from '@/components/ActivityFeed'
 import ToolQuickAccess from '@/components/ToolQuickAccess'
+import { ConnectButton } from '@/components/wallet/ConnectButton'
+import { WrongNetworkBanner } from '@/components/wallet/WrongNetwork'
 
 /* ── Theme ──────────────────────────────────────────── */
 const BG      = '#0a0e27'
@@ -530,7 +532,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Right — search + status */}
+          {/* Right — search + status + wallet */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {!isMobile && <SearchBar />}
             <div style={{
@@ -543,11 +545,15 @@ export default function DashboardPage() {
                 {isMobile ? 'Live' : 'All systems live'}
               </span>
             </div>
+            <ConnectButton type="auto" size="sm" />
           </div>
         </header>
 
         {/* Body — scrollable */}
         <div style={{ flex: 1, overflowY: 'auto' }}>
+
+          {/* Wrong-network warning (dashboard expects QIE Mainnet) */}
+          <WrongNetworkBanner />
 
           {/* Stats row */}
           <div style={{

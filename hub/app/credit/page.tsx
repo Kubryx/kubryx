@@ -20,14 +20,12 @@ import {
 import {
   isMetaMaskInstalled,
   truncateAddress,
-  switchToQIE,
-  loadWallet,
-  persistWallet,
-  clearWallet,
   WALLET_INSTALL_LINKS,
-  QIE_MAINNET,
 } from '../../lib/wallet-utils'
 import { toast } from '../../lib/toast'
+import { useWalletForTool } from '../../hooks/useWalletForTool'
+import { useWallet } from '../../context/WalletContext'
+import { ConnectButton } from '../../components/wallet/ConnectButton'
 
 // ─── Gauge math ──────────────────────────────────────────────
 const GAUGE_R = 90
@@ -232,7 +230,11 @@ const btnOutline: React.CSSProperties = {
 
 // ─── Page ─────────────────────────────────────────────────────
 export default function CreditDashboard() {
-  const [wallet, setWallet] = useState('')
+  // Wallet state now comes from the global wallet context.
+  const { address, isConnected, expectedNetwork } = useWalletForTool()
+  const { disconnectEVM } = useWallet()
+  const wallet = address ?? ''
+
   const [score, setScore] = useState(650)
   const [explanation, setExplanation] = useState('Based on on-chain analysis')
   const [refreshTxHash, setRefreshTxHash] = useState('')
@@ -255,8 +257,6 @@ export default function CreditDashboard() {
 
   useEffect(() => {
     setMounted(true)
-    const saved = loadWallet('evm')
-    if (saved) setWallet(saved)
     fetchOraclePrice().then(setOraclePrice)
 
     // Custom cursor mechanics
@@ -287,7 +287,15 @@ export default function CreditDashboard() {
   }, [cursorPos, mounted])
 
   useEffect(() => {
-    if (!wallet) return
+    if (!wallet) {
+      // Disconnected — reset back to demo defaults.
+      setScore(650)
+      setBreakdown(fallbackBreakdown)
+      setRefreshTxHash('')
+      setPrediction(null)
+      setIsDemo(false)
+      return
+    }
     loadDashboard(wallet)
   }, [wallet])
 
@@ -304,36 +312,13 @@ export default function CreditDashboard() {
     setLoading(false)
   }
 
-  async function connect() {
-    setError('')
-    try {
-      if (!isMetaMaskInstalled()) throw new Error('MetaMask is not installed.')
-      await switchToQIE()
-      const accounts = (await (window as any).ethereum.request({ method: 'eth_requestAccounts' })) as string[]
-      const address = accounts[0] || ''
-      setWallet(address)
-      persistWallet('evm', address)
-      toast.success('Connected to QIE Mainnet')
-    } catch (err: any) {
-      const msg = err?.message || 'Unable to connect wallet.'
-      setError(msg)
-      toast.error(msg)
-    }
-  }
-
   function disconnect() {
-    setWallet('')
-    clearWallet('evm')
-    setScore(650)
-    setBreakdown(fallbackBreakdown)
-    setRefreshTxHash('')
-    setPrediction(null)
-    setIsDemo(false)
+    disconnectEVM()
     toast.success('Wallet disconnected')
   }
 
   async function refreshScore() {
-    if (!wallet) return
+    if (!isConnected || !wallet) return
     setLoading(true)
     setRefreshTxHash('')
     setError('')
@@ -350,7 +335,7 @@ export default function CreditDashboard() {
   }
 
   async function runPredictor() {
-    if (!scenario || !wallet) return
+    if (!scenario || !isConnected || !wallet) return
     setPredicting(true)
     setPrediction(null)
     const res = await predictScore(wallet, scenario as any)
@@ -667,13 +652,12 @@ export default function CreditDashboard() {
             }}>🧠</div>
             <p style={{ fontSize: 22, fontWeight: 700, marginBottom: 8, fontFamily: "'Syne', sans-serif" }}>Connect your wallet</p>
             <p style={{ fontSize: 14, color: 'rgba(45,26,38,0.5)', marginBottom: 28, maxWidth: 360, margin: '0 auto 28px' }}>
-              Connect MetaMask on QIE Mainnet (Chain ID {QIE_MAINNET.chainId}) to generate your credit score.
+              Connect MetaMask on {expectedNetwork?.name ?? 'QIE Mainnet'} (Chain ID{' '}
+              {expectedNetwork?.chainIdDecimal ?? 1990}) to generate your credit score.
             </p>
-            <button style={btnPrimary} onClick={connect}
-              onMouseEnter={(e) => { (e.target as HTMLElement).style.backgroundColor = '#EAB308' }}
-              onMouseLeave={(e) => { (e.target as HTMLElement).style.backgroundColor = '#F5A623' }}>
-              Connect MetaMask
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <ConnectButton type="evm" size="lg" />
+            </div>
             {error && <p style={{ color: '#EF4444', marginTop: 12, fontSize: 13 }}>{error}</p>}
           </div>
         )}

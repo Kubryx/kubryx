@@ -8,13 +8,11 @@ import { uploadMemory } from '../../../lib/eternavault-api'
 import {
   isMetaMaskInstalled,
   truncateAddress,
-  switchToQIE,
-  loadWallet,
-  persistWallet,
   WALLET_INSTALL_LINKS,
-  QIE_MAINNET,
 } from '../../../lib/wallet-utils'
 import { toast } from '../../../lib/toast'
+import { useWalletForTool } from '../../../hooks/useWalletForTool'
+import { ConnectButton } from '../../../components/wallet/ConnectButton'
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif'
 
@@ -46,7 +44,9 @@ const labelStyle: React.CSSProperties = {
 }
 
 export default function UploadPage() {
-  const [wallet, setWallet] = useState('')
+  // Wallet state now comes from the global wallet context (EVM / QIE Mainnet).
+  const { address } = useWalletForTool()
+  const wallet = address ?? ''
   const [vaultKey, setVaultKey] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [title, setTitle] = useState('')
@@ -59,24 +59,6 @@ export default function UploadPage() {
 
   const installed = useMemo(() => (typeof window === 'undefined' ? true : isMetaMaskInstalled()), [])
 
-  useEffect(() => {
-    const saved = loadWallet('evm')
-    if (saved) setWallet(saved)
-  }, [])
-
-  async function connectWallet() {
-    try {
-      if (!isMetaMaskInstalled()) throw new Error('MetaMask is not installed.')
-      await switchToQIE()
-      const accounts = (await (window as any).ethereum.request({ method: 'eth_requestAccounts' })) as string[]
-      const address = accounts[0] || ''
-      setWallet(address)
-      persistWallet('evm', address)
-      toast.success('Connected to QIE Mainnet')
-    } catch (err: any) {
-      toast.error(err?.message || 'Could not connect wallet')
-    }
-  }
 
   function onDrop(e: React.DragEvent) {
     e.preventDefault()
@@ -451,27 +433,13 @@ export default function UploadPage() {
           <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: 0 }}>
             Connect wallet to anchor memories on QIE Mainnet
           </p>
-          <button
-            onClick={connectWallet}
-            style={{
-              background: 'rgba(245,197,24,0.1)',
-              color: '#F5C518',
-              border: '1px solid rgba(245,197,24,0.3)',
-              borderRadius: 7,
-              padding: '7px 16px',
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            Connect MetaMask
-          </button>
+          <ConnectButton type="evm" size="lg" />
         </div>
       )}
 
       {wallet && (
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginTop: 12, fontFamily: 'monospace' }}>
-          Wallet: {truncateAddress(wallet)} · {QIE_MAINNET.chainName}
+          Wallet: {truncateAddress(wallet)} · QIE Mainnet
         </p>
       )}
 

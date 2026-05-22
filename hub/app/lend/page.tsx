@@ -2,8 +2,8 @@
 
 import { Suspense, useEffect, useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { loadWallet, persistWallet } from '@/lib/wallet-utils'
-import { toast } from '@/lib/toast'
+import { useWalletForTool } from '@/hooks/useWalletForTool'
+import { ConnectButton } from '@/components/wallet/ConnectButton'
 
 // Child components that handle the actual logic and forms
 import LendDashboard from '@/components/lend/LendDashboard'
@@ -11,9 +11,6 @@ import LoanPortfolio from '@/components/lend/LoanPortfolio'
 import BorrowForm from '@/components/lend/BorrowForm'
 import LendForm from '@/components/lend/LendForm'
 import LendMarkets from '@/components/lend/LendMarkets'
-
-type EthereumProvider = { request: (a: { method: string; params?: unknown[] }) => Promise<unknown> }
-declare global { interface Window { ethereum?: EthereumProvider } }
 
 export type LendTabId = 'dashboard' | 'loans' | 'borrow' | 'lend' | 'markets'
 
@@ -72,7 +69,9 @@ function LendInner() {
   const params = useSearchParams()
   const initial = (params.get('tab') as LendTabId) || 'dashboard'
   const [tab, setTab] = useState<LendTabId>(VALID.includes(initial) ? initial : 'dashboard')
-  const [wallet, setWallet] = useState('')
+  // Wallet state now comes from the global wallet context.
+  const { address, isConnected, connect } = useWalletForTool()
+  const wallet = address ?? ''
   const [isLive, setIsLive] = useState(false)
   const [prefillAsset, setPrefillAsset] = useState<string | undefined>(undefined)
   const [mounted, setMounted] = useState(false)
@@ -83,7 +82,6 @@ function LendInner() {
 
   useEffect(() => {
     setMounted(true)
-    setWallet(loadWallet('evm') || '')
     if (!apiBase) return
     fetch(`${apiBase}/health`).then(r => r.ok && r.json()).then(d => setIsLive(d?.status === 'ok')).catch(() => {})
 
@@ -110,15 +108,6 @@ function LendInner() {
   useEffect(() => {
     router.replace(tab === 'dashboard' ? '/lend' : `/lend?tab=${tab}`, { scroll: false })
   }, [tab, router])
-
-  async function connect() {
-    if (!window.ethereum) { toast.error('MetaMask not detected'); return }
-    try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }) as string[]
-      const addr = accounts[0] || ''
-      setWallet(addr); persistWallet('evm', addr); toast.success('MetaMask connected')
-    } catch { toast.error('Connection cancelled') }
-  }
 
   // Floating circles mapping for background
   const floatingCircles = useMemo(() => {
@@ -474,9 +463,7 @@ function LendInner() {
             <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: isLive ? '#10b981' : '#f59e0b', boxShadow: isLive ? '0 0 8px #10b981' : 'none' }} />
             {isLive ? 'Network Live' : 'Connecting...'}
           </div>
-          <button className="btn-pill-brand" onClick={connect}>
-            {wallet ? `${wallet.slice(0, 6)}...${wallet.slice(-4)}` : 'Connect Wallet'}
-          </button>
+          <ConnectButton type="evm" size="lg" />
         </div>
       </header>
 
@@ -554,8 +541,8 @@ function LendInner() {
         {/* The child components are inverted to match the light theme seamlessly */}
         <div className="dark-to-light-inverter">
           {tab === 'dashboard' && <LendDashboard onGoToBorrow={() => setTab('borrow')} onGoToLoans={() => setTab('loans')} />}
-          {tab === 'loans'     && <LoanPortfolio />}
-          {tab === 'borrow'    && <BorrowForm walletAddress={wallet} />}
+          {tab === 'loans'     && <LoanPortfolio isConnected={isConnected} />}
+          {tab === 'borrow'    && <BorrowForm walletAddress={wallet} isConnected={isConnected} onConnect={connect} />}
           {tab === 'lend'      && <LendForm walletAddress={wallet} prefillAsset={prefillAsset} />}
           {tab === 'markets'   && <LendMarkets onSupply={(a) => { setPrefillAsset(a); setTab('lend') }} onBorrow={() => setTab('borrow')} />}
         </div>

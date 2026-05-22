@@ -13,9 +13,13 @@ const MONO = '"Fira Code","JetBrains Mono",monospace'
 type Mode = 'borrow' | 'lend'
 const healthColor = (h: number) => h >= 2 ? '#10b981' : h >= 1.2 ? '#f59e0b' : '#ef4444'
 
-export default function LoanPortfolio() {
+export default function LoanPortfolio({ isConnected = false }: { isConnected?: boolean }) {
   const [mode, setMode] = useState<Mode>('borrow')
   const [expanded, setExpanded] = useState<string | null>(null)
+
+  // Action buttons (repay / withdraw / claim) require a connected wallet.
+  const gate = (s: React.CSSProperties): React.CSSProperties =>
+    isConnected ? s : { ...s, opacity: 0.4, cursor: 'not-allowed' }
 
   return (
     <div style={{ padding: 28, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -49,7 +53,7 @@ export default function LoanPortfolio() {
                       <td style={{ ...td, color: '#10b981' }}>{l.apr} {l.aiNegotiated && <span style={{ fontSize: 10, color: A }}>🤖</span>}</td>
                       <td style={{ ...td, color: healthColor(l.health), fontFamily: MONO }}>{l.health}</td>
                       <td style={{ ...td, color: MUTED }}>{l.due}</td>
-                      <td style={td}><button onClick={e => e.stopPropagation()} style={smallBtn}>Repay</button></td>
+                      <td style={td}><button onClick={e => e.stopPropagation()} disabled={!isConnected} style={gate(smallBtn)}>Repay</button></td>
                     </tr>
                     {expanded === l.id && (
                       <tr key={`${l.id}-d`}>
@@ -84,7 +88,7 @@ export default function LoanPortfolio() {
                 </div>
               </div>
             ))}
-            <button style={{ ...smallBtn, marginTop: 12 }}>+ Add Collateral</button>
+            <button disabled={!isConnected} style={gate({ ...smallBtn, marginTop: 12 })}>+ Add Collateral</button>
           </div>
         </>
       ) : (
@@ -105,15 +109,15 @@ export default function LoanPortfolio() {
                   <td style={{ ...td, color: '#10b981', fontFamily: MONO }}>{s.earned}</td>
                   <td style={{ ...td, color: MUTED }}>{s.started}</td>
                   <td style={td}>
-                    <button style={smallBtn}>Withdraw</button>
-                    <button style={{ ...smallBtn, marginLeft: 6 }}>Claim</button>
+                    <button disabled={!isConnected} style={gate(smallBtn)}>Withdraw</button>
+                    <button disabled={!isConnected} style={gate({ ...smallBtn, marginLeft: 6 })}>Claim</button>
                   </td>
                 </tr>
               ))}
               <tr>
                 <td colSpan={5} style={{ ...td, color: MUTED, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Total Unclaimed: $312</td>
                 <td colSpan={2} style={{ ...td, textAlign: 'right' }}>
-                  <button style={{ padding: '6px 14px', borderRadius: 6, background: A, color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Claim All →</button>
+                  <button disabled={!isConnected} style={gate({ padding: '6px 14px', borderRadius: 6, background: A, color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer' })}>Claim All →</button>
                 </td>
               </tr>
             </tbody>

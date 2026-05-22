@@ -2,9 +2,8 @@
 
 import { Suspense, useEffect, useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { loadWallet, persistWallet } from '@/lib/wallet-utils'
-import { toast } from '@/lib/toast'
-import { fetchAnalytics } from '@/lib/trustmesh-api'
+import { useWalletForTool } from '@/hooks/useWalletForTool'
+import { ConnectButton } from '@/components/wallet/ConnectButton'
 
 // Sub-components for tabs
 import AgentDashboard from '@/components/agents/AgentDashboard'
@@ -12,15 +11,6 @@ import JobsExplorer from '@/components/agents/JobsExplorer'
 import NodeRegistry from '@/components/agents/NodeRegistry'
 import DeployWizard from '@/components/agents/DeployWizard'
 import AgentAnalytics from '@/components/agents/AgentAnalytics'
-
-type PhantomLike = {
-  isPhantom?: boolean
-  connect: () => Promise<{ publicKey: { toString: () => string } }>
-}
-function getPhantom(): PhantomLike | undefined {
-  if (typeof window === 'undefined') return undefined
-  return (window as unknown as { solana?: PhantomLike }).solana
-}
 
 type AgentsTabId = 'dashboard' | 'jobs' | 'registry' | 'deploy' | 'analytics'
 const VALID_TABS: AgentsTabId[] = ['dashboard', 'jobs', 'registry', 'deploy', 'analytics']
@@ -32,17 +22,16 @@ function AgentsPageInner() {
   const initialTab: AgentsTabId = tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'dashboard'
 
   const [activeTab, setActiveTab] = useState<AgentsTabId>(initialTab)
-  const [wallet, setWallet] = useState('')
-  const [isLive, setIsLive] = useState(false)
-  
+  // Wallet state now comes from the global wallet context (Solana / Devnet).
+  const { address } = useWalletForTool()
+  const wallet = address ?? ''
+
   const [mounted, setMounted] = useState(false)
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 })
   const [cursorTrail, setCursorTrail] = useState({ x: -100, y: -100 })
 
   useEffect(() => {
     setMounted(true)
-    setWallet(loadWallet('solana') || '')
-    fetchAnalytics().then(r => setIsLive(r.isLive)).catch(() => {})
 
     const moveCursor = (e: MouseEvent) => {
       setCursorPos({ x: e.clientX, y: e.clientY })
@@ -73,23 +62,6 @@ function AgentsPageInner() {
     const url = activeTab === 'dashboard' ? '/agents' : `/agents?tab=${activeTab}`
     router.replace(url, { scroll: false })
   }, [activeTab, router])
-
-  async function handleConnectWallet() {
-    const provider = getPhantom()
-    if (!provider?.isPhantom) {
-      toast.error('Phantom wallet not detected. Install from phantom.app')
-      return
-    }
-    try {
-      const res = await provider.connect()
-      const addr = res.publicKey.toString()
-      setWallet(addr)
-      persistWallet('solana', addr)
-      toast.success('Wallet connected')
-    } catch {
-      toast.error('Wallet connection cancelled')
-    }
-  }
 
   const floatingCircles = useMemo(() => {
     return Array.from({ length: 14 }).map((_, i) => ({
@@ -403,19 +375,7 @@ function AgentsPageInner() {
         </p>
         
         <div style={{ position: 'relative', zIndex: 10 }}>
-          {wallet ? (
-            <div className="wallet-badge">
-              <div className={`status-dot ${isLive ? '' : 'offline'}`} />
-              {wallet.slice(0, 4)}...{wallet.slice(-4)}
-            </div>
-          ) : (
-            <button className="connect-btn" onClick={handleConnectWallet}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 12V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V12ZM21 12H15C13.8954 12 13 12.8954 13 14C13 15.1046 13.8954 16 15 16H21V12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Connect Phantom
-            </button>
-          )}
+          <ConnectButton type="solana" size="lg" />
         </div>
       </div>
 
@@ -439,7 +399,7 @@ function AgentsPageInner() {
         {activeTab === 'dashboard' && <AgentDashboard />}
         {activeTab === 'jobs'      && <JobsExplorer />}
         {activeTab === 'registry'  && <NodeRegistry />}
-        {activeTab === 'deploy'    && <DeployWizard />}
+        {activeTab === 'deploy'    && <DeployWizard walletAddress={wallet} />}
         {activeTab === 'analytics' && <AgentAnalytics />}
       </div>
       <div style={{ textAlign: 'center', padding: '24px', fontSize: '12px', color: 'inherit', opacity: 0.6, fontWeight: 500 }}>

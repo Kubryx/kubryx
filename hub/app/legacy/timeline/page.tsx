@@ -1,15 +1,10 @@
 // Built by vsrupeshkumar
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  isMetaMaskInstalled,
-  truncateAddress,
-  switchToQIE,
-  loadWallet,
-  persistWallet,
-  QIE_MAINNET,
-} from '../../../lib/wallet-utils'
+import { useEffect, useRef, useState } from 'react'
+import { truncateAddress } from '../../../lib/wallet-utils'
+import { useWalletForTool } from '../../../hooks/useWalletForTool'
+import { ConnectButton } from '../../../components/wallet/ConnectButton'
 import {
   fetchVaultFiles,
   anchorCid,
@@ -357,15 +352,11 @@ function FileCard({
 
 // ─── Page ──────────────────────────────────────────────────────
 export default function TimelinePage() {
-  const [wallet, setWallet] = useState('')
+  // Wallet state now comes from the global wallet context (EVM / QIE Mainnet).
+  const { address } = useWalletForTool()
+  const wallet = address ?? ''
   const [files, setFiles] = useState<VaultFile[]>([])
   const [loading, setLoading] = useState(false)
-  const installed = useMemo(() => (typeof window === 'undefined' ? true : isMetaMaskInstalled()), [])
-
-  useEffect(() => {
-    const saved = loadWallet('evm')
-    if (saved) setWallet(saved)
-  }, [])
 
   useEffect(() => {
     if (!wallet) return
@@ -374,20 +365,6 @@ export default function TimelinePage() {
       .then(setFiles)
       .finally(() => setLoading(false))
   }, [wallet])
-
-  async function connectWallet() {
-    try {
-      if (!isMetaMaskInstalled()) throw new Error('MetaMask is not installed.')
-      await switchToQIE()
-      const accounts = (await (window as any).ethereum.request({ method: 'eth_requestAccounts' })) as string[]
-      const address = accounts[0] || ''
-      setWallet(address)
-      persistWallet('evm', address)
-      toast.success('Connected to QIE Mainnet')
-    } catch (err: any) {
-      toast.error(err?.message || 'Could not connect wallet')
-    }
-  }
 
   function removeFile(id: string) {
     setFiles((prev) => prev.filter((f) => f.id !== id))
@@ -426,22 +403,7 @@ export default function TimelinePage() {
           <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px', lineHeight: 1.6 }}>
             Your timeline is associated with your QIE wallet address.
           </p>
-          {installed ? (
-            <button
-              onClick={connectWallet}
-              style={{
-                background: 'linear-gradient(135deg, #D97706, #F5C518)',
-                color: '#0d0e11', border: 'none', borderRadius: 8,
-                padding: '11px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer',
-              }}
-            >
-              🔗 Connect MetaMask
-            </button>
-          ) : (
-            <p style={{ fontSize: 13, color: '#F87171' }}>
-              MetaMask not detected. Install it to continue.
-            </p>
-          )}
+          <ConnectButton type="evm" size="lg" />
         </div>
       ) : loading ? (
         <div style={{ textAlign: 'center', padding: '48px 0' }}>
@@ -484,7 +446,7 @@ export default function TimelinePage() {
             marginBottom: 20, flexWrap: 'wrap', gap: 8,
           }}>
             <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
-              {truncateAddress(wallet)} · {QIE_MAINNET.chainName}
+              {truncateAddress(wallet)} · QIE Mainnet
             </p>
             <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
               {files.length} {files.length === 1 ? 'file' : 'files'}

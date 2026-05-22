@@ -4,16 +4,12 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { fallbackShadowAgents } from '../../lib/fallback'
 import { toast } from '../../lib/toast'
-import { loadWallet, persistWallet } from '../../lib/wallet-utils'
+import { useWalletForTool } from '../../hooks/useWalletForTool'
+import { ConnectButton } from '../../components/wallet/ConnectButton'
 import ExecutiveWalkthrough from '../components/ExecutiveWalkthrough'
 import CommandPalette from '../components/CommandPalette'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-
-type PhantomProvider = {
-  connect: () => Promise<{ publicKey: { toString: () => string } }>
-  isPhantom?: boolean
-}
 
 type ShadowAgent = { agentType?: string; type?: string; name?: string; status?: string; lastAction?: string; time?: string }
 type FeedItem = { id: string; agentType: string; action: string; timestamp: string }
@@ -59,7 +55,6 @@ function ts() {
   const n = new Date()
   return `${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')}`
 }
-function shorten(a: string) { return `${a.slice(0,6)}…${a.slice(-4)}` }
 function sColor(s: string) { return s==='active'?'#10B981':s==='idle'?'#F59E0B':s==='alert'?'#EF4444':'#94A3B8' }
 
 // ─── AgentCard ────────────────────────────────────────────────────────────────
@@ -157,7 +152,9 @@ function AgentCard({
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ShadowPage() {
-  const [wallet,  setWallet]  = useState('')
+  // Wallet state now comes from the global wallet context (Solana / Devnet).
+  const { address } = useWalletForTool()
+  const wallet = address ?? ''
   const [orgName, setOrgName] = useState('')
   const [admin,   setAdmin]   = useState('')
   const [agents,  setAgents]  = useState<ShadowAgent[]>([])
@@ -184,10 +181,10 @@ export default function ShadowPage() {
 
   // ── Load ──────────────────────────────────────────────────────
 
+  // Seed the org admin field from the connected wallet (still user-editable).
   useEffect(() => {
-    const saved = loadWallet('solana')
-    if (saved) { setWallet(saved); setAdmin(saved) }
-  }, [])
+    if (wallet) setAdmin(wallet)
+  }, [wallet])
 
   async function req<T>(path: string, opts?: RequestInit): Promise<T> {
     if (!apiBase) throw new Error('Backend not configured')
@@ -254,21 +251,6 @@ export default function ShadowPage() {
   }, [])
 
   // ── Actions ───────────────────────────────────────────────────
-
-  async function connectWallet() {
-    try {
-      const phantom = (window as any).solana as PhantomProvider | undefined
-      if (!phantom?.isPhantom) throw new Error('Phantom wallet is not installed.')
-      const res = await phantom.connect()
-      const pk = res.publicKey.toString()
-      setWallet(pk); setAdmin(pk)
-      persistWallet('solana', pk)
-      toast.success('Phantom connected to Stealth Execution Suite')
-    } catch (e) {
-      const m = e instanceof Error ? e.message : 'Could not connect.'
-      setError(m); toast.error(m)
-    }
-  }
 
   async function setupOrg(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -352,9 +334,7 @@ export default function ShadowPage() {
             {stealth?'🔴 STEALTH ON':'⚫ Stealth Off'}
           </button>
           {/* Wallet */}
-          <button onClick={connectWallet} style={{ fontSize:13, padding:'8px 20px', borderRadius:999, cursor:'pointer', background:wallet?'#F1F5F9':'#0F172A', border:`1px solid ${wallet?'#E2E8F0':'#0F172A'}`, color:wallet?'#0F172A':'#FFFFFF', fontWeight:700, fontFamily:wallet?MONO:'inherit', transition: 'all 0.2s' }}>
-            {wallet ? shorten(wallet) : '🔗 Connect Phantom'}
-          </button>
+          <ConnectButton type="solana" size="lg" />
         </div>
       </header>
 

@@ -4,22 +4,23 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { TOOLS as TOOL_REGISTRY } from '../lib/tools'
+import { WalletPill } from './wallet/WalletPill'
 
 const GOLD = '#F5C518'
 const BG = '#080808'
 const BORDER = 'rgba(255,255,255,0.08)'
 const MONO = '"Fira Code","JetBrains Mono",monospace'
 
-const TOOLS = [
-  { icon: '◈', name: 'Credit Passport',  href: '/credit',   color: '#06b6d4', desc: 'Credit Scoring' },
-  { icon: '⬟', name: 'Family vault',  href: '/legacy',   color: '#f43f5e', desc: 'Inheritance' },
-  { icon: '⬡', name: 'Agent co-ordinator',    href: '/agents',   color: '#6366f1', desc: 'AI Agents' },
-  { icon: '🔐', name: 'Private vault',  href: '/vault',    color: '#14b8a6', desc: 'Privacy' },
-  { icon: '◆', name: 'Bill split',    href: '/split',    color: '#3b82f6', desc: 'Bill Splitting' },
-  { icon: '◎', name: 'Protocol Borrow Engine',      href: '/lend',     color: '#f59e0b', desc: 'DeFi Lending' },
-  { icon: '◇', name: 'Yield Operations Hub',  href: '/treasury', color: '#10b981', desc: 'Yield Operations Hub' },
-  { icon: '▲', name: 'Stealth Execution Suite', href: '/shadow',   color: '#8b5cf6', desc: 'Operations' },
-]
+/* Nav items derived from the central tool registry (lib/tools.ts) so names
+   and colors stay consistent across the whole platform. */
+const TOOLS = TOOL_REGISTRY.map(t => ({
+  icon: t.icon,
+  name: t.name,
+  href: t.route,
+  color: t.color,
+  desc: t.tagline,
+}))
 
 interface Props {
   collapsed: boolean
@@ -185,6 +186,9 @@ export default function KubrykSidebar({ collapsed, onToggle, mobileOpen, onMobil
             )
           })}
         </nav>
+
+        {/* Wallet — connect button or connected address pill */}
+        {(!collapsed || isMobile) && <WalletPill />}
 
         {/* Quick stats */}
         {(!collapsed || isMobile) && (

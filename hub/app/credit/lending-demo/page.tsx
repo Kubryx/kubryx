@@ -12,14 +12,12 @@ import { getRating, fallbackLoanOffers } from '../../../lib/neurocredit-fallback
 import {
   isMetaMaskInstalled,
   truncateAddress,
-  switchToQIE,
-  loadWallet,
-  persistWallet,
-  clearWallet,
   WALLET_INSTALL_LINKS,
-  QIE_MAINNET,
 } from '../../../lib/wallet-utils'
 import { toast } from '../../../lib/toast'
+import { useWalletForTool } from '../../../hooks/useWalletForTool'
+import { useWallet } from '../../../context/WalletContext'
+import { ConnectButton } from '../../../components/wallet/ConnectButton'
 
 // ─── Style helpers ────────────────────────────────────────────
 const card: React.CSSProperties = {
@@ -170,19 +168,22 @@ function OfferCard({ offer, index, score }: { offer: NcLoanOffer; index: number;
 }
 
 export default function LendingDemoPage() {
-  const [wallet, setWallet] = useState('')
+  // Wallet state now comes from the global wallet context (EVM / QIE Mainnet).
+  const { address } = useWalletForTool()
+  const { disconnectEVM } = useWallet()
+  const wallet = address ?? ''
   const [score, setScore] = useState(0)
   const [offers, setOffers] = useState<NcLoanOffer[]>([])
   const [loading, setLoading] = useState(false)
   const [hasScore, setHasScore] = useState(false)
-  const [error, setError] = useState('')
 
   const installed = useMemo(() => (typeof window === 'undefined' ? true : isMetaMaskInstalled()), [])
 
+  // Load lending offers whenever a wallet is connected.
   useEffect(() => {
-    const saved = loadWallet('evm')
-    if (saved) { setWallet(saved); loadOffers(saved) }
-  }, [])
+    if (wallet) loadOffers(wallet)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wallet])
 
   async function loadOffers(addr: string) {
     setLoading(true)
@@ -196,27 +197,8 @@ export default function LendingDemoPage() {
     setLoading(false)
   }
 
-  async function connect() {
-    setError('')
-    try {
-      if (!isMetaMaskInstalled()) throw new Error('MetaMask is not installed.')
-      await switchToQIE()
-      const accounts = (await (window as any).ethereum.request({ method: 'eth_requestAccounts' })) as string[]
-      const address = accounts[0] || ''
-      setWallet(address)
-      persistWallet('evm', address)
-      toast.success('Connected to QIE Mainnet')
-      loadOffers(address)
-    } catch (err: any) {
-      const msg = err?.message || 'Unable to connect.'
-      setError(msg)
-      toast.error(msg)
-    }
-  }
-
   function disconnect() {
-    setWallet('')
-    clearWallet('evm')
+    disconnectEVM()
     setScore(0)
     setOffers([])
     setHasScore(false)
@@ -277,9 +259,7 @@ export default function LendingDemoPage() {
             Generate your credit score to see personalized lending terms tailored to your on-chain profile.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button style={btnPrimary} onClick={connect}>
-              Connect Wallet
-            </button>
+            <ConnectButton type="evm" size="lg" />
             <Link
               href="/credit"
               style={{
@@ -294,7 +274,6 @@ export default function LendingDemoPage() {
               Generate Credit Score
             </Link>
           </div>
-          {error && <p style={{ color: '#F87171', marginTop: 12, fontSize: 13 }}>{error}</p>}
         </div>
       )}
 

@@ -69,6 +69,51 @@ export function clearWallet(kind: WalletKind) {
   try { sessionStorage.removeItem(SS_KEYS[kind]) } catch {}
 }
 
+// ── Wallet connection helpers (added for the wallet integration) ──────────────
+
+export function formatBalance(balance: string | null, symbol: string): string {
+  if (!balance) return '—'
+  return `${parseFloat(balance).toFixed(4)} ${symbol}`
+}
+
+export function getExplorerTxUrl(txHash: string, chainId: number): string {
+  const map: Record<number, string> = {
+    1:     'https://etherscan.io/tx/',
+    42161: 'https://arbiscan.io/tx/',
+    1990:  'https://mainnet.qie.digital/tx/',
+  }
+  return `${map[chainId] ?? 'https://etherscan.io/tx/'}${txHash}`
+}
+
+export function getSolanaExplorerUrl(txSig: string): string {
+  return `https://explorer.solana.com/tx/${txSig}?cluster=devnet`
+}
+
+export function formatUSD(value: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency', currency: 'USD',
+    minimumFractionDigits: 0, maximumFractionDigits: 2,
+  }).format(value)
+}
+
+export function shortenHash(hash: string): string {
+  if (!hash || hash.length < 10) return hash
+  return `${hash.slice(0, 6)}...${hash.slice(-4)}`
+}
+
+// Convert a hex wei value (0x…) into a fixed-precision ether string.
+export function weiHexToEther(hex: string, decimals = 4): string {
+  try {
+    const ONE_ETHER = BigInt('1000000000000000000') // 1e18
+    const wei = BigInt(hex)
+    const whole = wei / ONE_ETHER
+    const frac = (wei % ONE_ETHER).toString().padStart(18, '0').slice(0, decimals)
+    return `${whole.toString()}.${frac}`
+  } catch {
+    return (0).toFixed(decimals)
+  }
+}
+
 export function timeAgo(input: string | Date | undefined): string {
   if (!input) return 'recent'
   const t = typeof input === 'string' ? new Date(input).getTime() : input.getTime()

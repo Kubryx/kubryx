@@ -1,15 +1,10 @@
 // Built by vsrupeshkumar
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import {
-  isMetaMaskInstalled,
-  truncateAddress,
-  switchToQIE,
-  loadWallet,
-  persistWallet,
-  QIE_MAINNET,
-} from '../../../lib/wallet-utils'
+import { useEffect, useState } from 'react'
+import { truncateAddress } from '../../../lib/wallet-utils'
+import { useWalletForTool } from '../../../hooks/useWalletForTool'
+import { ConnectButton } from '../../../components/wallet/ConnectButton'
 import { fetchTokenProfile, saveTokenProfile } from '../../../lib/eternavault-api'
 import { toast } from '../../../lib/toast'
 
@@ -64,18 +59,14 @@ const INFO_CARDS = [
 ]
 
 export default function TokenizationPage() {
-  const [wallet, setWallet] = useState('')
+  // Wallet state now comes from the global wallet context (EVM / QIE Mainnet).
+  const { address } = useWalletForTool()
+  const wallet = address ?? ''
   const [tokenAddress, setTokenAddress] = useState('')
   const [marketLink, setMarketLink] = useState('')
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [savedAt, setSavedAt] = useState<string | null>(null)
-  const installed = useMemo(() => (typeof window === 'undefined' ? true : isMetaMaskInstalled()), [])
-
-  useEffect(() => {
-    const saved = loadWallet('evm')
-    if (saved) setWallet(saved)
-  }, [])
 
   useEffect(() => {
     if (!wallet) return
@@ -89,20 +80,6 @@ export default function TokenizationPage() {
       })
       .finally(() => setLoading(false))
   }, [wallet])
-
-  async function connectWallet() {
-    try {
-      if (!isMetaMaskInstalled()) throw new Error('MetaMask is not installed.')
-      await switchToQIE()
-      const accounts = (await (window as any).ethereum.request({ method: 'eth_requestAccounts' })) as string[]
-      const address = accounts[0] || ''
-      setWallet(address)
-      persistWallet('evm', address)
-      toast.success('Connected to QIE Mainnet')
-    } catch (err: any) {
-      toast.error(err?.message || 'Could not connect wallet')
-    }
-  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -154,17 +131,12 @@ export default function TokenizationPage() {
       </div>
 
       {/* Wallet connect */}
-      {!wallet && installed && (
+      {!wallet && (
         <div style={{ ...card, marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, padding: '14px 18px', background: 'rgba(245,197,24,0.04)', border: '1px solid rgba(245,197,24,0.15)' }}>
           <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: 0 }}>
             Connect wallet to load/save your token profile
           </p>
-          <button
-            onClick={connectWallet}
-            style={{ background: 'rgba(245,197,24,0.1)', color: '#F5C518', border: '1px solid rgba(245,197,24,0.3)', borderRadius: 7, padding: '7px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
-          >
-            Connect MetaMask
-          </button>
+          <ConnectButton type="evm" size="lg" />
         </div>
       )}
 
@@ -268,7 +240,7 @@ export default function TokenizationPage() {
       {/* Wallet info */}
       {wallet && (
         <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.3)' }}>
-          {truncateAddress(wallet)} · {QIE_MAINNET.chainName}
+          {truncateAddress(wallet)} · QIE Mainnet
         </p>
       )}
 

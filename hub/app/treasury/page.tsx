@@ -3,10 +3,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { toast } from 'sonner'
-import { loadWallet, persistWallet } from '@/lib/wallet-utils'
-
-type PhantomProvider = { isPhantom?: boolean; connect: () => Promise<{ publicKey: { toString: () => string } }> }
+import { ConnectButton } from '@/components/wallet/ConnectButton'
 
 const FEATURES = [
   {
@@ -55,22 +52,12 @@ const SUPPORTED = [
   { name:'Optimism', symbol:'OP',    color:'#EF4444' },
 ]
 
-function short(addr: string) {
-  return addr.length > 10 ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : addr
-}
-
 export default function TreasuryLanding() {
-  const [wallet, setWallet] = useState('')
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   // Cursor position
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 })
   const [cursorTrail, setCursorTrail] = useState({ x: -100, y: -100 })
-
-  useEffect(() => {
-    const saved = loadWallet('solana')
-    if (saved) setWallet(saved)
-  }, [])
 
   useEffect(() => {
     const moveCursor = (e: MouseEvent) => {
@@ -151,33 +138,6 @@ export default function TreasuryLanding() {
     draw()
     return () => cancelAnimationFrame(raf)
   }, [])
-
-  async function connectWallet() {
-    try {
-      const phantom = (window as any).solana as PhantomProvider | undefined
-      if (phantom?.isPhantom) {
-        const res = await phantom.connect()
-        const addr = res.publicKey.toString()
-        setWallet(addr)
-        persistWallet('solana', addr)
-        toast.success('Phantom connected')
-        return
-      }
-      const metamask = (window as any).ethereum
-      if (metamask) {
-        const accounts: string[] = await metamask.request({ method: 'eth_requestAccounts' })
-        if (accounts[0]) {
-          setWallet(accounts[0])
-          persistWallet('solana', accounts[0])
-          toast.success('MetaMask connected')
-          return
-        }
-      }
-      toast.error('No wallet detected. Install Phantom or MetaMask.')
-    } catch (e: any) {
-      toast.error(e?.message || 'Wallet connection failed')
-    }
-  }
 
   const floatingCircles = useMemo(() => {
     return Array.from({ length: 16 }).map((_, i) => ({
@@ -645,14 +605,7 @@ export default function TreasuryLanding() {
 
             {/* CTAs */}
             <div className="hero-buttons">
-              <motion.button
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={connectWallet}
-                className="btn-emerald-pill"
-              >
-                🔌 {wallet ? short(wallet) : 'Connect Wallet'}
-              </motion.button>
+              <ConnectButton type="solana" size="lg" />
               <Link href="/treasury/dashboard">
                 <motion.button
                   whileHover={{ scale: 1.04 }}

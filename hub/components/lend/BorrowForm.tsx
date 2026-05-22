@@ -37,7 +37,15 @@ type Msg = { role: 'user' | 'ai'; text: string }
 type Asset = 'ETH' | 'BTC' | 'SOL'
 type Borrow = 'USDC' | 'USDT' | 'DAI'
 
-export default function BorrowForm({ walletAddress }: { walletAddress?: string }) {
+export default function BorrowForm({
+  walletAddress,
+  isConnected = false,
+  onConnect,
+}: {
+  walletAddress?: string
+  isConnected?: boolean
+  onConnect?: () => void
+}) {
   const [collat, setCollat] = useState<Asset>('ETH')
   const [collatAmt, setCollatAmt] = useState('')
   const [borrowAsset, setBorrowAsset] = useState<Borrow>('USDC')
@@ -166,9 +174,15 @@ export default function BorrowForm({ walletAddress }: { walletAddress?: string }
           </div>
         </Section>
 
-        <button onClick={getQuote} disabled={!borrowAmt || negotiating} style={{ ...primaryBtn, opacity: !borrowAmt || negotiating ? 0.5 : 1 }}>
-          {negotiating ? '🤖 Negotiating…' : '🤖 Get AI Quote'}
-        </button>
+        {isConnected ? (
+          <button onClick={getQuote} disabled={!borrowAmt || negotiating} style={{ ...primaryBtn, opacity: !borrowAmt || negotiating ? 0.5 : 1 }}>
+            {negotiating ? '🤖 Negotiating…' : '🤖 Get AI Quote'}
+          </button>
+        ) : (
+          <button onClick={() => onConnect?.()} style={primaryBtn}>
+            🔗 Connect Wallet to Negotiate
+          </button>
+        )}
       </div>
 
       {/* Right: AI chat panel */}
@@ -208,7 +222,11 @@ export default function BorrowForm({ walletAddress }: { walletAddress?: string }
                 You save: <b style={{ color: '#10b981' }}>{quote.save}</b>
               </div>
               <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                <button onClick={accept} style={primaryBtn}>Accept & Borrow</button>
+                {isConnected ? (
+                  <button onClick={accept} style={primaryBtn}>Accept & Borrow</button>
+                ) : (
+                  <button onClick={() => onConnect?.()} style={primaryBtn}>🔗 Connect Wallet</button>
+                )}
                 <button onClick={getQuote} style={secondaryBtn}>Renegotiate</button>
               </div>
             </div>

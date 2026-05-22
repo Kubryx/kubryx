@@ -2,8 +2,8 @@
 
 import { Suspense, useEffect, useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { loadWallet, persistWallet } from '@/lib/wallet-utils'
-import { toast } from '@/lib/toast'
+import { useWalletForTool } from '@/hooks/useWalletForTool'
+import { ConnectButton } from '@/components/wallet/ConnectButton'
 
 import VaultDashboard from '@/components/vault/VaultDashboard'
 import CollateralManager from '@/components/vault/CollateralManager'
@@ -22,8 +22,6 @@ const TABS: { id: VaultTabId; label: string; icon: string }[] = [
   { id: 'history',    label: 'History',       icon: '◴' },
 ]
 
-type PhantomProvider = { isPhantom?: boolean; connect: () => Promise<{ publicKey: { toString: () => string } }> }
-declare global { interface Window { solana?: PhantomProvider } }
 const apiBase = process.env.NEXT_PUBLIC_CIPHER_URL || process.env.NEXT_PUBLIC_CIPHER_API || ''
 
 function VaultInner() {
@@ -31,7 +29,9 @@ function VaultInner() {
   const params = useSearchParams()
   const initial = (params.get('tab') as VaultTabId) || 'dashboard'
   const [tab, setTab] = useState<VaultTabId>(VALID.includes(initial) ? initial : 'dashboard')
-  const [wallet, setWallet] = useState('')
+  // Wallet state now comes from the global wallet context (EVM / Arbitrum).
+  const { address } = useWalletForTool()
+  const wallet = address ?? ''
   const [isLive, setIsLive] = useState(false)
   const [privacyScore, setPrivacyScore] = useState<number | undefined>(undefined)
 
@@ -41,7 +41,6 @@ function VaultInner() {
 
   useEffect(() => {
     setMounted(true)
-    setWallet(loadWallet('solana') || '')
     if (!apiBase) return
     fetch(`${apiBase}/health`).then(r => r.ok && r.json()).then(d => setIsLive(d?.status === 'ok')).catch(() => {})
     fetch(`${apiBase}/api/privacy/score`).then(r => r.ok && r.json()).then(d => d?.score && setPrivacyScore(d.score)).catch(() => {})
@@ -69,15 +68,6 @@ function VaultInner() {
   useEffect(() => {
     router.replace(tab === 'dashboard' ? '/vault' : `/vault?tab=${tab}`, { scroll: false })
   }, [tab, router])
-
-  async function connect() {
-    if (!window.solana?.isPhantom) { toast.error('Phantom not detected'); return }
-    try {
-      const r = await window.solana.connect()
-      const addr = r.publicKey.toString()
-      setWallet(addr); persistWallet('solana', addr); toast.success('Wallet connected')
-    } catch { toast.error('Connection cancelled') }
-  }
 
   const floatingCircles = useMemo(() => {
     return Array.from({ length: 18 }).map((_, i) => ({
@@ -248,9 +238,7 @@ function VaultInner() {
           </span>
           <span className="badge badge-private">FHE Private</span>
         </div>
-        <button className="btn-pill-cyan" onClick={connect}>
-          {wallet ? `${wallet.slice(0, 6)}…${wallet.slice(-4)}` : 'Connect Phantom'}
-        </button>
+        <ConnectButton type="evm" size="lg" />
       </header>
 
       <section className="hero-section">
@@ -286,7 +274,7 @@ function VaultInner() {
           <div className="vault-inverted-wrapper">
             {tab === 'dashboard'  && <VaultDashboard walletAddress={wallet} privacyScore={privacyScore} onGoToCollateral={() => setTab('collateral')} onGoToHistory={() => setTab('history')} />}
             {tab === 'collateral' && <CollateralManager walletAddress={wallet} />}
-            {tab === 'dwallet'    && <DWalletManager />}
+            {tab === 'dwallet'    && <DWalletManager walletAddress={wallet} />}
             {tab === 'trade'      && <FHETradeForm walletAddress={wallet} />}
             {tab === 'history'    && <VaultHistory />}
           </div>

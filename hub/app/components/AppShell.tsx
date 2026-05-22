@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import KubrykSidebar from '../../components/KubrykSidebar'
 import TopBar from '../../components/TopBar'
+import { WalletProvider } from '../../context/WalletContext'
+import { WrongNetworkBanner } from '../../components/wallet/WrongNetwork'
 
 /* Paths that render inside the hub shell (sidebar + topbar).
    /dashboard is self-contained — it owns its own sidebar. */
@@ -34,12 +36,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const showShell = HUB_PREFIXES.some(p => pathname === p || pathname.startsWith(p + '/'))
 
-  if (!showShell) return <>{children}</>
+  /* WalletProvider wraps every hub route (shell + the self-contained
+     /dashboard) so useWallet works platform-wide. The landing page renders
+     inside it too — harmless, the provider has no effect until used. */
+  if (!showShell) return <WalletProvider>{children}</WalletProvider>
 
   /* sidebar occupies fixed space; main content shifts right */
   const sidebarWidth = isMobile ? 0 : (collapsed ? 80 : 280)
 
   return (
+    <WalletProvider>
     <div style={{ background: '#080808', minHeight: '100vh', display: 'flex' }}>
       {mounted && (
         <KubrykSidebar
@@ -67,9 +73,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           />
         )}
         <main style={{ flex: 1 }}>
+          {/* Route-aware wrong-network warning — shows for any tool whose
+              required chain differs from the connected EVM wallet's chain. */}
+          <WrongNetworkBanner />
           {children}
         </main>
       </div>
     </div>
+    </WalletProvider>
   )
 }

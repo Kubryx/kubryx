@@ -5,11 +5,9 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   isMetaMaskInstalled,
   truncateAddress,
-  switchToQIE,
-  loadWallet,
-  persistWallet,
-  QIE_MAINNET,
 } from '../../../lib/wallet-utils'
+import { useWalletForTool } from '../../../hooks/useWalletForTool'
+import { ConnectButton } from '../../../components/wallet/ConnectButton'
 import {
   checkDeathStatus,
   simulateUnlock,
@@ -121,7 +119,9 @@ function HeirDecryptModal({ file, onClose }: { file: VaultFile; onClose: () => v
 
 // ─── Page ──────────────────────────────────────────────────────
 export default function HeirPage() {
-  const [wallet, setWallet] = useState('')
+  // Wallet state now comes from the global wallet context (EVM / QIE Mainnet).
+  const { address } = useWalletForTool()
+  const wallet = address ?? ''
   const [ownerDid, setOwnerDid] = useState('')
   const [vaultKey, setVaultKey] = useState('')
   const [checking, setChecking] = useState(false)
@@ -133,24 +133,6 @@ export default function HeirPage() {
   const [registerResult, setRegisterResult] = useState('')
   const installed = useMemo(() => (typeof window === 'undefined' ? true : isMetaMaskInstalled()), [])
 
-  useEffect(() => {
-    const saved = loadWallet('evm')
-    if (saved) setWallet(saved)
-  }, [])
-
-  async function connectWallet() {
-    try {
-      if (!isMetaMaskInstalled()) throw new Error('MetaMask is not installed.')
-      await switchToQIE()
-      const accounts = (await (window as any).ethereum.request({ method: 'eth_requestAccounts' })) as string[]
-      const address = accounts[0] || ''
-      setWallet(address)
-      persistWallet('evm', address)
-      toast.success('Connected to QIE Mainnet')
-    } catch (err: any) {
-      toast.error(err?.message || 'Could not connect wallet')
-    }
-  }
 
   async function handleUnlock(e: React.FormEvent) {
     e.preventDefault()
@@ -210,15 +192,13 @@ export default function HeirPage() {
           <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: 0 }}>
             Connect your heir wallet to proceed
           </p>
-          <button onClick={connectWallet} style={{ background: 'rgba(245,197,24,0.1)', color: '#F5C518', border: '1px solid rgba(245,197,24,0.3)', borderRadius: 7, padding: '7px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-            Connect MetaMask
-          </button>
+          <ConnectButton type="evm" size="lg" />
         </div>
       )}
 
       {wallet && (
         <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.3)', marginBottom: 20 }}>
-          Heir wallet: {truncateAddress(wallet)} · {QIE_MAINNET.chainName}
+          Heir wallet: {truncateAddress(wallet)} · QIE Mainnet
         </p>
       )}
 

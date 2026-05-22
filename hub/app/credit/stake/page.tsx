@@ -12,14 +12,12 @@ import { STAKING_TIERS, fallbackStaking, type StakingTier } from '../../../lib/n
 import {
   isMetaMaskInstalled,
   truncateAddress,
-  switchToQIE,
-  loadWallet,
-  persistWallet,
-  clearWallet,
   WALLET_INSTALL_LINKS,
-  QIE_MAINNET,
 } from '../../../lib/wallet-utils'
 import { toast } from '../../../lib/toast'
+import { useWalletForTool } from '../../../hooks/useWalletForTool'
+import { useWallet } from '../../../context/WalletContext'
+import { ConnectButton } from '../../../components/wallet/ConnectButton'
 
 // ─── Style helpers ────────────────────────────────────────────
 const card: React.CSSProperties = {
@@ -115,20 +113,23 @@ function TierOrb({ tier }: { tier: StakingTier }) {
 }
 
 export default function StakePage() {
-  const [wallet, setWallet] = useState('')
+  // Wallet state now comes from the global wallet context (EVM / QIE Mainnet).
+  const { address } = useWalletForTool()
+  const { disconnectEVM } = useWallet()
+  const wallet = address ?? ''
   const [data, setData] = useState<NcStakingData>(fallbackStaking)
   const [loading, setLoading] = useState(false)
   const [stakeAmt, setStakeAmt] = useState('')
   const [unstakeAmt, setUnstakeAmt] = useState('')
   const [txHash, setTxHash] = useState('')
-  const [error, setError] = useState('')
 
   const installed = useMemo(() => (typeof window === 'undefined' ? true : isMetaMaskInstalled()), [])
 
+  // Load staking data whenever a wallet is connected.
   useEffect(() => {
-    const saved = loadWallet('evm')
-    if (saved) { setWallet(saved); loadStaking(saved) }
-  }, [])
+    if (wallet) loadStaking(wallet)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wallet])
 
   async function loadStaking(addr: string) {
     setLoading(true)
@@ -137,27 +138,8 @@ export default function StakePage() {
     setLoading(false)
   }
 
-  async function connect() {
-    setError('')
-    try {
-      if (!isMetaMaskInstalled()) throw new Error('MetaMask is not installed.')
-      await switchToQIE()
-      const accounts = (await (window as any).ethereum.request({ method: 'eth_requestAccounts' })) as string[]
-      const address = accounts[0] || ''
-      setWallet(address)
-      persistWallet('evm', address)
-      toast.success('Connected to QIE Mainnet')
-      loadStaking(address)
-    } catch (err: any) {
-      const msg = err?.message || 'Unable to connect.'
-      setError(msg)
-      toast.error(msg)
-    }
-  }
-
   function disconnect() {
-    setWallet('')
-    clearWallet('evm')
+    disconnectEVM()
     setData(fallbackStaking)
     setTxHash('')
     toast.success('Wallet disconnected')
@@ -237,12 +219,9 @@ export default function StakePage() {
           <div style={{ fontSize: 40, marginBottom: 12 }}>🛡</div>
           <p style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>Connect wallet to stake</p>
           <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 20 }}>
-            Connect MetaMask on {QIE_MAINNET.chainName} to stake NCRD tokens.
+            Connect MetaMask on QIE Mainnet to stake NCRD tokens.
           </p>
-          <button style={btnPrimary} onClick={connect}>
-            Connect MetaMask
-          </button>
-          {error && <p style={{ color: '#F87171', marginTop: 10, fontSize: 13 }}>{error}</p>}
+          <ConnectButton type="evm" size="lg" />
         </div>
       )}
 
