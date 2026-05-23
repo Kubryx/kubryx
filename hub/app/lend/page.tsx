@@ -119,7 +119,7 @@ function LendInner() {
   // Wallet state now comes from the global wallet context.
   const { address, isConnected, connect } = useWalletForTool()
   const wallet = address ?? ''
-  const [isLive, setIsLive] = useState(false)
+  const [isLive, setIsLive] = useState<boolean | null>(null)
   const [prefillAsset, setPrefillAsset] = useState<string | undefined>(undefined)
   const [mounted, setMounted] = useState(false)
 
@@ -129,8 +129,14 @@ function LendInner() {
 
   useEffect(() => {
     setMounted(true)
-    if (!apiBase) return
-    fetch(`${apiBase}/health`).then(r => r.ok && r.json()).then(d => setIsLive(d?.status === 'ok')).catch(() => {})
+    if (!apiBase) { setIsLive(false); return }
+    const ctrl = new AbortController()
+    const t = setTimeout(() => ctrl.abort(), 5000)
+    fetch(`${apiBase}/health`, { signal: ctrl.signal })
+      .then(r => r.ok && r.json())
+      .then(d => setIsLive(d?.status === 'ok'))
+      .catch(() => setIsLive(false))
+      .finally(() => clearTimeout(t))
 
     const moveCursor = (e: MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY })
     window.addEventListener('mousemove', moveCursor)
@@ -507,8 +513,8 @@ function LendInner() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#6366F1', fontWeight: 600 }}>
-            <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: isLive ? '#10b981' : '#f59e0b', boxShadow: isLive ? '0 0 8px #10b981' : 'none' }} />
-            {isLive ? 'Network Live' : 'Connecting...'}
+            <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: isLive === true ? '#10b981' : isLive === null ? '#6366f1' : '#f59e0b', boxShadow: isLive === true ? '0 0 8px #10b981' : 'none' }} />
+            {isLive === true ? 'Network Live' : isLive === null ? 'Checking…' : 'Offline'}
           </div>
           <ConnectButton type="evm" size="lg" />
         </div>

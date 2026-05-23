@@ -26,7 +26,7 @@ export function ConnectButton({
 
   const isSolana = type === 'solana'
   const wallet = isSolana ? solana : evm
-  const { isConnected, isConnecting, address, balance } = wallet
+  const { isConnected, isConnecting, address, balance, error } = wallet
 
   const sizeMap = {
     sm: 'px-3 py-1.5 text-xs gap-1.5',
@@ -73,11 +73,17 @@ export function ConnectButton({
           {isConnecting ? 'Connecting...' : 'Connect Wallet'}
         </button>
 
+        {error && !isConnecting && (
+          <p className="text-[10px] text-[#ef4444] mt-1 max-w-40 text-center leading-tight">
+            {error}
+          </p>
+        )}
+
         {showModal && (
           <WalletModal
             onClose={() => setShowModal(false)}
-            onConnectEVM={async () => { await connectEVM(); setShowModal(false) }}
-            onConnectSolana={async () => { await connectSolana(); setShowModal(false) }}
+            onConnectEVM={() => { setShowModal(false); connectEVM() }}
+            onConnectSolana={() => { setShowModal(false); connectSolana() }}
           />
         )}
       </>

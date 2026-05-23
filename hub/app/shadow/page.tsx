@@ -328,7 +328,7 @@ export default function ShadowPage() {
           {/* Health */}
           <span style={{ fontSize:12, padding:'6px 14px', borderRadius:999, background:health==='ok'?'#D1FAE5':'#FEE2E2', border:`1px solid ${health==='ok'?'#A7F3D0':'#FECACA'}`, color:health==='ok'?'#10B981':'#EF4444', display:'flex', alignItems:'center', gap:6, fontWeight:700 }}>
             <span style={{ width:6, height:6, borderRadius:'50%', background:health==='ok'?'#10B981':'#EF4444' }} />
-            {health==='checking'?'Connecting…':health==='ok'?'API Online':'API Offline'}
+            {health==='checking'?'Checking…':health==='ok'?'API Online':'API Offline'}
           </span>
           {/* Stealth */}
           <button onClick={()=>setStealth(s=>!s)} style={{ fontSize:12, padding:'6px 16px', borderRadius:999, cursor:'pointer', background:stealth?'#FEF2F2':'#FFFFFF', border:`1px solid ${stealth?'#FECACA':'#E2E8F0'}`, color:stealth?'#EF4444':'#64748B', fontWeight:700, transition: 'all 0.2s' }} onMouseOver={e => !stealth && (e.currentTarget.style.background = '#F8FAFC')} onMouseOut={e => !stealth && (e.currentTarget.style.background = '#FFFFFF')}>
