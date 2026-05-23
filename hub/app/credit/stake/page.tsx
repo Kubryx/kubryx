@@ -174,7 +174,7 @@ export default function StakePage() {
   async function handleStake() {
     const amount = parseFloat(stakeAmt)
     if (!wallet || isNaN(amount) || amount <= 0) { toast.error('Enter a valid amount'); return }
-    if (amount > data.availableBalance) { toast.error('Insufficient balance'); return }
+    if (amount > (data.availableBalance ?? 0)) { toast.error('Insufficient balance'); return }
     setLoading(true)
     setTxHash('')
     // Try the real on-chain stake first; fall back to the mock simulation.
@@ -202,7 +202,7 @@ export default function StakePage() {
   async function handleUnstake() {
     const amount = parseFloat(unstakeAmt)
     if (!wallet || isNaN(amount) || amount <= 0) { toast.error('Enter a valid amount'); return }
-    if (amount > data.stakedAmount) { toast.error('Exceeds staked amount'); return }
+    if (amount > (data.stakedAmount ?? 0)) { toast.error('Exceeds staked amount'); return }
     setLoading(true)
     setTxHash('')
     // Try the real on-chain unstake first; fall back to the mock simulation.
@@ -288,10 +288,10 @@ export default function StakePage() {
             {/* Stats grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12, marginBottom: 20 }}>
               {[
-                { label: 'STAKED', value: `${data.stakedAmount} NCRD`, color: '#A78BFA' },
-                { label: 'AVAILABLE', value: `${data.availableBalance} NCRD`, color: 'rgba(255,255,255,0.7)' },
+                { label: 'STAKED', value: `${data.stakedAmount ?? 0} NCRD`, color: '#A78BFA' },
+                { label: 'AVAILABLE', value: `${data.availableBalance ?? 0} NCRD`, color: 'rgba(255,255,255,0.7)' },
                 { label: 'CURRENT TIER', value: data.currentTier, color: tierColor(data.currentTier) },
-                { label: 'SCORE BOOST', value: `+${data.scoreBoost}`, color: '#22C55E' },
+                { label: 'SCORE BOOST', value: `+${data.scoreBoost ?? 0}`, color: '#22C55E' },
               ].map((s) => (
                 <div key={s.label} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '12px 14px' }}>
                   <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.3)', margin: '0 0 6px' }}>{s.label}</p>
@@ -359,9 +359,9 @@ export default function StakePage() {
                 style={input}
               />
               <button
-                style={{ ...btnDanger, opacity: loading || !unstakeAmt || data.stakedAmount === 0 ? 0.5 : 1 }}
+                style={{ ...btnDanger, opacity: loading || !unstakeAmt || (data.stakedAmount ?? 0) === 0 ? 0.5 : 1 }}
                 onClick={handleUnstake}
-                disabled={loading || !unstakeAmt || data.stakedAmount === 0}
+                disabled={loading || !unstakeAmt || (data.stakedAmount ?? 0) === 0}
               >
                 {loading ? 'Processing…' : 'Unstake'}
               </button>

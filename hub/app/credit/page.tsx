@@ -839,7 +839,7 @@ export default function CreditDashboard() {
                       ORACLE PRICE
                     </p>
                     <p style={{ fontSize: 24, fontWeight: 700, color: '#3B82F6', margin: 0, fontFamily: "'Syne', sans-serif" }}>
-                      ${oraclePrice.toFixed(2)}
+                      ${(oraclePrice ?? 2.45).toFixed(2)}
                     </p>
                     <p style={{ fontSize: 11, color: 'rgba(45,26,38,0.4)', margin: '4px 0 0' }}>QIE / USD</p>
                   </div>
@@ -871,13 +871,13 @@ export default function CreditDashboard() {
                 <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', color: '#F5A623', margin: '0 0 24px' }}>
                   SCORE BREAKDOWN
                 </p>
-                <ProgressBar label="Base Score" value={breakdown.baseScore} max={1000} color="#2D1A26" displayValue={String(breakdown.baseScore)} />
-                <ProgressBar label="Staking Boost" value={breakdown.stakingBoost} max={300} color="#16A34A" displayValue={`+${breakdown.stakingBoost}`} />
-                <ProgressBar label="Oracle Penalty" value={breakdown.oraclePenalty} max={200} color="#EF4444" displayValue={breakdown.oraclePenalty === 0 ? '0' : `-${breakdown.oraclePenalty}`} />
-                
+                <ProgressBar label="Base Score" value={breakdown.baseScore ?? 0} max={1000} color="#2D1A26" displayValue={String(breakdown.baseScore ?? 0)} />
+                <ProgressBar label="Staking Boost" value={breakdown.stakingBoost ?? 0} max={300} color="#16A34A" displayValue={`+${breakdown.stakingBoost ?? 0}`} />
+                <ProgressBar label="Oracle Penalty" value={breakdown.oraclePenalty ?? 0} max={200} color="#EF4444" displayValue={(breakdown.oraclePenalty ?? 0) === 0 ? '0' : `-${breakdown.oraclePenalty ?? 0}`} />
+
                 <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid rgba(45,26,38,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: 14, color: 'rgba(45,26,38,0.5)', fontWeight: 500 }}>
-                    {breakdown.baseScore} + {breakdown.stakingBoost} − {breakdown.oraclePenalty} =
+                    {breakdown.baseScore ?? 0} + {breakdown.stakingBoost ?? 0} − {breakdown.oraclePenalty ?? 0} =
                   </span>
                   <span style={{ fontSize: 24, fontWeight: 700, color: '#F5A623', fontFamily: "'Syne', sans-serif" }}>{score}</span>
                 </div>

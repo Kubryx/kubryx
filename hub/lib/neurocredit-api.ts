@@ -193,7 +193,7 @@ export async function fetchLendingOffers(
 export async function fetchOraclePrice(): Promise<number> {
   try {
     const r = await resilientRequest<{ price: number }>(`${NEUROCREDIT_API}/api/oracle/price`)
-    return r.price
+    return typeof r.price === 'number' ? r.price : ORACLE_PRICE_FALLBACK
   } catch (err: any) {
     logTelemetryError('FETCH_ERROR', 'NC fetchOraclePrice', err?.message, err)
     return ORACLE_PRICE_FALLBACK

@@ -65,7 +65,7 @@ function OfferCard({ offer, index, score }: { offer: NcLoanOffer; index: number;
     await new Promise((r) => setTimeout(r, 1000))
     setAccepted(true)
     setAccepting(false)
-    toast.success(`Offer accepted — $${offer.loanAmount.toLocaleString()} at ${offer.interestRate}% APR`)
+    toast.success(`Offer accepted — $${(offer.loanAmount ?? 0).toLocaleString()} at ${offer.interestRate ?? 0}% APR`)
   }
 
   return (
@@ -116,7 +116,7 @@ function OfferCard({ offer, index, score }: { offer: NcLoanOffer; index: number;
           LOAN AMOUNT
         </p>
         <p style={{ fontSize: 32, fontWeight: 800, color: '#fff', margin: 0 }}>
-          ${offer.loanAmount.toLocaleString()}
+          ${(offer.loanAmount ?? 0).toLocaleString()}
         </p>
       </div>
 
@@ -126,7 +126,7 @@ function OfferCard({ offer, index, score }: { offer: NcLoanOffer; index: number;
         <StatPill label="DURATION" value={`${offer.duration} months`} color="rgba(255,255,255,0.7)" />
         <StatPill
           label="COLLATERAL"
-          value={`$${offer.collateralRequired.toLocaleString()}`}
+          value={`$${(offer.collateralRequired ?? 0).toLocaleString()}`}
           color="rgba(255,255,255,0.6)"
         />
         <StatPill label="LTV RATIO" value={`${offer.ltv}%`} color="rgba(255,255,255,0.6)" />
