@@ -12,6 +12,8 @@ import {
   type AnalyticsResponse,
 } from '@/lib/trustmesh-fallbacks'
 import { DASH_STAT_PLACEHOLDERS, HOW_IT_WORKS, TRUSTMESH_ACCENT } from '@/lib/agents-fallbacks'
+import { useTrustMesh } from '@/hooks/useTrustMesh'
+import { JOB_STATUS_LABEL, type OnChainJobAccount } from '@/lib/api/solana'
 import MiniMesh from './MiniMesh'
 
 const ACCENT = TRUSTMESH_ACCENT
@@ -37,9 +39,16 @@ function relativeTime(iso: string) {
   return `${Math.round(diff / 86_400_000)}d ago`
 }
 
+const STATUS_CHIP: Record<number, { label: string; color: string }> = {
+  0: { label: 'Active',    color: '#10b981' },
+  1: { label: 'Complete',  color: '#3b82f6' },
+  2: { label: 'Revoked',   color: '#ef4444' },
+}
+
 export default function AgentDashboard() {
   const [jobsRes, setJobsRes] = useState<JobsResponse>(fallbackJobs)
   const [analytics, setAnalytics] = useState<AnalyticsResponse>(fallbackAnalytics)
+  const trustmesh = useTrustMesh()
 
   useEffect(() => {
     let cancelled = false
@@ -62,6 +71,118 @@ export default function AgentDashboard() {
 
   return (
     <div style={{ padding: 28, display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+      {/* ── Devnet live job accounts panel ─────────────────────── */}
+      <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 20 }}>
+        {/* Header row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, flexWrap: 'wrap', gap: 8 }}>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: MUTED2, textTransform: 'uppercase' }}>
+              On-Chain Job Accounts
+            </div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginTop: 2 }}>
+              Solana Devnet · Program{' '}
+              <span style={{ fontFamily: MONO, fontSize: 11, color: ACCENT }}>66DXeS…42quz</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {trustmesh.currentSlot > 0 && (
+              <span style={{ fontFamily: MONO, fontSize: 11, color: MUTED2 }}>
+                Block: {trustmesh.currentSlot.toLocaleString()}
+              </span>
+            )}
+            <span style={{
+              fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 10,
+              background: trustmesh.isLive ? 'rgba(16,185,129,0.12)' : 'rgba(249,115,22,0.10)',
+              border: `1px solid ${trustmesh.isLive ? 'rgba(16,185,129,0.4)' : 'rgba(249,115,22,0.3)'}`,
+              color: trustmesh.isLive ? '#10b981' : '#f59e0b',
+              fontFamily: MONO,
+            }}>
+              {trustmesh.isLive ? '⬤ Verified On-Chain · Solana Devnet' : '◎ Demo Data'}
+            </span>
+          </div>
+        </div>
+
+        {/* Job rows */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {trustmesh.loading ? (
+            <div style={{ color: MUTED2, fontSize: 12, padding: '12px 0' }}>Fetching Devnet accounts…</div>
+          ) : trustmesh.jobs.map(job => {
+            const live = job.isLive ? (job as OnChainJobAccount) : null
+            const statusNum = live?.status ?? 0
+            const chip = STATUS_CHIP[statusNum] ?? STATUS_CHIP[0]
+            return (
+              <div key={job.pda} style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 14px', borderRadius: 10,
+                background: 'rgba(255,255,255,0.02)',
+                border: `1px solid ${BORDER}`,
+                flexWrap: 'wrap',
+              }}>
+                {/* Status dot */}
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: chip.color, flexShrink: 0 }} />
+
+                {/* Description + PDA */}
+                <div style={{ flex: 1, minWidth: 180 }}>
+                  <div style={{ fontSize: 13, color: '#fff', fontWeight: 600 }}>{job.description}</div>
+                  <div style={{ fontSize: 11, color: MUTED2, fontFamily: MONO, marginTop: 2 }}>
+                    {job.pda.slice(0, 8)}…{job.pda.slice(-6)}
+                    {live?.createdAt && (
+                      <span style={{ marginLeft: 8 }}>
+                        · Created {live.createdAt.toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Stats pills */}
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                  {/* Template */}
+                  <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: `${ACCENT}18`, color: ACCENT, fontWeight: 600 }}>
+                    {job.template}
+                  </span>
+
+                  {/* Budget */}
+                  {live ? (
+                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: 'rgba(255,255,255,0.05)', color: MUTED, fontWeight: 600 }}>
+                      ◎ {live.budgetSol} SOL
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: 'rgba(255,255,255,0.05)', color: MUTED, fontWeight: 600 }}>
+                      ◎ {job.budgetSol ?? '—'} SOL
+                    </span>
+                  )}
+
+                  {/* Agent count */}
+                  {live && (
+                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: 'rgba(255,255,255,0.05)', color: MUTED, fontWeight: 600 }}>
+                      {live.agentCount} agents
+                    </span>
+                  )}
+
+                  {/* Status badge */}
+                  <span style={{
+                    fontSize: 10, padding: '2px 8px', borderRadius: 6,
+                    background: `${chip.color}18`, color: chip.color, fontWeight: 700,
+                  }}>
+                    {chip.label}
+                  </span>
+
+                  {/* Explorer link */}
+                  <a
+                    href={`https://explorer.solana.com/address/${job.pda}?cluster=devnet`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontSize: 10, color: ACCENT, textDecoration: 'none', fontWeight: 600 }}
+                  >
+                    Explorer ↗
+                  </a>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
       {/* Stats row */}
       <div style={{
         display: 'grid',

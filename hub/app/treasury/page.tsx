@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ConnectButton } from '@/components/wallet/ConnectButton'
 import { PriceBadge } from '@/components/ui/PriceBadge'
+import { useTrustMesh } from '@/hooks/useTrustMesh'
+import { type OnChainJobAccount } from '@/lib/api/solana'
+import { TRUSTMESH_OWNER_WALLET } from '@/lib/trustmesh-seeds'
 
 const FEATURES = [
   {
@@ -55,6 +58,13 @@ const SUPPORTED = [
 
 export default function TreasuryLanding() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const trustmesh = useTrustMesh()
+
+  // Derive live stats from on-chain job accounts
+  const liveJobs = trustmesh.jobs.filter(j => j.isLive) as OnChainJobAccount[]
+  const activeJobCount = liveJobs.filter(j => j.status === 0).length
+  const totalBudgetSol = liveJobs.reduce((sum, j) => sum + Number(j.budgetLamports), 0) / 1e9
+  const operatorShort = `${TRUSTMESH_OWNER_WALLET.slice(0, 6)}…${TRUSTMESH_OWNER_WALLET.slice(-4)}`
 
   // Cursor position
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 })
@@ -632,21 +642,43 @@ export default function TreasuryLanding() {
 
         {/* Stats Grid */}
         <section className="stats-grid-container">
+          {/* Live badge */}
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
+            <span style={{
+              fontSize: 11, fontWeight: 700, letterSpacing: '0.1em',
+              padding: '3px 14px', borderRadius: 12,
+              background: trustmesh.isLive ? 'rgba(16,185,129,0.12)' : 'rgba(249,115,22,0.10)',
+              border: `1px solid ${trustmesh.isLive ? 'rgba(16,185,129,0.4)' : 'rgba(249,115,22,0.3)'}`,
+              color: trustmesh.isLive ? '#10b981' : '#f59e0b',
+              fontFamily: '"Fira Code", monospace',
+            }}>
+              {trustmesh.isLive
+                ? `⬤ Live · Solana Devnet · Block ${trustmesh.currentSlot.toLocaleString()} · Operator ${operatorShort}`
+                : '◎ Demo Data — Connecting to Solana Devnet…'}
+            </span>
+          </div>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
             className="stats-grid"
           >
-            {STATS.map((s, idx) => (
-              <div key={s.label} className="stat-card">
-                <div>
-                  <div className="stat-eyebrow">✦ Metric {idx + 1}</div>
-                  <div className="stat-number">{s.value}</div>
+            {STATS.map((s, idx) => {
+              let displayValue = s.value
+              if (trustmesh.isLive) {
+                if (idx === 0) displayValue = `◎ ${totalBudgetSol.toFixed(3)} SOL`
+                if (idx === 1) displayValue = String(activeJobCount)
+              }
+              return (
+                <div key={s.label} className="stat-card">
+                  <div>
+                    <div className="stat-eyebrow">✦ Metric {idx + 1}</div>
+                    <div className="stat-number">{displayValue}</div>
+                  </div>
+                  <div className="stat-label">{s.label}</div>
                 </div>
-                <div className="stat-label">{s.label}</div>
-              </div>
-            ))}
+              )
+            })}
           </motion.div>
         </section>
 
