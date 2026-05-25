@@ -12,6 +12,8 @@ import ExecutiveWalkthrough from '../components/ExecutiveWalkthrough'
 import CommandPalette from '../components/CommandPalette'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { ColdStartBanner } from '../../components/ui/ColdStartBanner'
+import { useKubrykPlatform } from '../../context/KubrykPlatformContext'
+import { getCreditTier } from '../../lib/platform/scoring'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -159,6 +161,8 @@ export default function ShadowPage() {
   // Wallet state now comes from the global wallet context (Solana / Devnet).
   const { address } = useWalletForTool()
   const wallet = address ?? ''
+  const platform = useKubrykPlatform()
+  const tier = getCreditTier(platform.creditScore)
   const [orgName, setOrgName] = useState('')
   const [admin,   setAdmin]   = useState('')
   const [agents,  setAgents]  = useState<ShadowAgent[]>([])
@@ -363,6 +367,10 @@ export default function ShadowPage() {
               ↻ Retry
             </button>
           )}
+          {/* Credit tier */}
+          <span style={{ fontSize: 11, padding: '5px 12px', borderRadius: 999, background: tier.bg, border: `1px solid ${tier.border}`, color: tier.color, fontWeight: 700 }}>
+            {tier.name} · {platform.creditScore !== null ? `${platform.creditScore}/1000` : '—'}
+          </span>
           {/* Stealth */}
           <button onClick={()=>setStealth(s=>!s)} style={{ fontSize:12, padding:'6px 16px', borderRadius:999, cursor:'pointer', background:stealth?'#FEF2F2':'#FFFFFF', border:`1px solid ${stealth?'#FECACA':'#E2E8F0'}`, color:stealth?'#EF4444':'#64748B', fontWeight:700, transition: 'all 0.2s' }} onMouseOver={e => !stealth && (e.currentTarget.style.background = '#F8FAFC')} onMouseOut={e => !stealth && (e.currentTarget.style.background = '#FFFFFF')}>
             {stealth?'🔴 STEALTH ON':'⚫ Stealth Off'}

@@ -11,12 +11,16 @@ import { toast } from '../../lib/toast'
 import { useWalletForTool } from '../../hooks/useWalletForTool'
 import { useWallet } from '../../context/WalletContext'
 import { ConnectButton } from '../../components/wallet/ConnectButton'
+import { useKubrykPlatform } from '../../context/KubrykPlatformContext'
+import { getCreditTier } from '../../lib/platform/scoring'
 
 export default function LegacyLandingPage() {
   // Wallet state now comes from the global wallet context.
   const { address } = useWalletForTool()
   const { disconnectEVM } = useWallet()
   const wallet = address ?? ''
+  const platform = useKubrykPlatform()
+  const tier = getCreditTier(platform.creditScore)
 
   const [mounted, setMounted] = useState(false)
 
@@ -312,6 +316,22 @@ export default function LegacyLandingPage() {
             }}>
               🔒 AES-GCM-256
             </span>
+            <span style={{
+              fontSize: 12, padding: '6px 16px', borderRadius: 20,
+              background: tier.bg, border: `1px solid ${tier.border}`,
+              color: tier.color, display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 700
+            }}>
+              ◈ {tier.name} · {platform.creditScore !== null ? `${platform.creditScore}/1000` : 'No credit score'}
+            </span>
+            {platform.vaultActive && (
+              <span style={{
+                fontSize: 12, padding: '6px 16px', borderRadius: 20,
+                background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.25)',
+                color: '#7C3AED', display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 600
+              }}>
+                🔐 Private Vault active · +85 pts
+              </span>
+            )}
           </div>
 
           <h1 className="font-serif" style={{

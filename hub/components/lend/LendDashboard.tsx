@@ -2,6 +2,8 @@
 'use client'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Area, AreaChart } from 'recharts'
 import { LENDORA_ACCENT, FALLBACK_LEND_STATS, FALLBACK_MY_POSITIONS, FALLBACK_RATE_HISTORY, FALLBACK_AI_ACTIVITY } from '@/lib/lend-fallbacks'
+import { useKubrykPlatform } from '@/context/KubrykPlatformContext'
+import { getCreditTier } from '@/lib/platform/scoring'
 
 const A = LENDORA_ACCENT
 const BORDER = 'rgba(255,255,255,0.08)'
@@ -14,8 +16,22 @@ const healthColor = (h: number) => h >= 2 ? '#10b981' : h >= 1.2 ? '#f59e0b' : '
 
 export default function LendDashboard({ onGoToBorrow, onGoToLoans }: { onGoToBorrow?: () => void; onGoToLoans?: () => void }) {
   const m = FALLBACK_MY_POSITIONS
+  const platform = useKubrykPlatform()
+  const tier = getCreditTier(platform.creditScore)
+  const liveScore = platform.creditScore
+  const liveRate = `${tier.lendingRate.toFixed(1)}% APR`
   return (
     <div style={{ padding: 28, display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+      {/* Credit Passport integration banner */}
+      <div style={{ background: `linear-gradient(135deg, ${tier.bg}, rgba(0,229,204,0.03))`, border: `1px solid ${tier.border}`, borderRadius: 10, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: tier.color, fontFamily: MONO }}>{tier.name.toUpperCase()} TIER</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#fff', fontFamily: MONO }}>{liveScore !== null ? `${liveScore}/1000` : '—'}</span>
+        <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
+        <span style={{ fontSize: 11, color: MUTED, flex: 1 }}>Borrow rate: <span style={{ color: tier.color, fontWeight: 700 }}>{liveRate}</span> · Vault LTV: <span style={{ color: tier.color, fontWeight: 700 }}>{tier.vaultLTV}%</span></span>
+        {liveScore === null && <span style={{ fontSize: 10, color: MUTED2 }}>Connect Credit Passport to see your rate</span>}
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
         {FALLBACK_LEND_STATS.map(s => (
           <div key={s.label} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '18px 20px' }}>
@@ -56,7 +72,8 @@ export default function LendDashboard({ onGoToBorrow, onGoToLoans }: { onGoToBor
           <Row label="Supplied" value={`${m.supplied} @ avg 9.4%`} />
           <Row label="Net APY"  value={m.netAPY} color="#10b981" />
           <Row label="Health"   value={`${m.healthFactor} Safe`} color={healthColor(m.healthFactor)} />
-          <Row label="ZK Credit" value={`${m.creditScore} / 1000`} color={A} />
+          <Row label="Credit Score" value={liveScore !== null ? `${liveScore} / 1000` : `${m.creditScore} / 1000`} color={tier.color} />
+          <Row label="Your Borrow Rate" value={liveScore !== null ? liveRate : '—'} color={tier.color} />
           <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
             <button onClick={onGoToLoans} style={btn(A, true)}>Manage Loans</button>
             <button onClick={onGoToBorrow} style={btn(A, false)}>Borrow</button>

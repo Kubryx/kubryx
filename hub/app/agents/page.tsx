@@ -6,6 +6,8 @@ import { useWalletForTool } from '@/hooks/useWalletForTool'
 import { ConnectButton } from '@/components/wallet/ConnectButton'
 import { WrongNetworkBanner } from '@/components/wallet/WrongNetwork'
 import { PriceBadge } from '@/components/ui/PriceBadge'
+import { useKubrykPlatform } from '@/context/KubrykPlatformContext'
+import { getCreditTier } from '@/lib/platform/scoring'
 
 // Sub-components for tabs
 import AgentDashboard from '@/components/agents/AgentDashboard'
@@ -28,6 +30,8 @@ function AgentsPageInner() {
   const { address } = useWalletForTool()
   const wallet = address ?? ''
 
+  const platform = useKubrykPlatform()
+  const agentTier = getCreditTier(platform.creditScore)
   const [mounted, setMounted] = useState(false)
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 })
   const [cursorTrail, setCursorTrail] = useState({ x: -100, y: -100 })
@@ -385,6 +389,16 @@ function AgentsPageInner() {
         <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
           <PriceBadge coinId="solana" label="SOL" />
           <ConnectButton type="solana" size="lg" />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 11, padding: '5px 14px', borderRadius: 999, background: `${agentTier.bg}`, border: `1px solid ${agentTier.border}`, color: agentTier.color, fontWeight: 700 }}>
+            {agentTier.name} · {agentTier.treasuryTier}
+          </span>
+          {platform.solanaSlot && platform.solanaSlot > 0 && (
+            <span style={{ fontSize: 11, padding: '5px 14px', borderRadius: 999, background: 'rgba(153,69,255,0.08)', border: '1px solid rgba(153,69,255,0.2)', color: '#9945FF', fontWeight: 600 }}>
+              ◎ Slot #{platform.solanaSlot.toLocaleString()}
+            </span>
+          )}
         </div>
       </div>
 

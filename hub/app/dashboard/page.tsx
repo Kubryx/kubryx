@@ -17,6 +17,8 @@ import ToolQuickAccess from '@/components/ToolQuickAccess'
 import { PriceTicker } from '@/components/ui/PriceTicker'
 import { ConnectButton } from '@/components/wallet/ConnectButton'
 import { WrongNetworkBanner } from '@/components/wallet/WrongNetwork'
+import { useKubrykPlatform } from '@/context/KubrykPlatformContext'
+import { getCreditTier } from '@/lib/platform/scoring'
 
 /* ── Theme ──────────────────────────────────────────── */
 const BG      = '#0a0e27'
@@ -472,6 +474,8 @@ export default function DashboardPage() {
   const [secondsAgo, setSecondsAgo] = useState(0)
 
   const { stats, loading: dashLoading } = useDashboard()
+  const platform = useKubrykPlatform()
+  const creditTier = getCreditTier(platform.creditScore)
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768)
@@ -619,6 +623,41 @@ export default function DashboardPage() {
             padding: '20px 24px 0',
           }}>
             {statCards.map(card => <StatCard key={card.label} card={card} />)}
+          </div>
+
+          {/* Platform Identity — unified cross-module credit signal */}
+          <div style={{ padding: '20px 24px 0' }}>
+            <div style={{ background: `linear-gradient(135deg, ${creditTier.bg}, rgba(99,102,241,0.04))`, border: `1px solid ${creditTier.border}`, borderRadius: 12, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: creditTier.color, fontFamily: MONO }}>{creditTier.name.toUpperCase()}</span>
+                <span style={{ fontSize: 20, fontWeight: 900, color: '#fff', fontFamily: MONO, letterSpacing: '-0.02em' }}>
+                  {platform.creditScore !== null ? platform.creditScore : '—'}
+                  <span style={{ fontSize: 11, color: MUTED2, fontWeight: 400 }}>/1000</span>
+                </span>
+              </div>
+              <div style={{ width: 1, height: 28, background: BORDER, flexShrink: 0 }} />
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', flex: 1 }}>
+                {[
+                  platform.vaultActive      && { icon: '🔐', label: 'Vault',    note: '+85 pts', color: '#A855F7' },
+                  platform.stellarPayments  && { icon: '⭐', label: 'Stellar',  note: `${platform.stellarPayments} txns`, color: '#F472B6' },
+                  platform.treasuryValue    && { icon: '💰', label: 'Treasury', note: `$${(platform.treasuryValue/1000).toFixed(0)}k`, color: '#00E5CC' },
+                  platform.solanaSlot       && { icon: '◎',  label: 'Solana',   note: `slot #${platform.solanaSlot.toLocaleString()}`, color: '#9945FF' },
+                ].filter(Boolean).map((s) => {
+                  const sig = s as { icon: string; label: string; note: string; color: string }
+                  return (
+                    <span key={sig.label} style={{ fontSize: 11, padding: '3px 10px', borderRadius: 999, background: `${sig.color}12`, border: `1px solid ${sig.color}30`, color: sig.color, fontFamily: MONO, display: 'flex', alignItems: 'center', gap: 5 }}>
+                      {sig.icon} {sig.label} · {sig.note}
+                    </span>
+                  )
+                })}
+                {platform.creditScore === null && (
+                  <span style={{ fontSize: 11, color: MUTED2 }}>Visit Credit Passport to build your on-chain identity</span>
+                )}
+              </div>
+              <div style={{ flexShrink: 0 }}>
+                <span style={{ fontSize: 10, color: MUTED2, fontFamily: MONO }}>{creditTier.lendingRate}% APR · {creditTier.vaultLTV}% LTV</span>
+              </div>
+            </div>
           </div>
 
           {/* Backend health cards */}
