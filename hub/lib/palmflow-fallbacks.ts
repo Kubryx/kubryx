@@ -295,3 +295,103 @@ export const MARKETPLACE_AGENTS = [
   { name:'Policy Enforcer',    role:'Guardrail Agent',    efficiency:100,complexity:'High',   price:'Free',         rating:5.0, category:'Compliance', desc:'Enforces neural laws cryptographically on every transaction before execution.' },
   { name:'Cloud Cost AI',      role:'DevOps Optimizer',   efficiency:89, complexity:'Medium', price:'100 PUSD/mo',  rating:4.6, category:'DevOps',     desc:'Monitors and optimizes cloud infrastructure costs for AI agent operations.' },
 ]
+
+// ─── P&L Tracker Types & Fallbacks ────────────────────────────────────────────
+
+export type PFPnLAsset = {
+  symbol: string
+  name: string
+  amount: number
+  avgCost: number          // USD per unit paid
+  currentPrice: number     // live USD price
+  currentValue: number
+  totalCost: number
+  unrealizedPnL: number
+  unrealizedPnLPct: number
+  network: string
+  color: string
+  isStable: boolean
+}
+
+export type PFRealizedTrade = {
+  id: string
+  fromAsset: string; toAsset: string
+  fromAmount: number; toAmount: number
+  proceeds: number; costBasis: number
+  realizedPnL: number; realizedPnLPct: number
+  timestamp: string; txHash: string; network: string
+}
+
+export type PFPnLSummary = {
+  totalUnrealizedPnL: number
+  totalUnrealizedPnLPct: number
+  totalRealizedPnL: number
+  totalPortfolioValue: number
+  totalCostBasis: number
+  assets: PFPnLAsset[]
+  trades: PFRealizedTrade[]
+}
+
+export const PF_PNL_SUMMARY: PFPnLSummary = {
+  totalUnrealizedPnL: 184320.50,
+  totalUnrealizedPnLPct: 17.36,
+  totalRealizedPnL: 8240.75,
+  totalPortfolioValue: 1245678.90,
+  totalCostBasis: 1061358.40,
+  assets: [
+    { symbol:'SOL',   name:'Solana',        amount:100.5, avgCost:88.20,  currentPrice:124.99, currentValue:12561.50, totalCost:8861.10,  unrealizedPnL:3700.40,   unrealizedPnLPct:41.8, network:'Solana',   color:'#A855F7', isStable:false },
+    { symbol:'ETH',   name:'Ethereum',      amount:10.2,  avgCost:2490.00,currentPrice:2988.00,currentValue:30477.60, totalCost:25398.00, unrealizedPnL:5079.60,   unrealizedPnLPct:20.0, network:'Ethereum', color:'#60A5FA', isStable:false },
+    { symbol:'MATIC', name:'Polygon',       amount:500,   avgCost:0.62,   currentPrice:0.99,   currentValue:495.00,   totalCost:310.00,   unrealizedPnL:185.00,    unrealizedPnLPct:59.7, network:'Polygon',  color:'#8B5CF6', isStable:false },
+    { symbol:'PUSD',  name:'PalmFlow USD',  amount:999945,avgCost:1.00,   currentPrice:1.00,   currentValue:999945,   totalCost:999945,   unrealizedPnL:0,         unrealizedPnLPct:0,    network:'Solana',   color:'#00E5CC', isStable:true  },
+    { symbol:'USDC',  name:'USD Coin',      amount:25000, avgCost:1.00,   currentPrice:1.00,   currentValue:25000,    totalCost:25000,    unrealizedPnL:0,         unrealizedPnLPct:0,    network:'Ethereum', color:'#22C55E', isStable:true  },
+    { symbol:'DAI',   name:'Dai',           amount:5000,  avgCost:1.00,   currentPrice:1.00,   currentValue:5000,     totalCost:5000,     unrealizedPnL:0,         unrealizedPnLPct:0,    network:'Arbitrum', color:'#F59E0B', isStable:true  },
+  ],
+  trades: [
+    { id:'r1', fromAsset:'SOL',  toAsset:'USDC', fromAmount:10,  toAmount:1245,  proceeds:1245,  costBasis:882,   realizedPnL:363,   realizedPnLPct:41.2, timestamp:'5/19/2026, 2:15 PM', txHash:'7yRt...4kWs', network:'Solana'  },
+    { id:'r2', fromAsset:'MATIC',toAsset:'USDC', fromAmount:500, toAmount:498,   proceeds:498,   costBasis:310,   realizedPnL:188,   realizedPnLPct:60.6, timestamp:'5/17/2026, 5:00 PM', txHash:'2dIv...5pZj', network:'Polygon' },
+  ],
+}
+
+// ─── Tax Report Types & Fallbacks ─────────────────────────────────────────────
+
+export type PFTaxLot = {
+  id: string
+  asset: string
+  buyDate: string; sellDate: string
+  amount: number
+  buyPricePerUnit: number; sellPricePerUnit: number
+  costBasis: number; proceeds: number
+  gain: number; gainPct: number
+  holdingDays: number; isLongTerm: boolean
+  txHash: string; network: string
+}
+
+export type PFTaxSummary = {
+  taxYear: number
+  shortTermGain: number    // held ≤ 365 days
+  longTermGain: number     // held > 365 days
+  totalGain: number
+  shortTermLoss: number
+  longTermLoss: number
+  netShortTerm: number
+  netLongTerm: number
+  netCapitalGain: number
+  lots: PFTaxLot[]
+}
+
+export const PF_TAX_SUMMARY: PFTaxSummary = {
+  taxYear: 2026,
+  shortTermGain:  4842.60,
+  longTermGain:   5120.30,
+  totalGain:      9962.90,
+  shortTermLoss:  0,
+  longTermLoss:   1722.15,
+  netShortTerm:   4842.60,
+  netLongTerm:    3398.15,
+  netCapitalGain: 8240.75,
+  lots: [
+    { id:'lot1', asset:'SOL',   buyDate:'2/14/2026, 10:00 AM', sellDate:'5/19/2026, 2:15 PM', amount:10,  buyPricePerUnit:88.20,  sellPricePerUnit:124.50, costBasis:882.00,  proceeds:1245.00,  gain:363.00,  gainPct:41.2, holdingDays:94,  isLongTerm:false, txHash:'7yRt...4kWs', network:'Solana'  },
+    { id:'lot2', asset:'MATIC', buyDate:'1/8/2026, 9:30 AM',   sellDate:'5/17/2026, 5:00 PM', amount:500, buyPricePerUnit:0.62,   sellPricePerUnit:0.996,  costBasis:310.00,  proceeds:498.00,   gain:188.00,  gainPct:60.6, holdingDays:129, isLongTerm:false, txHash:'2dIv...5pZj', network:'Polygon' },
+    { id:'lot3', asset:'ETH',   buyDate:'4/20/2025, 2:00 PM',  sellDate:'5/18/2026, 10:00 AM',amount:5,   buyPricePerUnit:2490.00, sellPricePerUnit:2984.00,costBasis:12450.00,proceeds:14920.00, gain:2470.00, gainPct:19.8, holdingDays:393, isLongTerm:true,  txHash:'1aZp...9nVm', network:'Ethereum'},
+  ],
+}

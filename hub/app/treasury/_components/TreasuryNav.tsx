@@ -15,6 +15,8 @@ const ITEMS = [
   { href:'/treasury/payroll',        label:'💰 Payroll',    exact:false },
   { href:'/treasury/yield',          label:'📈 Yield',      exact:false },
   { href:'/treasury/analytics',      label:'📉 Analytics',  exact:false },
+  { href:'/treasury/pnl',            label:'📊 P&L',        exact:false },
+  { href:'/treasury/tax',            label:'🧾 Tax',         exact:false },
   { href:'/treasury/policy',         label:'🛡 Policy',     exact:false },
   { href:'/treasury/history',        label:'🕒 History',    exact:false },
   { href:'/treasury/marketplace',    label:'🏪 Store',      exact:false },

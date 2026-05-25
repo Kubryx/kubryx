@@ -4,10 +4,11 @@ import { logTelemetryError } from './telemetry'
 import {
   PF_AGENTS, PF_STREAMS, PF_HISTORY, PF_POLICIES, PF_TREASURY_CHART, PF_CHART_LABELS,
   PF_PORTFOLIO, PF_WALLETS, PF_TRANSACTIONS, PF_SWAP_ROUTES, PF_PAYMENT_REQUESTS,
-  PF_ANALYTICS, PF_DEFAULT_SETTINGS, PF_AGENTS_AI,
+  PF_ANALYTICS, PF_DEFAULT_SETTINGS, PF_AGENTS_AI, PF_PNL_SUMMARY, PF_TAX_SUMMARY,
   type PFAgent, type PFStream, type PFHistoryItem, type PFPolicy,
   type PFPortfolio, type PFWallet, type PFTransaction, type PFSwapRoute,
   type PFPaymentRequest, type PFAnalyticsData, type PFSettings, type PFAgentAI,
+  type PFPnLSummary, type PFTaxSummary, type PFPnLAsset, type PFRealizedTrade, type PFTaxLot,
 } from './palmflow-fallbacks'
 
 async function apiFetch<T>(path: string, opts?: RequestInit): Promise<T> {
@@ -282,7 +283,20 @@ export async function askAdvisor(question: string, context?: unknown): Promise<s
   }
 }
 
+// ─── P&L Tracker ─────────────────────────────────────────────────────────────
+
+export async function fetchPnLSummary(): Promise<PFPnLSummary> {
+  try { return await apiFetch<PFPnLSummary>('/api/portfolio/pnl') }
+  catch (e: any) { logTelemetryError('FETCH_ERROR', 'PF fetchPnLSummary', e?.message, e); return PF_PNL_SUMMARY }
+}
+
+export async function fetchTaxSummary(year?: number): Promise<PFTaxSummary> {
+  try { return await apiFetch<PFTaxSummary>(`/api/portfolio/tax${year ? `?year=${year}` : ''}`) }
+  catch (e: any) { logTelemetryError('FETCH_ERROR', 'PF fetchTaxSummary', e?.message, e); return PF_TAX_SUMMARY }
+}
+
 // ─── Re-exports ───────────────────────────────────────────────────────────────
 
 export type { PFAgent, PFStream, PFHistoryItem, PFPolicy, PFPortfolio, PFWallet,
-  PFTransaction, PFSwapRoute, PFPaymentRequest, PFAnalyticsData, PFSettings, PFAgentAI }
+  PFTransaction, PFSwapRoute, PFPaymentRequest, PFAnalyticsData, PFSettings, PFAgentAI,
+  PFPnLSummary, PFTaxSummary, PFPnLAsset, PFRealizedTrade, PFTaxLot }
