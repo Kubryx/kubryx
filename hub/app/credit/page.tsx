@@ -777,6 +777,9 @@ export default function CreditDashboard() {
                 <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: tier.bg, border: `1px solid ${tier.border}`, color: tier.color }}>
                   {tier.name} Tier — {score}/1000
                 </span>
+                <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: platform.isDemoMode ? 'rgba(107,114,128,0.1)' : 'rgba(16,185,129,0.1)', border: `1px solid ${platform.isDemoMode ? 'rgba(107,114,128,0.3)' : 'rgba(16,185,129,0.3)'}`, color: platform.isDemoMode ? '#9CA3AF' : '#10b981', fontWeight: 600 }}>
+                  {platform.isDemoMode ? '◎ Demo · Connect wallet for live data' : '⬤ Live · Wallet Connected'}
+                </span>
                 {totalBoost > 0 && (
                   <span style={{ fontSize: 11, color: '#059669', fontWeight: 600, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', padding: '3px 10px', borderRadius: 20 }}>
                     +{totalBoost} pts from platform activity

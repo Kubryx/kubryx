@@ -371,6 +371,9 @@ export default function ShadowPage() {
           <span style={{ fontSize: 11, padding: '5px 12px', borderRadius: 999, background: tier.bg, border: `1px solid ${tier.border}`, color: tier.color, fontWeight: 700 }}>
             {tier.name} · {platform.creditScore !== null ? `${platform.creditScore}/1000` : '—'}
           </span>
+          <span style={{ fontSize: 11, padding: '5px 12px', borderRadius: 999, background: platform.isDemoMode ? 'rgba(107,114,128,0.1)' : 'rgba(16,185,129,0.1)', border: `1px solid ${platform.isDemoMode ? 'rgba(107,114,128,0.3)' : 'rgba(16,185,129,0.3)'}`, color: platform.isDemoMode ? '#9CA3AF' : '#10b981', fontWeight: 600 }}>
+            {platform.isDemoMode ? '◎ Demo · Connect wallet for live data' : '⬤ Live · Wallet Connected'}
+          </span>
           {/* Stealth */}
           <button onClick={()=>setStealth(s=>!s)} style={{ fontSize:12, padding:'6px 16px', borderRadius:999, cursor:'pointer', background:stealth?'#FEF2F2':'#FFFFFF', border:`1px solid ${stealth?'#FECACA':'#E2E8F0'}`, color:stealth?'#EF4444':'#64748B', fontWeight:700, transition: 'all 0.2s' }} onMouseOver={e => !stealth && (e.currentTarget.style.background = '#F8FAFC')} onMouseOut={e => !stealth && (e.currentTarget.style.background = '#FFFFFF')}>
             {stealth?'🔴 STEALTH ON':'⚫ Stealth Off'}

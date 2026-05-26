@@ -35,7 +35,10 @@ export async function readCreditScore(address: string): Promise<number> {
   try {
     const data = encodeCall('getScore(address)', address)
     const result = await ethCall(CONTRACTS.CreditPassportNFT, data)
-    const score = Number(decodeUint256(result)) // word[0] = score
+    // uint16 score is right-aligned in word[0] — extract from rightmost 4 hex chars
+    const word0 = result.replace(/^0x/, '').slice(0, 64)
+    const score = parseInt(word0.slice(-4), 16)
+    console.debug('[creditPassport] readCreditScore word[0]:', word0, '→ score:', score)
     return Number.isFinite(score) && score >= 0 ? score : 0
   } catch (e) {
     console.error('[creditPassport] readCreditScore failed:', e)

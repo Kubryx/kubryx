@@ -512,13 +512,19 @@ function LendInner() {
           Kubryx Lend
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#6366F1', fontWeight: 600 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: isLive === false ? '#D97706' : '#6366F1', fontWeight: 600 }}>
             <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: isLive === true ? '#10b981' : isLive === null ? '#6366f1' : '#f59e0b', boxShadow: isLive === true ? '0 0 8px #10b981' : 'none' }} />
-            {isLive === true ? 'Network Live' : isLive === null ? 'Checking…' : 'Offline'}
+            {isLive === true ? 'Network Live' : isLive === null ? 'Checking…' : '⚡ AI Engine Upgrading · Demo Mode Active'}
           </div>
           <ConnectButton type="evm" size="lg" />
         </div>
       </header>
+
+      {isLive === false && (
+        <div style={{ background: 'rgba(245,158,11,0.1)', borderBottom: '1px solid rgba(245,158,11,0.3)', padding: '8px 40px', textAlign: 'center', fontSize: 12, fontWeight: 600, color: '#D97706', position: 'relative', zIndex: 10 }}>
+          Lendora AI backend is being upgraded to GPU infrastructure — demo data shown
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="hero-section">

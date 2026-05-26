@@ -399,6 +399,9 @@ function AgentsPageInner() {
               ◎ Slot #{platform.solanaSlot.toLocaleString()}
             </span>
           )}
+          <span style={{ fontSize: 11, padding: '5px 14px', borderRadius: 999, background: platform.isDemoMode ? 'rgba(107,114,128,0.1)' : 'rgba(16,185,129,0.1)', border: `1px solid ${platform.isDemoMode ? 'rgba(107,114,128,0.3)' : 'rgba(16,185,129,0.3)'}`, color: platform.isDemoMode ? '#9CA3AF' : '#10b981', fontWeight: 600 }}>
+            {platform.isDemoMode ? '◎ Demo · Connect wallet for live data' : '⬤ Live · Wallet Connected'}
+          </span>
         </div>
       </div>
 

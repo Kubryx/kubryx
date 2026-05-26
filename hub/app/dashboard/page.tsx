@@ -654,8 +654,11 @@ export default function DashboardPage() {
                   <span style={{ fontSize: 11, color: MUTED2 }}>Visit Credit Passport to build your on-chain identity</span>
                 )}
               </div>
-              <div style={{ flexShrink: 0 }}>
+              <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end' }}>
                 <span style={{ fontSize: 10, color: MUTED2, fontFamily: MONO }}>{creditTier.lendingRate}% APR · {creditTier.vaultLTV}% LTV</span>
+                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 999, background: platform.isDemoMode ? 'rgba(107,114,128,0.12)' : 'rgba(16,185,129,0.12)', border: `1px solid ${platform.isDemoMode ? 'rgba(107,114,128,0.3)' : 'rgba(16,185,129,0.3)'}`, color: platform.isDemoMode ? '#9CA3AF' : '#10b981', fontWeight: 600, fontFamily: MONO }}>
+                  {platform.isDemoMode ? '◎ Demo · Connect wallet for live data' : '⬤ Live · Wallet Connected'}
+                </span>
               </div>
             </div>
           </div>

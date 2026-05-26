@@ -332,6 +332,9 @@ export default function LegacyLandingPage() {
                 🔐 Private Vault active · +85 pts
               </span>
             )}
+            <span style={{ fontSize: 12, padding: '6px 16px', borderRadius: 20, background: platform.isDemoMode ? 'rgba(107,114,128,0.1)' : 'rgba(16,185,129,0.1)', border: `1px solid ${platform.isDemoMode ? 'rgba(107,114,128,0.3)' : 'rgba(16,185,129,0.3)'}`, color: platform.isDemoMode ? '#9CA3AF' : '#10b981', display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
+              {platform.isDemoMode ? '◎ Demo · Connect wallet for live data' : '⬤ Live · Wallet Connected'}
+            </span>
           </div>
 
           <h1 className="font-serif" style={{

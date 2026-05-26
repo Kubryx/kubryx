@@ -350,30 +350,33 @@ function VaultInner() {
         )}
 
         {vaultState && (
-          <>
-            <div style={{ display: 'flex', gap: 12, marginBottom: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
-              <div style={{ fontSize: 12, padding: '8px 16px', borderRadius: 999, background: 'rgba(255,255,255,0.7)', border: '1px solid #CFFAFE', color: '#083344', fontWeight: 600, fontFamily: 'Fira Code, monospace' }}>
-                Owner: {vaultState.owner.slice(0, 8)}…{vaultState.owner.slice(-6)}
-              </div>
-              <div style={{ fontSize: 12, padding: '8px 16px', borderRadius: 999, background: vaultState.deceased ? '#FEE2E2' : '#D1FAE5', border: `1px solid ${vaultState.deceased ? '#FECACA' : '#A7F3D0'}`, color: vaultState.deceased ? '#DC2626' : '#059669', fontWeight: 600 }}>
-                {vaultState.deceased ? '⚠ Legacy Mode Active' : '✓ Vault Active'}
-              </div>
-              {vaultState.unlockDate && (
-                <div style={{ fontSize: 12, padding: '8px 16px', borderRadius: 999, background: 'rgba(255,255,255,0.7)', border: '1px solid #CFFAFE', color: '#083344', fontWeight: 600 }}>
-                  Unlock: {vaultState.unlockDate.toLocaleDateString()}
-                </div>
-              )}
-              {vaultState.canAccess !== null && (
-                <div style={{ fontSize: 12, padding: '8px 16px', borderRadius: 999, background: vaultState.canAccess ? '#D1FAE5' : '#FEF3C7', border: `1px solid ${vaultState.canAccess ? '#A7F3D0' : '#FDE68A'}`, color: vaultState.canAccess ? '#059669' : '#D97706', fontWeight: 600 }}>
-                  {vaultState.canAccess ? '✓ You have access' : '◎ Access pending'}
-                </div>
-              )}
+          <div style={{ display: 'flex', gap: 12, marginBottom: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <div style={{ fontSize: 12, padding: '8px 16px', borderRadius: 999, background: 'rgba(255,255,255,0.7)', border: '1px solid #CFFAFE', color: '#083344', fontWeight: 600, fontFamily: 'Fira Code, monospace' }}>
+              Owner: {vaultState.owner.slice(0, 8)}…{vaultState.owner.slice(-6)}
             </div>
-            <div style={{ fontSize: 12, padding: '6px 16px', borderRadius: 999, background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.25)', color: '#7C3AED', fontWeight: 600, marginBottom: 20 }}>
-              🔐 Active vault → +85 pts to your Kubryx Credit Score
+            <div style={{ fontSize: 12, padding: '8px 16px', borderRadius: 999, background: vaultState.deceased ? '#FEE2E2' : '#D1FAE5', border: `1px solid ${vaultState.deceased ? '#FECACA' : '#A7F3D0'}`, color: vaultState.deceased ? '#DC2626' : '#059669', fontWeight: 600 }}>
+              {vaultState.deceased ? '⚠ Legacy Mode Active' : '✓ Vault Active'}
             </div>
-          </>
+            {vaultState.unlockDate && (
+              <div style={{ fontSize: 12, padding: '8px 16px', borderRadius: 999, background: 'rgba(255,255,255,0.7)', border: '1px solid #CFFAFE', color: '#083344', fontWeight: 600 }}>
+                Unlock: {vaultState.unlockDate.toLocaleDateString()}
+              </div>
+            )}
+            {vaultState.canAccess !== null && (
+              <div style={{ fontSize: 12, padding: '8px 16px', borderRadius: 999, background: vaultState.canAccess ? '#D1FAE5' : '#FEF3C7', border: `1px solid ${vaultState.canAccess ? '#A7F3D0' : '#FDE68A'}`, color: vaultState.canAccess ? '#059669' : '#D97706', fontWeight: 600 }}>
+                {vaultState.canAccess ? '✓ You have access' : '◎ Access pending'}
+              </div>
+            )}
+          </div>
         )}
+        {(vaultState || platform.vaultActive) && (
+          <div style={{ fontSize: 12, padding: '6px 16px', borderRadius: 999, background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.25)', color: '#7C3AED', fontWeight: 600, marginBottom: 12 }}>
+            🔐 Active vault → +85 pts to your Kubryx Credit Score
+          </div>
+        )}
+        <div style={{ fontSize: 12, padding: '5px 14px', borderRadius: 999, background: platform.isDemoMode ? 'rgba(107,114,128,0.1)' : 'rgba(16,185,129,0.1)', border: `1px solid ${platform.isDemoMode ? 'rgba(107,114,128,0.3)' : 'rgba(16,185,129,0.3)'}`, color: platform.isDemoMode ? '#9CA3AF' : '#10b981', fontWeight: 600, marginBottom: 20, display: 'inline-block' }}>
+          {platform.isDemoMode ? '◎ Demo · Connect wallet for live data' : '⬤ Live · Wallet Connected'}
+        </div>
 
         <div className="tabs-container">
           {TABS.map(t => (
