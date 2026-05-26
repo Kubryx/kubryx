@@ -1,0 +1,30 @@
+{
+  "owner": "ge6xBg6ScAVWyN1TK6WKk2DcPD46oemCjMcu6vXMWfX",
+  "program": "66DXeSqBccWxWWw9S21vxe2Mvvqqkmw5KsK5jqA42quz",
+  "jobs": [
+    {
+      "description": "Rebalance SOL/USDC portfolio to 60/40 target allocation",
+      "pda": "4wMGzQYHWVMLNjkGDPeTdveqLAzQXYfZNhQseWrfyQDq",
+      "template": 0,
+      "bump": 253,
+      "txHash": "QPNKqiJfz7HKzopfJxrPzTcYp65bDA4ADCiUYJjDrcZxnHGy5NqSNJkriwQKETCcVHLGxDf8YeLw8oZgqTyvdie",
+      "alreadyExisted": false
+    },
+    {
+      "description": "Cast governance vote on Marinade DAO proposal #42",
+      "pda": "DNagoDZ68hmFTMoHGZHRKKbucvsUcY4RViPs9Sdcp4iJ",
+      "template": 1,
+      "bump": 254,
+      "txHash": "REH22oLAF3iU1UndLEgjFwP4Zs2KLAd253fgray8PYik9un4EqvuWuho3W5wqv2tPviiprMvz9TnQ4YmQtsgJpa",
+      "alreadyExisted": false
+    },
+    {
+      "description": "Monitor and compound USDC yield on Kamino Finance",
+      "pda": "J9TmfXdbkEuS85p6A6KihSBUn2WEKsCabAPArjK63GbM",
+      "template": 2,
+      "bump": 255,
+      "txHash": "5iuccVPnswAsRGj3wQDcNYiQQyqfLwfY2bc3qkVnTPaXEV4imvVqKuSiYxHzcKsxjskqES8Xat2BjTugXBCfBd8E",
+      "alreadyExisted": false
+    }
+  ]
+}
