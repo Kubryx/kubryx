@@ -189,6 +189,41 @@ export default function KubrykSidebar({ collapsed, onToggle, mobileOpen, onMobil
               </Link>
             )
           })}
+
+          {/* Network status — fills dead space at bottom of nav */}
+          {(!collapsed || isMobile) && (
+            <div style={{ marginTop: 'auto', paddingTop: 16 }}>
+              <div style={{
+                fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.2)',
+                letterSpacing: '0.15em', textTransform: 'uppercase',
+                padding: '4px 8px', marginBottom: 4, fontFamily: MONO,
+              }}>Networks</div>
+              {[
+                { name: 'QIE Mainnet', color: '#6366f1' },
+                { name: 'Solana',      color: '#9945FF' },
+                { name: 'Stellar',     color: '#3B9BF5' },
+                { name: 'Arbitrum',    color: '#12AAFF' },
+              ].map(n => (
+                <div key={n.name} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '5px 8px', borderRadius: 6,
+                }}>
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{n.name}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: n.color, fontFamily: MONO, fontWeight: 600 }}>
+                    <span style={{ width: 5, height: 5, borderRadius: '50%', background: n.color, display: 'inline-block' }} />
+                    Live
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+          {(collapsed && !isMobile) && (
+            <div style={{ marginTop: 'auto', paddingTop: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              {['#6366f1','#9945FF','#3B9BF5','#12AAFF'].map(c => (
+                <span key={c} style={{ width: 6, height: 6, borderRadius: '50%', background: c, display: 'inline-block' }} />
+              ))}
+            </div>
+          )}
         </nav>
 
         {/* Wallet — connect button or connected address pill */}
