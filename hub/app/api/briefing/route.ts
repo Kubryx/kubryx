@@ -13,10 +13,17 @@
 // Response is cached in-memory for 30 minutes to stay under free-tier limits.
 import { NextResponse } from 'next/server'
 
+// Force this route to run dynamically on every request — without this,
+// Next.js's App Router can statically pre-render GET routes and serve
+// empty data forever, since the fetches happen at build time.
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
 const GROQ_MODEL = 'llama-3.3-70b-versatile'
 const CACHE_MS = 30 * 60 * 1_000  // 30 minutes
-const FETCH_TIMEOUT_MS = 7_000
+const FETCH_TIMEOUT_MS = 8_000
+const UA = 'Kubryx/1.0 (briefing-aggregator)'
 
 export type Headline = {
   title: string
@@ -29,7 +36,7 @@ export type Headline = {
 export type BriefingResponse = {
   summary: string[]
   headlines: Headline[]
-  sources: { name: string; ok: boolean }[]
+  sources: { name: string; ok: boolean; error?: string; count: number }[]
   generatedAt: string
 }
 
@@ -38,15 +45,21 @@ let cache: { data: BriefingResponse; expires: number } | null = null
 function fetchWithTimeout(url: string, init?: RequestInit): Promise<Response> {
   const ctrl = new AbortController()
   const t = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS)
-  return fetch(url, { ...init, signal: ctrl.signal })
-    .finally(() => clearTimeout(t))
+  return fetch(url, {
+    ...init,
+    signal: ctrl.signal,
+    headers: { 'User-Agent': UA, Accept: 'application/json', ...(init?.headers ?? {}) },
+    cache: 'no-store',
+  }).finally(() => clearTimeout(t))
 }
 
 async function fetchCryptoCompare(): Promise<Headline[]> {
   const res = await fetchWithTimeout('https://min-api.cryptocompare.com/data/v2/news/?lang=EN')
   if (!res.ok) throw new Error(`CryptoCompare HTTP ${res.status}`)
   const json = await res.json() as { Data?: Array<{ title: string; url: string; source: string; published_on: number }> }
-  return (json.Data ?? []).slice(0, 10).map(d => ({
+  const rows = json.Data ?? []
+  if (rows.length === 0) throw new Error('CryptoCompare returned 0 items')
+  return rows.slice(0, 12).map(d => ({
     title: d.title,
     url: d.url,
     source: d.source || 'CryptoCompare',
@@ -55,16 +68,26 @@ async function fetchCryptoCompare(): Promise<Headline[]> {
 }
 
 async function fetchNewsApi(key: string): Promise<Headline[]> {
-  const url = `https://newsapi.org/v2/everything?q=crypto+OR+blockchain+OR+defi&language=en&sortBy=publishedAt&pageSize=10&apiKey=${encodeURIComponent(key)}`
-  const res = await fetchWithTimeout(url)
+  // NewsAPI dev tier sometimes returns HTTP 200 with status:"error" in body.
+  // The X-Api-Key header is more reliable than the apiKey URL param.
+  const url = 'https://newsapi.org/v2/everything?q=crypto+OR+blockchain+OR+defi&language=en&sortBy=publishedAt&pageSize=12'
+  const res = await fetchWithTimeout(url, { headers: { 'X-Api-Key': key } })
+  const json = await res.json() as {
+    status?: string
+    message?: string
+    articles?: Array<{ title: string; url: string; publishedAt: string; source?: { name?: string } }>
+  }
+  if (json.status === 'error') throw new Error(`NewsAPI: ${json.message || 'error'}`)
   if (!res.ok) throw new Error(`NewsAPI HTTP ${res.status}`)
-  const json = await res.json() as { articles?: Array<{ title: string; url: string; publishedAt: string; source?: { name?: string } }> }
-  return (json.articles ?? []).slice(0, 10).map(d => ({
-    title: d.title,
-    url: d.url,
-    source: d.source?.name || 'NewsAPI',
-    publishedAt: d.publishedAt,
-  }))
+  return (json.articles ?? [])
+    .filter(d => d.title && d.title !== '[Removed]' && d.url)
+    .slice(0, 12)
+    .map(d => ({
+      title: d.title,
+      url: d.url,
+      source: d.source?.name || 'NewsAPI',
+      publishedAt: d.publishedAt,
+    }))
 }
 
 function dedupe(headlines: Headline[]): Headline[] {
@@ -131,11 +154,21 @@ export async function GET() {
 
   const results = await Promise.allSettled([
     fetchCryptoCompare(),
-    newsApiKey ? fetchNewsApi(newsApiKey) : Promise.resolve([]),
+    newsApiKey ? fetchNewsApi(newsApiKey) : Promise.reject(new Error('NEWSAPI_KEY not set')),
   ])
 
   const sourceNames = ['CryptoCompare', 'NewsAPI']
-  const sources = results.map((r, i) => ({ name: sourceNames[i], ok: r.status === 'fulfilled' && (r.value as Headline[]).length > 0 }))
+  const sources = results.map((r, i) => {
+    if (r.status === 'fulfilled') {
+      const count = (r.value as Headline[]).length
+      return { name: sourceNames[i], ok: count > 0, count }
+    }
+    const err = r.reason instanceof Error ? r.reason.message : String(r.reason)
+    return { name: sourceNames[i], ok: false, count: 0, error: err }
+  })
+
+  // Diagnostic log — visible in the dev server terminal and Vercel logs.
+  console.log('[briefing] sources:', sources.map(s => `${s.name}=${s.ok ? s.count : `ERR(${s.error})`}`).join(' '))
 
   const combined: Headline[] = []
   for (const r of results) {
@@ -154,5 +187,9 @@ export async function GET() {
     generatedAt: new Date().toISOString(),
   }
   cache = { data: payload, expires: Date.now() + CACHE_MS }
-  return NextResponse.json(payload)
+  return NextResponse.json(payload, {
+    headers: {
+      'Cache-Control': 'no-store, max-age=0',
+    },
+  })
 }

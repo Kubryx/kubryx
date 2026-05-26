@@ -17,7 +17,7 @@ type Headline = {
 type BriefingResponse = {
   summary: string[]
   headlines: Headline[]
-  sources: { name: string; ok: boolean }[]
+  sources: { name: string; ok: boolean; error?: string; count: number }[]
   generatedAt: string
 }
 
@@ -79,7 +79,7 @@ export default function DailyBriefing() {
             What moved today, across crypto
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: MUTED, fontFamily: MONO }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: MUTED, fontFamily: MONO, flexWrap: 'wrap' }}>
           {liveSources.length > 0 ? (
             <>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -87,6 +87,13 @@ export default function DailyBriefing() {
                 {liveSources.length} {liveSources.length === 1 ? 'source' : 'sources'} · Groq Llama-3.3
               </span>
               {data?.generatedAt && <span>· {relativeTime(data.generatedAt)}</span>}
+              <button
+                onClick={() => { setLoading(true); load() }}
+                style={{ background: 'transparent', border: 'none', color: '#6366f1', cursor: 'pointer', fontSize: 11, fontWeight: 700, padding: 0, fontFamily: MONO }}
+                title="Force refresh"
+              >
+                ↻ refresh
+              </button>
             </>
           ) : loading ? (
             <span>Fetching headlines…</span>
@@ -95,6 +102,27 @@ export default function DailyBriefing() {
           )}
         </div>
       </div>
+
+      {/* Source status row — only shows when something failed, helps you diagnose */}
+      {data && data.sources.some(s => !s.ok) && (
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+          {data.sources.map(s => (
+            <span
+              key={s.name}
+              title={s.error || `${s.count} headlines`}
+              style={{
+                fontSize: 10, fontWeight: 700, fontFamily: MONO,
+                padding: '3px 10px', borderRadius: 999,
+                background: s.ok ? 'rgba(16,185,129,0.10)' : 'rgba(239,68,68,0.10)',
+                border: `1px solid ${s.ok ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                color: s.ok ? '#10b981' : '#ef4444',
+              }}
+            >
+              {s.ok ? `✓ ${s.name} (${s.count})` : `✗ ${s.name}: ${(s.error || 'failed').slice(0, 40)}`}
+            </span>
+          ))}
+        </div>
+      )}
 
       <div style={{
         display: 'grid',
