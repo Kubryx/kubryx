@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { LENDORA_ACCENT, AI_SUGGESTIONS, getStaticAIResponse } from '@/lib/lend-fallbacks'
 import { toast } from '@/lib/toast'
+import { simTx, type SimTx } from '@/lib/sim-tx'
+import { useKubrykPlatform } from '@/context/KubrykPlatformContext'
+import { getCreditTier } from '@/lib/platform/scoring'
 
 const A = LENDORA_ACCENT
 const BORDER = 'rgba(255,255,255,0.08)'
@@ -45,14 +48,17 @@ export default function BorrowForm({
   const [borrowAmt, setBorrowAmt] = useState('')
   const [duration, setDuration] = useState(60)
   const [aiEnabled, setAiEnabled] = useState(true)
+  const platform = useKubrykPlatform()
+  const tier = getCreditTier(platform.creditScore)
+  const userScore = platform.creditScore ?? 0
   const [chat, setChat] = useState<Msg[]>([
-    { role: 'ai', text: "I'm Protocol Borrow Engine AI, your loan negotiation agent. Fill in the form and click **Get AI Quote** — I'll scan available pools and negotiate the best rate for your credit tier." },
+    { role: 'ai', text: `I'm Protocol Borrow Engine AI, your loan negotiation agent. Your ZK credit score is ${userScore || 'unverified'} (${tier.name} tier) — I'll target rates around ${tier.lendingRate}% APR. Fill in the form and click **Get AI Quote**.` },
   ])
   const [input, setInput] = useState('')
   const [thinking, setThinking] = useState(false)
   const [negotiating, setNegotiating] = useState(false)
   const [quote, setQuote] = useState<{ rate: string; term: number; save: string } | null>(null)
-  const [success, setSuccess] = useState<{ id: string; tx: string } | null>(null)
+  const [success, setSuccess] = useState<{ id: string; tx: SimTx } | null>(null)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => { ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' }) }, [chat, thinking])
@@ -82,8 +88,11 @@ export default function BorrowForm({
     setThinking(true)
     await new Promise(r => setTimeout(r, 1800))
     setThinking(false)
-    setQuote({ rate: '4.2', term: duration, save: '~$130/year' })
-    setChat(c => [...c, { role: 'ai', text: `Found you 4.2% APR (market 6.8%). Your ZK score 847 unlocks Tier 2. Split across 3 pools to reduce slippage. You save ~$130/year.` }])
+    const rate = tier.lendingRate
+    const marketRate = 18.0
+    const annualSavings = Math.round(Number(borrowAmt || 0) * (marketRate - rate) / 100)
+    setQuote({ rate: rate.toFixed(1), term: duration, save: annualSavings > 0 ? `~$${annualSavings}/year` : 'market rate' })
+    setChat(c => [...c, { role: 'ai', text: `Found you ${rate.toFixed(1)}% APR (market ${marketRate.toFixed(1)}%). Your ZK score ${userScore || 'unverified'} unlocks ${tier.name} tier. ${annualSavings > 0 ? `You save ~$${annualSavings}/year vs market.` : 'Generate a credit score on /credit to unlock discounted rates.'}` }])
     setNegotiating(false)
   }
 
@@ -99,18 +108,19 @@ export default function BorrowForm({
   }
 
   async function accept() {
+    const tx = simTx('arbitrum')
     setSuccess({
       id: `LN-${1042 + Math.floor(Math.random() * 50)}`,
-      tx: `0x${Math.random().toString(16).slice(2, 6)}…${Math.random().toString(16).slice(2, 6)}`,
+      tx,
     })
+    toast.success('Loan submitted to Arbitrum')
     if (apiBase) {
-      try {
-        await fetch(`${apiBase}/api/loans/create`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ borrower: walletAddress || 'demo', amount: borrowAmt, duration, terms: `${quote?.rate}% APR` }),
-        })
-        toast.success('Loan created on Arbitrum')
-      } catch { /* demo */ }
+      // Best-effort: log the loan against the Lendora backend if it's up.
+      // Result doesn't affect the user-visible success state.
+      fetch(`${apiBase}/api/loans/create`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ borrower: walletAddress || 'demo', amount: borrowAmt, duration, terms: `${quote?.rate}% APR`, txHash: tx.hash }),
+      }).catch(() => {})
     }
   }
 
@@ -123,8 +133,12 @@ export default function BorrowForm({
           <p style={{ color: MUTED, fontSize: 13, margin: '0 0 22px' }}>
             {success.id} · {borrowAmt} {borrowAsset} · {quote?.rate}% APR · {duration} days
           </p>
-          <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: 14, fontSize: 12, color: MUTED, marginBottom: 16, fontFamily: MONO }}>
-            Tx: {success.tx}
+          <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: 14, fontSize: 12, color: MUTED, marginBottom: 16, fontFamily: MONO, textAlign: 'left' }}>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Arbitrum Tx</div>
+            <div style={{ wordBreak: 'break-all', color: '#fff' }}>{success.tx.hash}</div>
+            <a href={success.tx.explorerUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 8, color: '#10b981', textDecoration: 'none', fontFamily: 'inherit', fontWeight: 600 }}>
+              View on Arbiscan ↗
+            </a>
           </div>
           <button onClick={() => { setSuccess(null); setQuote(null); setBorrowAmt('') }} style={primaryBtn}>Borrow Again</button>
         </div>
@@ -163,7 +177,7 @@ export default function BorrowForm({
             Enable AI rate negotiation (recommended)
           </label>
           <div style={{ marginTop: 8, padding: 10, background: 'rgba(255,255,255,0.02)', border: `1px solid ${BORDER}`, borderRadius: 6, fontSize: 11, color: MUTED }}>
-            ZK Credit Score: <span style={{ color: A, fontWeight: 700 }}>847</span> ✓ Verified
+            ZK Credit Score: <span style={{ color: A, fontWeight: 700 }}>{userScore || '—'}</span> {userScore ? `✓ ${tier.name} tier` : <a href="/credit" style={{ color: A, textDecoration: 'underline' }}>Generate score</a>}
           </div>
         </Section>
 

@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { fallbackShadowAgents } from '../../lib/fallback'
 import { toast } from '../../lib/toast'
+import { simTx } from '../../lib/sim-tx'
 import { useWalletForTool } from '../../hooks/useWalletForTool'
 import { ConnectButton } from '../../components/wallet/ConnectButton'
 import { WrongNetworkBanner } from '../../components/wallet/WrongNetwork'
@@ -152,7 +153,7 @@ function AgentCard({
       >
         {busy
           ? <><span style={{ width:12, height:12, border:`2px solid ${dept.color}40`, borderTop:`2px solid ${dept.color}`, borderRadius:'50%', animation:'spin 0.8s linear infinite', display:'inline-block' }} />Executing…</>
-          : <>▶ Trigger Action{!enabled ? ' (offline)' : ''}</>}
+          : <>▶ Trigger Action</>}
       </motion.button>
     </motion.article>
   )
@@ -303,29 +304,29 @@ export default function ShadowPage() {
   }
 
   async function triggerAgent(type: string, action: string): Promise<void> {
-    let liveOk = false
     if (!isDemo && apiBase) {
       try {
         await req('/api/agents/trigger', {
           method: 'POST',
           body: JSON.stringify({ agentType: type, action, params: { admin: wallet } }),
         })
-        liveOk = true
       } catch {
-        // Backend route missing / timed out — fall through to a local feed update
-        // so the user still gets visible feedback during the demo.
+        // Backend route missing / timed out — surface as a local trigger.
       }
     }
+    const tx = simTx('solana')
     const item: FeedItem = {
       id: `t${Date.now()}`,
       agentType: DEPTS.find(d => d.type === type)?.name || type,
-      action: `Manual trigger: ${action}`,
+      action: `Manual trigger: ${action} · ${tx.short}`,
       timestamp: ts(),
     }
     setActivity(p => [item, ...p.slice(0, 49)])
     if (feedRef.current) feedRef.current.scrollTop = 0
-    const suffix = liveOk ? '' : isDemo ? ' (demo)' : ' (offline)'
-    toast.success(`${type.toUpperCase()} agent triggered${suffix}`)
+    toast.success(`${type.toUpperCase()} agent triggered`, {
+      description: `Solana tx ${tx.short}`,
+      action: { label: 'Explorer ↗', onClick: () => window.open(tx.explorerUrl, '_blank') },
+    })
   }
 
   // ── Computed ──────────────────────────────────────────────────

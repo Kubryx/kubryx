@@ -16,8 +16,7 @@ import { useTrustMesh } from '@/hooks/useTrustMesh'
 import { JOB_STATUS_LABEL, type OnChainJobAccount } from '@/lib/api/solana'
 import MiniMesh from './MiniMesh'
 import { useKubrykPlatform } from '@/context/KubrykPlatformContext'
-import { getCreditTier } from '@/lib/platform/scoring'
-import { PlatformModeBadge } from '@/components/ui/PlatformModeBadge'
+import LiveCrossChainPulse from '@/components/ui/LiveCrossChainPulse'
 
 const ACCENT = TRUSTMESH_ACCENT
 const BORDER = 'rgba(255,255,255,0.08)'
@@ -53,7 +52,6 @@ export default function AgentDashboard() {
   const [analytics, setAnalytics] = useState<AnalyticsResponse>(fallbackAnalytics)
   const trustmesh = useTrustMesh()
   const platform = useKubrykPlatform()
-  const tier = getCreditTier(platform.creditScore)
 
   useEffect(() => {
     let cancelled = false
@@ -85,21 +83,8 @@ export default function AgentDashboard() {
     <div style={{ padding: 28, display: 'flex', flexDirection: 'column', gap: 24 }}>
       <style>{`@keyframes agentPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.85)} }`}</style>
 
-      {/* ── Platform Identity — credit tier → agent routing tier ─ */}
-      <div style={{ background: `linear-gradient(135deg, ${tier.bg}, rgba(153,69,255,0.04))`, border: `1px solid ${tier.border}`, borderRadius: 12, padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 10, fontWeight: 700, color: tier.color, fontFamily: MONO, letterSpacing: '0.1em' }}>{tier.name.toUpperCase()}</span>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#fff', fontFamily: MONO }}>
-            {platform.creditScore !== null ? platform.creditScore : '—'}<span style={{ fontSize: 10, color: MUTED2 }}>/1000</span>
-          </span>
-        </div>
-        <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.1)' }} />
-        <span style={{ fontSize: 11, color: MUTED, flex: 1 }}>Agent routing: <span style={{ color: tier.color, fontWeight: 600 }}>{tier.treasuryTier}</span></span>
-        {platform.solanaSlot && platform.solanaSlot > 0 && (
-          <span style={{ fontSize: 10, fontFamily: MONO, color: MUTED2 }}>slot #{platform.solanaSlot.toLocaleString()}</span>
-        )}
-        <PlatformModeBadge />
-      </div>
+      {/* ── Live cross-chain integration pulse ─ */}
+      <LiveCrossChainPulse />
 
       {/* ── Devnet live job accounts panel ─────────────────────── */}
       <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 20 }}>

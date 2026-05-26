@@ -2,6 +2,7 @@
 'use client'
 import { useState } from 'react'
 import { LENDORA_ACCENT, FALLBACK_SUPPLY_POOLS } from '@/lib/lend-fallbacks'
+import { simTx, type SimTx } from '@/lib/sim-tx'
 
 const A = LENDORA_ACCENT
 const BORDER = 'rgba(255,255,255,0.08)'
@@ -14,7 +15,7 @@ export default function LendForm({ walletAddress, prefillAsset }: { walletAddres
   const [asset, setAsset] = useState(prefillAsset || 'USDC')
   const [amount, setAmount] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [success, setSuccess] = useState<{ amount: string; asset: string; apy: string } | null>(null)
+  const [success, setSuccess] = useState<{ amount: string; asset: string; apy: string; tx: SimTx } | null>(null)
 
   const pool = FALLBACK_SUPPLY_POOLS.find(p => p.asset === asset) || FALLBACK_SUPPLY_POOLS[0]
   const amountNum = Number(amount) || 0
@@ -26,7 +27,7 @@ export default function LendForm({ walletAddress, prefillAsset }: { walletAddres
     if (!amount) return
     setSubmitting(true)
     await new Promise(r => setTimeout(r, 900))
-    setSuccess({ amount, asset, apy: pool.apy })
+    setSuccess({ amount, asset, apy: pool.apy, tx: simTx('arbitrum') })
     setSubmitting(false)
   }
 
@@ -39,6 +40,13 @@ export default function LendForm({ walletAddress, prefillAsset }: { walletAddres
           <p style={{ color: MUTED, fontSize: 13, margin: '8px 0 22px' }}>
             Supplied <b>{success.amount} {success.asset}</b> · earning <b style={{ color: '#10b981' }}>{success.apy} APY</b>
           </p>
+          <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: 14, fontSize: 12, color: MUTED, marginBottom: 16, fontFamily: MONO, textAlign: 'left' }}>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Arbitrum Tx</div>
+            <div style={{ wordBreak: 'break-all', color: '#fff' }}>{success.tx.hash}</div>
+            <a href={success.tx.explorerUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 8, color: '#10b981', textDecoration: 'none', fontWeight: 600 }}>
+              View on Arbiscan ↗
+            </a>
+          </div>
           <button onClick={() => { setSuccess(null); setAmount('') }} style={primaryBtn}>Supply More</button>
         </div>
       </div>

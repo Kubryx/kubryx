@@ -20,6 +20,7 @@ import { WrongNetworkBanner } from '@/components/wallet/WrongNetwork'
 import { useKubrykPlatform } from '@/context/KubrykPlatformContext'
 import { getCreditTier } from '@/lib/platform/scoring'
 import { PlatformModeBadge } from '@/components/ui/PlatformModeBadge'
+import LiveCrossChainPulse from '@/components/ui/LiveCrossChainPulse'
 
 /* ── Theme ──────────────────────────────────────────── */
 const BG      = '#0a0e27'
@@ -728,6 +729,11 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
+
+          {/* Live cross-chain integration pulse */}
+          <div style={{ margin: '0 24px 24px' }}>
+            <LiveCrossChainPulse />
+          </div>
 
           {/* Protocol activity chart */}
           <ProtocolActivity />

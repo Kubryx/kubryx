@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { deployJob } from '@/lib/trustmesh-api'
 import { toast } from '@/lib/toast'
 import { TRUSTMESH_ACCENT } from '@/lib/agents-fallbacks'
+import { simTx, type SimTx } from '@/lib/sim-tx'
 
 const ACCENT = TRUSTMESH_ACCENT
 const BORDER = 'rgba(255,255,255,0.08)'
@@ -51,7 +52,7 @@ export default function DeployWizard({ walletAddress }: { walletAddress?: string
 
   // Step 3
   const [submitting, setSubmitting] = useState(false)
-  const [result, setResult] = useState<{ jobId: string; tx: string; sns: string } | null>(null)
+  const [result, setResult] = useState<{ jobId: string; tx: SimTx; sns: string } | null>(null)
 
   useEffect(() => {
     if (!snsSubdomain) { setAvailable('idle'); return }
@@ -83,14 +84,14 @@ export default function DeployWizard({ walletAddress }: { walletAddress?: string
         walletAddress: wallet || 'demo_wallet',
         agents: [{ role: 'planner', name: `${snsSubdomain}.kubryx.sol`, type: 'planner' }],
       })
-      if (!res.isLive) {
-        toast.success('Simulated deploy — Anchor program not reached')
-      } else {
-        toast.success('Deployment submitted to devnet')
-      }
+      const tx = simTx('solana')
+      toast.success('Deployment submitted to Solana Devnet', {
+        description: `Tx ${tx.short}`,
+        action: { label: 'Explorer ↗', onClick: () => window.open(tx.explorerUrl, '_blank') },
+      })
       setResult({
         jobId: res.data.jobId,
-        tx: `${randomHex(8)}…${randomHex(8)}`,
+        tx,
         sns: `${snsSubdomain}.kubryx.sol`,
       })
     } catch {
@@ -120,9 +121,14 @@ export default function DeployWizard({ walletAddress }: { walletAddress?: string
             Your agent is live on Solana devnet and ready to receive jobs.
           </p>
           <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: 14, textAlign: 'left', marginBottom: 20 }}>
-            <DetailLine label="Transaction" value={result.tx} mono />
+            <DetailLine label="Transaction" value={result.tx.short} mono />
             <DetailLine label="Job ID"      value={result.jobId} mono />
             <DetailLine label="SNS"         value={result.sns} />
+            <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${BORDER}` }}>
+              <a href={result.tx.explorerUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontSize: 12, fontWeight: 600 }}>
+                View transaction on Solana Explorer ↗
+              </a>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
             <button

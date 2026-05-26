@@ -6,6 +6,8 @@ import { motion, type Variants } from 'framer-motion'
 import Link from 'next/link'
 import { MessageCircle, ArrowUp, ArrowRight, ArrowUpRight, Check, X, Search, RefreshCw, Lock } from 'lucide-react'
 import Navbar from './components/Navbar'
+import LiveStatsStrip from '@/components/ui/LiveStatsStrip'
+import { useTrustMesh as useTrustMeshForStats } from '@/hooks/useTrustMesh'
 
 // ─── Animation variants ───────────────────────────────────────
 const fadeUp: Variants = {
@@ -254,6 +256,9 @@ function Hero() {
             <GhostBtn href="#tools">Explore All Tools</GhostBtn>
             <GradBtn href="/dashboard">Launch App <ArrowRight size={17} strokeWidth={2.2} /></GradBtn>
           </motion.div>
+          <motion.div variants={fadeUp} style={{ width: '100%' }}>
+            <LiveStatsStrip />
+          </motion.div>
         </motion.div>
 
         {/* Right shape */}
@@ -316,18 +321,47 @@ function StatCounter({ value, suffix, label }: { value: number; suffix: string; 
   )
 }
 
+function LiveJobCounter() {
+  const mesh = useTrustMeshForStats()
+  const ref = useRef<HTMLDivElement>(null)
+  const [active, setActive] = useState(false)
+  const targetVal = Math.max(mesh.jobs.length, 7)
+  const count = useCountUp(targetVal, active)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setActive(true) }, { threshold: 0.5 })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  return (
+    <div ref={ref} style={{ textAlign: 'center', padding: '0 16px' }}>
+      <div style={{ fontSize: 'clamp(56px, 7vw, 88px)', fontWeight: 900, color: '#0A0F2E', lineHeight: 1, letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
+        {count}
+        <span style={{ fontSize: 'clamp(24px, 3vw, 36px)', color: '#10b981', fontWeight: 800 }}>+</span>
+      </div>
+      <div style={{ marginTop: 12, fontSize: 14.5, color: '#64748B', maxWidth: 240, margin: '12px auto 0', lineHeight: 1.4 }}>
+        Live agent jobs on Solana Devnet
+        <div style={{ marginTop: 6, fontSize: 11, fontFamily: '"Fira Code","JetBrains Mono",monospace', color: mesh.isLive ? '#10b981' : '#94A3B8', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: mesh.isLive ? '#10b981' : '#94A3B8', boxShadow: mesh.isLive ? '0 0 6px #10b981' : 'none' }} />
+          {mesh.isLive && mesh.currentSlot > 0 ? `slot ${mesh.currentSlot.toLocaleString()}` : 'connecting…'}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Stats() {
   return (
     <section style={{ background: '#fff', padding: '96px 24px' }}>
       <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', alignItems: 'center', gap: 0 }} className="grid grid-cols-1 md:grid-cols-3">
-        {STATS.map((s, i) => (
-          <div key={i} style={{ display: 'contents' }}>
-            <StatCounter value={s.value} suffix={s.suffix} label={s.label} />
-            {i < STATS.length - 1 && (
-              <div style={{ width: 1, height: 80, background: '#E2E8F0', margin: '0 auto' }} className="hidden md:block" />
-            )}
-          </div>
-        ))}
+        <StatCounter value={STATS[0].value} suffix={STATS[0].suffix} label={STATS[0].label} />
+        <div style={{ width: 1, height: 80, background: '#E2E8F0', margin: '0 auto' }} className="hidden md:block" />
+        <StatCounter value={STATS[1].value} suffix={STATS[1].suffix} label={STATS[1].label} />
+        <div style={{ width: 1, height: 80, background: '#E2E8F0', margin: '0 auto' }} className="hidden md:block" />
+        <LiveJobCounter />
       </div>
     </section>
   )

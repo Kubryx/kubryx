@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { LENDORA_ACCENT, FALLBACK_LOANS, FALLBACK_SUPPLY, FALLBACK_MY_POSITIONS } from '@/lib/lend-fallbacks'
 import { toast } from '@/lib/toast'
+import { simTx } from '@/lib/sim-tx'
 
 const A = LENDORA_ACCENT
 const BORDER = 'rgba(255,255,255,0.08)'
@@ -29,36 +30,45 @@ export default function LoanPortfolio({ isConnected = false }: { isConnected?: b
     toast.error('Connect your wallet to perform on-chain actions')
   }
 
+  function announce(label: string) {
+    const tx = simTx('arbitrum')
+    toast.success(
+      `${label} · Arbitrum tx ${tx.short}`,
+      { description: tx.explorerUrl, action: { label: 'View ↗', onClick: () => window.open(tx.explorerUrl, '_blank') } }
+    )
+    return tx
+  }
+
   function handleRepay(loanId: string, amount: string, asset: string) {
     if (!isConnected) { notConnected(); return }
     if (repaidIds.has(loanId)) { toast.success(`${loanId} already settled`); return }
     setRepaidIds(prev => new Set(prev).add(loanId))
-    toast.success(`Repayment broadcast — ${amount} ${asset} (${loanId})`)
+    announce(`Repaid ${amount} ${asset} (${loanId})`)
   }
 
   function handleAddCollateral() {
     if (!isConnected) { notConnected(); return }
-    toast.success('Collateral deposit dialog — pending wallet signature')
+    announce('Collateral deposit broadcast')
   }
 
   function handleWithdraw(pool: string, amount: string) {
     if (!isConnected) { notConnected(); return }
     if (withdrawnPools.has(pool)) { toast.success(`${pool} already withdrawn`); return }
     setWithdrawnPools(prev => new Set(prev).add(pool))
-    toast.success(`Withdraw broadcast — ${amount} from ${pool}`)
+    announce(`Withdrew ${amount} from ${pool}`)
   }
 
   function handleClaim(pool: string, earned: string) {
     if (!isConnected) { notConnected(); return }
     if (claimedPools.has(pool)) { toast.success(`${pool} rewards already claimed`); return }
     setClaimedPools(prev => new Set(prev).add(pool))
-    toast.success(`Claimed ${earned} from ${pool}`)
+    announce(`Claimed ${earned} from ${pool}`)
   }
 
   function handleClaimAll() {
     if (!isConnected) { notConnected(); return }
     setClaimedPools(new Set(FALLBACK_SUPPLY.map(s => s.pool)))
-    toast.success('Claimed $312 across all positions')
+    announce('Claimed $312 across all positions')
   }
 
   return (

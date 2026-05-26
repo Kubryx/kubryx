@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from '../../lib/toast'
 import { getExplorerUrl } from '../../lib/explorer'
+import { simTx } from '../../lib/sim-tx'
 import { useWalletForTool } from '../../hooks/useWalletForTool'
 import { ConnectButton } from '../../components/wallet/ConnectButton'
 import { WrongNetworkBanner } from '../../components/wallet/WrongNetwork'
@@ -413,7 +414,7 @@ export default function SyncSplitPage() {
       toast.error('Connect your wallet first!')
       return
     }
-    
+
     // Simulate transaction signatures
     toast.info('Requesting transaction signature via Freighter...')
     setTimeout(() => {
@@ -426,7 +427,11 @@ export default function SyncSplitPage() {
         }
         return bill
       }))
-      toast.success('✦ Escrow payment completed and cleared on-chain!')
+      const tx = simTx('stellar')
+      toast.success('✦ Escrow payment cleared on-chain', {
+        description: `Stellar tx ${tx.short}`,
+        action: { label: 'Explorer ↗', onClick: () => window.open(tx.explorerUrl, '_blank') },
+      })
     }, 1000)
   }
 
