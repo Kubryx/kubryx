@@ -82,7 +82,7 @@ function AgentCard({
   const isActive = status === 'active'
 
   async function handle() {
-    if (!enabled || busy || pageLoading) return
+    if (busy || pageLoading) return
     setBusy(true)
     try { await onTrigger(dept.type, dept.action) } finally { setBusy(false) }
   }
@@ -137,20 +137,22 @@ function AgentCard({
       <motion.button
         whileTap={{ scale: 0.98 }}
         onClick={handle}
-        disabled={!enabled || busy || pageLoading}
+        disabled={busy || pageLoading}
+        title={!enabled ? 'Runs in offline mode — connect Phantom to push on-chain' : undefined}
         style={{
           background: busy ? 'rgba(255,255,255,0.06)' : dept.bg,
           color: busy ? '#64748B' : dept.color,
           border: `1px solid ${dept.bd}`,
           borderRadius: 12, padding: '12px 0', fontSize: 14, fontWeight: 700,
-          cursor: !enabled || busy || pageLoading ? 'not-allowed' : 'pointer',
+          cursor: busy || pageLoading ? 'not-allowed' : 'pointer',
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          transition: 'background 0.2s'
+          transition: 'background 0.2s',
+          opacity: busy || pageLoading ? 0.6 : 1,
         }}
       >
         {busy
           ? <><span style={{ width:12, height:12, border:`2px solid ${dept.color}40`, borderTop:`2px solid ${dept.color}`, borderRadius:'50%', animation:'spin 0.8s linear infinite', display:'inline-block' }} />Executing…</>
-          : <>▶ Trigger Action</>}
+          : <>▶ Trigger Action{!enabled ? ' (offline)' : ''}</>}
       </motion.button>
     </motion.article>
   )
@@ -301,19 +303,29 @@ export default function ShadowPage() {
   }
 
   async function triggerAgent(type: string, action: string): Promise<void> {
-    try {
-      if (!isDemo) await req('/api/agents/trigger', { method:'POST', body:JSON.stringify({ agentType:type, action, params:{ admin:wallet } }) })
-      const item: FeedItem = {
-        id: `t${Date.now()}`,
-        agentType: DEPTS.find(d=>d.type===type)?.name || type,
-        action: `Manual trigger: ${action}`,
-        timestamp: ts(),
+    let liveOk = false
+    if (!isDemo && apiBase) {
+      try {
+        await req('/api/agents/trigger', {
+          method: 'POST',
+          body: JSON.stringify({ agentType: type, action, params: { admin: wallet } }),
+        })
+        liveOk = true
+      } catch {
+        // Backend route missing / timed out — fall through to a local feed update
+        // so the user still gets visible feedback during the demo.
       }
-      setActivity(p => [item, ...p.slice(0,49)])
-      toast.success(`${type.toUpperCase()} agent triggered`)
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Trigger failed')
     }
+    const item: FeedItem = {
+      id: `t${Date.now()}`,
+      agentType: DEPTS.find(d => d.type === type)?.name || type,
+      action: `Manual trigger: ${action}`,
+      timestamp: ts(),
+    }
+    setActivity(p => [item, ...p.slice(0, 49)])
+    if (feedRef.current) feedRef.current.scrollTop = 0
+    const suffix = liveOk ? '' : isDemo ? ' (demo)' : ' (offline)'
+    toast.success(`${type.toUpperCase()} agent triggered${suffix}`)
   }
 
   // ── Computed ──────────────────────────────────────────────────
@@ -555,7 +567,7 @@ export default function ShadowPage() {
         <section style={{ marginBottom:40 }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:24 }}>
             <h2 style={{ fontSize: 24, fontWeight: 800, color: '#E2E8F0', margin: 0 }}>AI Department Grid</h2>
-            {!wallet && !isDemo && <p style={{ fontSize:13, color:'#94A3B8', margin:0, fontWeight: 500 }}>Connect wallet to enable triggers</p>}
+            {!wallet && !isDemo && <p style={{ fontSize:13, color:'#94A3B8', margin:0, fontWeight: 500 }}>Triggers run offline — connect Phantom to push on-chain</p>}
           </div>
           {loading
             ? <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:24 }}>
