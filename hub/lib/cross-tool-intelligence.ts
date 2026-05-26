@@ -261,7 +261,7 @@ export const SHOWCASE_FLOW: WalkthroughStep[] = [
   {
     title: '7. Protocol Control Center',
     route: '/protocols',
-    instructions: 'Observe active synchronization states across QIE Mainnet, Solana Devnet, Stellar Testnet, and Arbitrum Sepolia in a unified visual topology.',
+    instructions: 'Observe active synchronization states across QIE Mainnet, Solana Devnet, Stellar Testnet, and Arbitrum One in a unified visual topology.',
     tip: '💡 Multichain Power: Deep-links direct queries to live block explorers for each network environment.',
   },
   {

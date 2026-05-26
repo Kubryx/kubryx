@@ -16,7 +16,7 @@ export default function AgentsTabs() {
   const pathname = usePathname() || '/agents'
   return (
     <nav
-      aria-label="Agent co-ordinator sections"
+      aria-label="Agent Coordinator sections"
       style={{
         display: 'flex',
         gap: 4,

@@ -346,7 +346,7 @@ export default function AgentDashboard() {
         </div>
       </div>
 
-      {/* How Agent co-ordinator works */}
+      {/* How Agent Coordinator works */}
       <div style={{
         background: CARD,
         border: `1px solid ${BORDER}`,
@@ -355,7 +355,7 @@ export default function AgentDashboard() {
       }}>
         <div style={{ marginBottom: 16 }}>
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: MUTED2, textTransform: 'uppercase' }}>
-            How Agent co-ordinator works
+            How Agent Coordinator works
           </div>
           <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginTop: 2 }}>
             Deploy → Delegate → Verify → Revoke

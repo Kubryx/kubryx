@@ -35,7 +35,7 @@ export default function TrustMeshHero({
       }}>
         <span>Kubryx</span>
         <span>›</span>
-        <span style={{ color: ACCENT }}>Agent co-ordinator</span>
+        <span style={{ color: ACCENT }}>Agent Coordinator</span>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
@@ -50,7 +50,7 @@ export default function TrustMeshHero({
             }}>⬡</div>
             <div>
               <div style={{ fontSize: 24, fontWeight: 700, color: '#fff', fontFamily: 'Georgia, "Playfair Display", serif', letterSpacing: '-0.01em', lineHeight: 1 }}>
-                Agent co-ordinator
+                Agent Coordinator
               </div>
               <div style={{ fontSize: 12, color: MUTED2, marginTop: 4 }}>
                 AI Agent Coordination · Solana Devnet

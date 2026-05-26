@@ -21,7 +21,7 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     title: 'The 8 Built-In Tools',
-    description: 'Launch tools like CreditBlocks, Family vault, Bill split, and AI Lending directly. Each card lists its respective blockchain network—from QIE Mainnet to Stellar Testnet and Solana Devnet.',
+    description: 'Launch tools like CreditBlocks, Family Vault, Bill Split, and AI Lending directly. Each card lists its respective blockchain network—from QIE Mainnet to Stellar Testnet and Solana Devnet.',
     highlightId: 'command-tools-grid',
   },
   {

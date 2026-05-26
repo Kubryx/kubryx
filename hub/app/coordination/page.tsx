@@ -182,7 +182,7 @@ export default function CoordinationPage() {
                   { id: 'node-qie', x: 80, y: 140, name: 'QIE Gateway', color: '#10B981' },
                   { id: 'node-sol', x: 250, y: 60, name: 'Solana Devnet', color: bottleneckDetected ? '#EF4444' : '#10B981' },
                   { id: 'node-stellar', x: 250, y: 220, name: 'Stellar Testnet', color: '#10B981' },
-                  { id: 'node-arb', x: 420, y: 140, name: 'Arbitrum Sepolia', color: '#10B981' }
+                  { id: 'node-arb', x: 420, y: 140, name: 'Arbitrum One', color: '#10B981' }
                 ].map((node) => {
                   const isHovered = selectedNode === node.id
                   return (
@@ -232,7 +232,7 @@ export default function CoordinationPage() {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                     <strong style={{ color: '#F5C518' }}>
-                      {selectedNode === 'node-qie' ? 'QIE Mainnet' : selectedNode === 'node-sol' ? 'Solana Devnet' : selectedNode === 'node-stellar' ? 'Stellar Testnet' : 'Arbitrum Sepolia'}
+                      {selectedNode === 'node-qie' ? 'QIE Mainnet' : selectedNode === 'node-sol' ? 'Solana Devnet' : selectedNode === 'node-stellar' ? 'Stellar Testnet' : 'Arbitrum One'}
                     </strong>
                     <button onClick={() => setSelectedNode(null)} style={{ background: 'none', border: 'none', color: '#EF4444', fontSize: 10, cursor: 'pointer' }}>Close</button>
                   </div>
@@ -393,7 +393,7 @@ export default function CoordinationPage() {
                   <option value="QIE Mainnet">QIE Mainnet</option>
                   <option value="Solana Devnet">Solana Devnet</option>
                   <option value="Stellar Testnet">Stellar Testnet</option>
-                  <option value="Arbitrum Sepolia">Arbitrum Sepolia</option>
+                  <option value="Arbitrum One">Arbitrum One</option>
                 </select>
               </div>
 

@@ -49,12 +49,12 @@ export default function CommandPalette() {
     { id: 'nav-story', title: 'Open Executive Storytelling Mode', subtitle: 'Immersive slide presentation for accelerators', category: 'Navigation', action: () => router.push('/story') },
     { id: 'nav-credit', title: 'Open Credit Passport Score', subtitle: 'View soulbound NFT & NCRD APYs', category: 'Navigation', action: () => router.push('/credit') },
     { id: 'nav-lend', title: 'Open AI Lending Desk', subtitle: 'Negotiate interest rates statefully', category: 'Navigation', action: () => router.push('/lend') },
-    { id: 'nav-split', title: 'Open Bill split payments', subtitle: 'Stellar Soroban multi-party splits', category: 'Navigation', action: () => router.push('/split') },
-    { id: 'nav-agents', title: 'Open Solana Agent co-ordinator', subtitle: 'Deploy & delegate autonomous workers', category: 'Navigation', action: () => router.push('/agents') },
+    { id: 'nav-split', title: 'Open Bill Split payments', subtitle: 'Stellar Soroban multi-party splits', category: 'Navigation', action: () => router.push('/split') },
+    { id: 'nav-agents', title: 'Open Solana Agent Coordinator', subtitle: 'Deploy & delegate autonomous workers', category: 'Navigation', action: () => router.push('/agents') },
     { id: 'nav-Yield Operations Hub', title: 'Open Yield Operations Hub Manager', subtitle: 'Payroll streaming & governance', category: 'Navigation', action: () => router.push('/treasury') },
     { id: 'nav-shadow', title: 'Open Stealth Execution Suite Console', subtitle: 'Command 7 corporate AI departments', category: 'Navigation', action: () => router.push('/shadow') },
     { id: 'nav-vault', title: 'Open Private Vault Secure Trades', subtitle: 'Zero-metadata secure bridge trades', category: 'Navigation', action: () => router.push('/vault') },
-    { id: 'nav-legacy', title: 'Open Family vault Inheritance', subtitle: 'Self-claiming secure heir lockers', category: 'Navigation', action: () => router.push('/legacy') },
+    { id: 'nav-legacy', title: 'Open Family Vault Inheritance', subtitle: 'Self-claiming secure heir lockers', category: 'Navigation', action: () => router.push('/legacy') },
 
     {
       id: 'act-demo',

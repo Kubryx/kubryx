@@ -197,7 +197,7 @@ export default function JobsExplorer() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <div>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: MUTED2, textTransform: 'uppercase' }}>
-                Agent co-ordinator
+                Agent Coordinator
               </div>
               <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginTop: 2 }}>
                 {jobsRes.stats.activeCount} active · {jobsRes.stats.agentCount} agents · {jobsRes.stats.breachCount} breaches

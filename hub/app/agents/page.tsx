@@ -374,7 +374,7 @@ function AgentsPageInner() {
       {/* Hero Section */}
       <div className="hero-section">
         <div className="page-eyebrow">
-          ✦ Agent co-ordinator Protocol
+          ✦ Agent Coordinator Protocol
           <span className="badge-live">
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
             Live

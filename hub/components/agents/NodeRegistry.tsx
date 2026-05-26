@@ -98,7 +98,7 @@ export default function NodeRegistry() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `Agent co-ordinator-nodes-${Date.now()}.csv`
+    a.download = `Agent Coordinator-nodes-${Date.now()}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }

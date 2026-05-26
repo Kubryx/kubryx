@@ -33,7 +33,7 @@ const DEFAULT_OUTLOOKS: PredictiveMetrics[] = [
   { chainName: 'QIE Mainnet', forecastLatency: [42, 45, 48, 44, 43], forecastImbalanceProbability: 2, reliabilityOutlook: 'Optimal', healthConfidenceCurve: [99.8, 99.8, 99.7, 99.8, 99.9] },
   { chainName: 'Solana Devnet', forecastLatency: [280, 450, 920, 680, 310], forecastImbalanceProbability: 64, reliabilityOutlook: 'Unstable Forecast', healthConfidenceCurve: [98.5, 96.2, 91.4, 93.8, 97.4] },
   { chainName: 'Stellar Testnet', forecastLatency: [110, 115, 120, 118, 114], forecastImbalanceProbability: 8, reliabilityOutlook: 'Optimal', healthConfidenceCurve: [99.9, 99.9, 99.8, 99.9, 99.9] },
-  { chainName: 'Arbitrum Sepolia', forecastLatency: [95, 180, 340, 210, 105], forecastImbalanceProbability: 25, reliabilityOutlook: 'Optimal', healthConfidenceCurve: [99.5, 98.7, 97.2, 98.5, 99.2] }
+  { chainName: 'Arbitrum One', forecastLatency: [95, 180, 340, 210, 105], forecastImbalanceProbability: 25, reliabilityOutlook: 'Optimal', healthConfidenceCurve: [99.5, 98.7, 97.2, 98.5, 99.2] }
 ]
 
 const DEFAULT_ADVISORIES: PredictiveAdvisory[] = [

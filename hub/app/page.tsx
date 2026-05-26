@@ -48,19 +48,19 @@ function useCountUp(target: number, active: boolean): number {
 // ─── Data ────────────────────────────────────────────────────
 const TOOLS = [
   { icon: '◈', name: 'Credit Passport', href: '/credit', tagline: 'AI Credit Scoring', desc: 'Generate your on-chain credit score as a soulbound NFT. Every DeFi protocol reads your score with a single contract call.', chain: 'QIE', chainColor: '#F5A623', badge: 'Identity' },
-  { icon: '⬟', name: 'Family vault', href: '/legacy', tagline: 'Encrypted Inheritance', desc: 'Store your most important files with AES-GCM encryption. Heirs unlock access on-chain after validator attestation.', chain: 'QIE', chainColor: '#F5A623', badge: 'Security' },
-  { icon: '⬡', name: 'Agent co-ordinator', href: '/agents', tagline: 'AI Agent Coordination', desc: 'Deploy AI agents with verified on-chain identities. Every delegation is Ed25519 signed and permanently logged.', chain: 'Solana', chainColor: '#9945FF', badge: 'AI' },
+  { icon: '⬟', name: 'Family Vault', href: '/legacy', tagline: 'Encrypted Inheritance', desc: 'Store your most important files with AES-GCM encryption. Heirs unlock access on-chain after validator attestation.', chain: 'QIE', chainColor: '#F5A623', badge: 'Security' },
+  { icon: '⬡', name: 'Agent Coordinator', href: '/agents', tagline: 'AI Agent Coordination', desc: 'Deploy AI agents with verified on-chain identities. Every delegation is Ed25519 signed and permanently logged.', chain: 'Solana', chainColor: '#9945FF', badge: 'AI' },
   { icon: '🔐', name: 'Private Vault', href: '/vault', tagline: 'Cross-Chain Privacy', desc: 'Trade assets across chains with complete privacy. Zero transaction metadata exposed to any observer.', chain: 'Multi', chainColor: '#06B6D4', badge: 'Privacy' },
-  { icon: '◆', name: 'Bill split', href: '/split', tagline: 'On-Chain Bill Splitting', desc: 'Split bills using smart contracts on Stellar. Multi-wallet support with automatic settlement on full payment.', chain: 'Stellar', chainColor: '#3B82F6', badge: 'Payments' },
+  { icon: '◆', name: 'Bill Split', href: '/split', tagline: 'On-Chain Bill Splitting', desc: 'Split bills using smart contracts on Stellar. Multi-wallet support with automatic settlement on full payment.', chain: 'Stellar', chainColor: '#3B82F6', badge: 'Payments' },
   { icon: '◎', name: 'AI Lending', href: '/lend', tagline: 'DeFi Loan Negotiation', desc: 'AI agents negotiate your loan terms in natural language. Zero-knowledge credit verification. L2 settlement.', chain: 'ETH L2', chainColor: '#6366F1', badge: 'DeFi' },
-  { icon: '◇', name: 'Yield Operations Hub', href: '/treasury', tagline: 'Autonomous Yield Operations Hub', desc: 'AI agents manage your Yield Operations Hub, stream payroll per-second, enforce governance, and optimize yield automatically.', chain: 'Solana', chainColor: '#10B981', badge: 'Yield Operations Hub' },
+  { icon: '◇', name: 'Yield Operations Hub', href: '/treasury', tagline: 'Autonomous Yield Management', desc: 'AI agents manage your treasury, stream payroll per-second, enforce governance, and optimize yield automatically.', chain: 'Solana', chainColor: '#10B981', badge: 'Yield' },
   { icon: '▲', name: 'Stealth Execution Suite', href: '/shadow', tagline: 'Invisible Operations', desc: 'Run your entire financial organization invisibly on-chain. Seven specialized AI agents. Fully autonomous.', chain: 'Solana', chainColor: '#64748B', badge: 'Enterprise' },
 ]
 
 const STATS = [
   { value: 8, suffix: '+', label: 'Powerful tools in one platform' },
   { value: 4, suffix: '', label: 'Blockchains: QIE · Solana · Stellar · ETH' },
-  { value: 100, suffix: '%', label: 'Real on-chain data. Zero mock.' },
+  { value: 7, suffix: '+', label: 'Live backends with on-chain data' },
 ]
 
 const FEATURES = [
@@ -71,19 +71,19 @@ const FEATURES = [
 ]
 
 const CHAINS = [
-  { name: 'QIE Mainnet', id: 'Chain ID: 1990', color: '#F5A623', glyph: '⬡', tools: 'Credit Passport · Family vault' },
-  { name: 'Solana', id: 'Mainnet Beta', color: '#9945FF', glyph: '◎', tools: 'Agent co-ordinator · Yield Operations Hub · Stealth Execution Suite' },
-  { name: 'Stellar', id: 'Soroban', color: '#3B82F6', glyph: '✦', tools: 'Bill split' },
+  { name: 'QIE Mainnet', id: 'Chain ID: 1990', color: '#F5A623', glyph: '⬡', tools: 'Credit Passport · Family Vault' },
+  { name: 'Solana', id: 'Mainnet Beta', color: '#9945FF', glyph: '◎', tools: 'Agent Coordinator · Yield Operations Hub · Stealth Execution Suite' },
+  { name: 'Stellar', id: 'Soroban', color: '#3B82F6', glyph: '✦', tools: 'Bill Split' },
   { name: 'Ethereum L2', id: 'Arbitrum', color: '#6366F1', glyph: '◆', tools: 'AI Lending · Private Vault' },
 ]
 
 const TESTIMONIALS = [
-  { quote: 'The credit scoring architecture is the most elegant identity primitive I have seen in Web3. Clean, auditable, and genuinely useful.', name: 'Alex Chen', title: 'DeFi Protocol Lead', avatar: 'AC' },
-  { quote: 'Eight working tools, four chains, all in one app. This is what serious Web3 infrastructure actually looks like.', name: 'Sarah Kim', title: 'Blockchain Researcher', avatar: 'SK' },
-  { quote: 'The AI agent coordination combined with on-chain proof is genuinely novel. I have not seen this approach before.', name: 'Marcus Webb', title: 'Web3 Ecosystem Developer', avatar: 'MW' },
+  { quote: 'Credit Passport issues a soulbound NFT on QIE Mainnet. Any DeFi protocol can verify your score with a single on-chain read — no oracles, no off-chain trust.', name: 'Credit Passport', title: 'QIE Mainnet · Chain ID 1990', avatar: '◈' },
+  { quote: 'Agent Coordinator logs every AI delegation as an Ed25519-signed Solana account. Rogue or hallucinating agents cannot act without a valid on-chain proof of authority.', name: 'Agent Coordinator', title: 'Solana Devnet · TrustMesh Protocol', avatar: '⬡' },
+  { quote: 'Stealth Execution Suite runs CFO, Payroll, Compliance, Audit, Procurement, Tax and Risk agents autonomously. The entire corporate stack, invisible on-chain.', name: 'Stealth Execution Suite', title: 'Solana · 7 Autonomous AI Agents', avatar: '▲' },
 ]
 
-const LOGOS = ['QIE Network', 'Solana', 'Stellar', 'Ethereum', 'Arbitrum', 'Anchor Protocol', 'Soroban', 'OpenAI']
+const LOGOS = ['QIE Network', 'Solana', 'Stellar', 'Ethereum', 'Arbitrum', 'Anchor Protocol', 'Soroban', 'Groq']
 
 const CHAIN_SWATCHES: Record<string, string> = {
   'QIE Network': 'linear-gradient(135deg,#F5C518,#FFA800)',
@@ -93,7 +93,7 @@ const CHAIN_SWATCHES: Record<string, string> = {
   'Arbitrum': 'linear-gradient(135deg,#2D374B,#28A0F0)',
   'Anchor Protocol': 'linear-gradient(135deg,#4A6CFE,#A5B4FC)',
   'Soroban': 'linear-gradient(135deg,#000,#3B82F6)',
-  'OpenAI': 'linear-gradient(135deg,#10A37F,#0E8C6A)',
+  'Groq': 'linear-gradient(135deg,#FF6B35,#F5A623)',
 }
 
 // ─── Shared utility components ────────────────────────────────
@@ -573,7 +573,7 @@ function ActivityChart() {
 }
 
 function DashFrame() {
-  const sideItems = [['◉', 'Overview', true], ['◈', 'Credit Passport'], ['⬟', 'Family vault'], ['⬡', 'Agent co-ordinator'], ['🔐', 'Private Vault'], ['◆', 'Bill split'], ['◎', 'AI Lending'], ['◇', 'Yield Operations Hub'], ['▲', 'Stealth Execution Suite']]
+  const sideItems = [['◉', 'Overview', true], ['◈', 'Credit Passport'], ['⬟', 'Family Vault'], ['⬡', 'Agent Coordinator'], ['🔐', 'Private Vault'], ['◆', 'Bill Split'], ['◎', 'AI Lending'], ['◇', 'Yield Operations Hub'], ['▲', 'Stealth Execution Suite']]
   return (
     <div className="dash-tilt" style={{ maxWidth: 960, margin: '0 auto', borderRadius: 22, overflow: 'hidden', boxShadow: '0 50px 120px -30px rgba(15,23,42,0.45)', background: '#0A0F2E', border: '1px solid rgba(255,255,255,0.08)' }}>
       {/* Chrome */}
@@ -697,18 +697,17 @@ function Testimonials() {
     <section style={{ background: '#F9FAFB', padding: '112px 24px' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 48, maxWidth: 700 }}>
-          <motion.div variants={fadeUp}><Eyebrow>Reviews</Eyebrow></motion.div>
+          <motion.div variants={fadeUp}><Eyebrow>How It Works</Eyebrow></motion.div>
           <motion.h2 variants={fadeUp} style={{ fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 800, color: '#0A0F2E', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05 }}>
-            What builders<br />actually <span className="gradient-text">say about us.</span>
+            Three tools. Three chains.<br /><span className="gradient-text">One platform.</span>
           </motion.h2>
         </motion.div>
         <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 20 }}>
           {TESTIMONIALS.map((t, i) => (
             <motion.article key={i} variants={fadeUp} className="module-card" style={{ position: 'relative', background: '#fff', borderRadius: 24, border: '1px solid rgba(226,232,240,0.7)', padding: 28, display: 'flex', flexDirection: 'column', gap: 24, boxShadow: '0 10px 30px -15px rgba(15,23,42,0.15)' }}>
-              <span style={{ position: 'absolute', top: 20, left: 24, fontSize: 80, lineHeight: 1, fontWeight: 900, background: 'linear-gradient(135deg,#3B5BFA,#8B5CF6,#EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', opacity: 0.18, pointerEvents: 'none', userSelect: 'none' }}>&#8220;</span>
-              <p style={{ position: 'relative', fontSize: 18.5, fontWeight: 600, lineHeight: 1.55, color: '#0A0F2E', letterSpacing: '-0.01em', marginTop: 16, margin: '16px 0 0' }}>{t.quote}</p>
+              <p style={{ position: 'relative', fontSize: 16, fontWeight: 500, lineHeight: 1.65, color: '#334155', letterSpacing: '-0.01em', margin: 0 }}>{t.quote}</p>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 20, borderTop: '1px solid #F1F5F9', marginTop: 'auto' }}>
-                <span style={{ width: 44, height: 44, borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: 14, fontWeight: 900, color: '#fff', background: `linear-gradient(135deg, ${['#3B5BFA','#8B5CF6','#EC4899'][i]}, #8B5CF6 80%)` }}>{t.avatar}</span>
+                <span style={{ width: 44, height: 44, borderRadius: 12, display: 'grid', placeItems: 'center', fontSize: 22, background: `linear-gradient(135deg, ${['#3B5BFA','#8B5CF6','#EC4899'][i]}, #8B5CF6 80%)` }}>{t.avatar}</span>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: '#0A0F2E', letterSpacing: '-0.01em' }}>{t.name}</div>
                   <div style={{ fontSize: 12.5, color: '#64748B', marginTop: 2 }}>{t.title}</div>
@@ -772,7 +771,7 @@ function Pricing() {
               <div style={{ fontSize: 13.5, color: '#94A3B8', marginTop: 8 }}>Forever, for everyone</div>
             </div>
             <div style={{ flex: 1 }}>
-              {['Credit Passport tool', 'Family vault tool', 'QIE Mainnet access', 'Read-only dashboard'].map(f => <Bullet key={f} text={f} />)}
+              {['Credit Passport tool', 'Family Vault tool', 'QIE Mainnet access', 'Read-only dashboard'].map(f => <Bullet key={f} text={f} />)}
             </div>
             <GhostBtn href="#launch">Start exploring</GhostBtn>
           </motion.div>
@@ -859,7 +858,7 @@ function FinalCTA() {
 
 // ─── FOOTER ──────────────────────────────────────────────────
 const FOOTER_COLS = {
-  PLATFORM: ['Credit Passport', 'Family vault', 'Agent co-ordinator', 'Private Vault', 'Bill split', 'AI Lending', 'Yield Operations Hub', 'Stealth Execution Suite'],
+  PLATFORM: ['Credit Passport', 'Family Vault', 'Agent Coordinator', 'Private Vault', 'Bill Split', 'AI Lending', 'Yield Operations Hub', 'Stealth Execution Suite'],
   CHAINS: ['QIE Mainnet', 'Solana', 'Stellar', 'Ethereum L2'],
   RESOURCES: ['Smart Contracts', 'API Docs', 'Demo Video'],
   COMPANY: ['About', 'Blog', 'Newsletter'],

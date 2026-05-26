@@ -13,12 +13,12 @@ export interface RPCNode {
 
 // 1. Env-safe URLs & Fallbacks
 export const API_ENDPOINTS = {
-  ETERNALVAULT: process.env.NEXT_PUBLIC_ETERNALVAULT_URL || process.env.NEXT_PUBLIC_ETERNALVAULT_API || 'http://localhost:3000/api/eternalvault',
-  LENDORA: process.env.NEXT_PUBLIC_LENDORA_URL || process.env.NEXT_PUBLIC_LENDORA_API || 'http://localhost:3000/api/lendora',
-  TRUSTMESH: process.env.NEXT_PUBLIC_TRUSTMESH_URL || process.env.NEXT_PUBLIC_TRUSTMESH_API || 'http://localhost:3000/api/trustmesh',
-  SHADOW: process.env.NEXT_PUBLIC_SHADOW_URL || process.env.NEXT_PUBLIC_SHADOW_API || 'http://localhost:3000/api/shadow',
-  PALMFLOW: process.env.NEXT_PUBLIC_PALMFLOW_URL || process.env.NEXT_PUBLIC_PALMFLOW_API || 'http://localhost:3000/api/palmflow',
-  CIPHER: process.env.NEXT_PUBLIC_CIPHER_URL || process.env.NEXT_PUBLIC_CIPHER_API || 'http://localhost:3000/api/cipher',
+  ETERNALVAULT: process.env.NEXT_PUBLIC_ETERNALVAULT_URL || process.env.NEXT_PUBLIC_ETERNALVAULT_API || 'https://kubryx-eternalvault.onrender.com',
+  LENDORA: process.env.NEXT_PUBLIC_LENDORA_URL || process.env.NEXT_PUBLIC_LENDORA_API || 'https://kubryx-lendora.onrender.com',
+  TRUSTMESH: process.env.NEXT_PUBLIC_TRUSTMESH_URL || process.env.NEXT_PUBLIC_TRUSTMESH_API || 'https://kubryx-trustmesh.onrender.com',
+  SHADOW: process.env.NEXT_PUBLIC_SHADOW_URL || process.env.NEXT_PUBLIC_SHADOW_API || 'https://kubryx-shadow.onrender.com',
+  PALMFLOW: process.env.NEXT_PUBLIC_PALMFLOW_URL || process.env.NEXT_PUBLIC_PALMFLOW_API || 'https://kubryx-palmflow.onrender.com',
+  CIPHER: process.env.NEXT_PUBLIC_CIPHER_URL || process.env.NEXT_PUBLIC_CIPHER_API || 'https://kubryx-cipher.onrender.com',
   CREDITBLOCKS: process.env.NEXT_PUBLIC_CREDITBLOCKS_URL || process.env.NEXT_PUBLIC_CREDITBLOCKS_API || 'https://creditblock-rs-backend.onrender.com'
 }
 
@@ -37,8 +37,8 @@ export const RPC_NODES: Record<ChainType, RPCNode[]> = {
     { url: 'https://friendbot.stellar.org', latency: 0, healthy: true }
   ],
   ARBITRUM: [
-    { url: process.env.NEXT_PUBLIC_ARBITRUM_RPC || 'https://sepolia-rollup.arbitrum.io/rpc', latency: 0, healthy: true },
-    { url: 'https://arb-sepolia.g.allthatnode.com', latency: 0, healthy: true }
+    { url: process.env.NEXT_PUBLIC_ARBITRUM_RPC || 'https://arb1.arbitrum.io/rpc', latency: 0, healthy: true },
+    { url: 'https://arbitrum.meowrpc.com', latency: 0, healthy: true }
   ]
 }
 

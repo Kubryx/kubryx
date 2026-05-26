@@ -210,7 +210,7 @@ export default function StoryPage() {
         'This establishes a secure sandbox where machine intelligence performs sweeps while preserving absolute operator override control.'
       ],
       metrics: [
-        { label: 'Agent co-ordinator', value: 'Heuristic Gating' },
+        { label: 'Agent Coordinator', value: 'Heuristic Gating' },
         { label: 'Override Control', value: '100% Secure' }
       ]
     },
@@ -273,7 +273,7 @@ export default function StoryPage() {
     {
       id: 'ai-native-decision',
       title: 'AI-Native Decision Systems',
-      subtitle: 'Enforcing zero-knowledge policies across parallelized Agent co-ordinator networks.',
+      subtitle: 'Enforcing zero-knowledge policies across parallelized Agent Coordinator networks.',
       paragraphs: [
         'Machine intelligence must be gated inside secure boundaries to prevent collateral state corruption.',
         'Our AI Recommendation Feed checks active policies dynamically, producing deterministic, replay-safe reasoning trails for all proposed balance sweeps.',

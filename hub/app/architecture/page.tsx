@@ -80,9 +80,9 @@ export default function ArchitecturePage() {
     // Tools
     { id: 'credit', label: 'CreditBlocks', layer: 'blockchain', x: 80, y: 150 },
     { id: 'lend', label: 'AI Lending', layer: 'ai', x: 80, y: 230 },
-    { id: 'split', label: 'Bill split', layer: 'blockchain', x: 80, y: 310 },
-    
-    { id: 'agents', label: 'Agent co-ordinator', layer: 'security', x: 420, y: 150 },
+    { id: 'split', label: 'Bill Split', layer: 'blockchain', x: 80, y: 310 },
+
+    { id: 'agents', label: 'Agent Coordinator', layer: 'security', x: 420, y: 150 },
     { id: 'shadow', label: 'Stealth Execution Suite', layer: 'ai', x: 420, y: 230 },
     { id: 'Yield Operations Hub', label: 'Yield Operations Hub', layer: 'blockchain', x: 420, y: 310 },
     

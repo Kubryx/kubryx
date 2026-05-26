@@ -139,7 +139,7 @@ const INTEGRATIONS: IntegrationItem[] = [
     description: 'Lending Desk dynamic credit scorecard auditor and Natural Language negotiator.',
     metadata: {
       endpoint: '/api/chat (Groq API)',
-      version: 'llama3-8b-8192',
+      version: 'llama-3.3-70b-versatile',
       payloadExample: '{\n  "message": "Negotiate loan for 500 NCRD",\n  "wallet": "0x..."\n}'
     }
   },
@@ -153,7 +153,7 @@ const INTEGRATIONS: IntegrationItem[] = [
     description: 'Automated Yield Operations Hub streams scheduler and yield rebalancing planner.',
     metadata: {
       endpoint: '/api/treasury/planner',
-      version: 'gpt-4o-mini',
+      version: 'llama-3.3-70b-versatile',
       payloadExample: '{\n  "balance": "12,480 SOL",\n  "optimize": true\n}'
     }
   },

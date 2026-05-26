@@ -150,7 +150,7 @@ export default function ForceGraphSVG({
         width="100%"
         height={height}
         role="img"
-        aria-label="Agent co-ordinator graph"
+        aria-label="Agent Coordinator graph"
         style={{
           display: 'block',
           background:

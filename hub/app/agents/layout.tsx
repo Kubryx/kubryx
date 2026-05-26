@@ -1,7 +1,7 @@
 // Built by vsrupeshkumar
 import type { Metadata } from 'next'
 
-const title = 'Agent co-ordinator — Kubryx'
+const title = 'Agent Coordinator — Kubryx'
 const description =
   'Every agent. Every decision. On chain. Coordinate, verify, and audit autonomous Solana agents.'
 const url = 'https://kubryx.vercel.app/agents'

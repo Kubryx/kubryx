@@ -25,7 +25,7 @@ export default function LiveBadge({ isLive }: { isLive: boolean }) {
           background: isLive ? '#22C55E' : '#bbb',
         }}
       />
-      {isLive ? 'Live · Agent co-ordinator API' : 'Testnet Data'}
+      {isLive ? 'Live · Agent Coordinator API' : 'Testnet Data'}
     </span>
   )
 }

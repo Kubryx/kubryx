@@ -31,13 +31,13 @@ const BG = '#F8FAFC', MONO = '"JetBrains Mono","Fira Code","Courier New",monospa
 const CARD = 'rgba(255,255,255,0.85)', BORDER = 'rgba(255,255,255,0.6)'
 
 const DEPTS = [
-  { type:'cfo',         name:'CFO Agent',         icon:'💰', role:'Yield Operations Hub oversight, rebalancing & capital allocation', color:'#EAB308', bg:'#FEF9C3', bd:'#FEF08A', metric:'12,480.50', unit:'SOL',    label:'Yield Operations Hub Balance',   action:'Rebalance Yield Operations Hub' },
-  { type:'payroll',     name:'Payroll Agent',      icon:'💸', role:'Real-time SOL salary streaming to team wallets',       color:'#10B981', bg:'#D1FAE5', bd:'#A7F3D0', metric:'0.00034',   unit:'SOL/s',  label:'Stream Rate',        action:'Process payroll batch' },
-  { type:'compliance',  name:'Compliance Agent',   icon:'⚖️', role:'Regulatory rule enforcement & AML screening',         color:'#3B82F6', bg:'#DBEAFE', bd:'#BFDBFE', metric:'347',       unit:'rules',  label:'Rules Checked',      action:'Run compliance sweep' },
-  { type:'audit',       name:'Audit Agent',        icon:'🔍', role:'Immutable transaction logging & on-chain audit trail', color:'#8B5CF6', bg:'#EDE9FE', bd:'#DDD6FE', metric:'1,847',     unit:'txns',   label:'Txns Logged',        action:'Run full audit' },
-  { type:'procurement', name:'Procurement Agent',  icon:'🛒', role:'Vendor management & automated purchase orders',       color:'#F97316', bg:'#FFEDD5', bd:'#FED7AA', metric:'3',         unit:'orders', label:'Pending POs',        action:'Process pending POs' },
-  { type:'tax',         name:'Tax Agent',          icon:'📋', role:'On-chain tax liability estimation & filing prep',      color:'#F43F5E', bg:'#FFE4E6', bd:'#FECDD3', metric:'0.082', unit:'SOL',   label:'Est. Liability',     action:'Calculate liability' },
-  { type:'risk',        name:'Risk Agent',         icon:'🛡',  role:'Real-time anomaly detection & threat monitoring',     color:'#EF4444', bg:'#FEE2E2', bd:'#FECACA', metric:'2',         unit:'/ 10',   label:'Threat Level',       action:'Run threat scan' },
+  { type:'cfo',         name:'CFO Agent',         icon:'💰', role:'Yield Operations Hub oversight, rebalancing & capital allocation', color:'#EAB308', bg:'rgba(234,179,8,0.15)',    bd:'rgba(234,179,8,0.3)',    metric:'12,480.50', unit:'SOL',    label:'Yield Operations Hub Balance',   action:'Rebalance Yield Operations Hub' },
+  { type:'payroll',     name:'Payroll Agent',      icon:'💸', role:'Real-time SOL salary streaming to team wallets',       color:'#10B981', bg:'rgba(16,185,129,0.15)',  bd:'rgba(16,185,129,0.3)',  metric:'0.00034',   unit:'SOL/s',  label:'Stream Rate',        action:'Process payroll batch' },
+  { type:'compliance',  name:'Compliance Agent',   icon:'⚖️', role:'Regulatory rule enforcement & AML screening',         color:'#3B82F6', bg:'rgba(59,130,246,0.15)',  bd:'rgba(59,130,246,0.3)',  metric:'347',       unit:'rules',  label:'Rules Checked',      action:'Run compliance sweep' },
+  { type:'audit',       name:'Audit Agent',        icon:'🔍', role:'Immutable transaction logging & on-chain audit trail', color:'#8B5CF6', bg:'rgba(139,92,246,0.15)',  bd:'rgba(139,92,246,0.3)',  metric:'1,847',     unit:'txns',   label:'Txns Logged',        action:'Run full audit' },
+  { type:'procurement', name:'Procurement Agent',  icon:'🛒', role:'Vendor management & automated purchase orders',       color:'#F97316', bg:'rgba(249,115,22,0.15)',  bd:'rgba(249,115,22,0.3)',  metric:'3',         unit:'orders', label:'Pending POs',        action:'Process pending POs' },
+  { type:'tax',         name:'Tax Agent',          icon:'📋', role:'On-chain tax liability estimation & filing prep',      color:'#F43F5E', bg:'rgba(244,63,94,0.15)',   bd:'rgba(244,63,94,0.3)',   metric:'0.082', unit:'SOL',   label:'Est. Liability',     action:'Calculate liability' },
+  { type:'risk',        name:'Risk Agent',         icon:'🛡',  role:'Real-time anomaly detection & threat monitoring',     color:'#EF4444', bg:'rgba(239,68,68,0.15)',   bd:'rgba(239,68,68,0.3)',   metric:'2',         unit:'/ 10',   label:'Threat Level',       action:'Run threat scan' },
 ] as const
 
 const POOL: Omit<FeedItem,'id'|'timestamp'>[] = [
@@ -104,8 +104,8 @@ function AgentCard({
             {dept.icon}
           </div>
           <div>
-            <p style={{ fontSize: 16, fontWeight: 700, color: '#0F172A', margin: 0 }}>{dept.name}</p>
-            <p style={{ fontSize: 12, color: '#64748B', margin: 0 }}>{dept.role}</p>
+            <p style={{ fontSize: 16, fontWeight: 700, color: '#E2E8F0', margin: 0 }}>{dept.name}</p>
+            <p style={{ fontSize: 12, color: '#94A3B8', margin: 0 }}>{dept.role}</p>
           </div>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:5 }}>
@@ -114,23 +114,23 @@ function AgentCard({
       </div>
 
       {/* Metric */}
-      <div style={{ background:'#F8FAFC', borderRadius:12, padding:'16px', display:'flex', justifyContent:'space-between', alignItems:'center', border: '1px solid #E2E8F0' }}>
+      <div style={{ background:'rgba(255,255,255,0.05)', borderRadius:12, padding:'16px', display:'flex', justifyContent:'space-between', alignItems:'center', border: '1px solid rgba(255,255,255,0.08)' }}>
         <div>
-          <p style={{ fontSize:11, color:'#64748B', margin:'0 0 4px', textTransform:'uppercase', letterSpacing:'0.05em', fontWeight: 600 }}>{dept.label}</p>
-          <p style={{ fontSize:24, fontWeight:800, color:'#0F172A', margin:0, fontFamily:MONO }}>
+          <p style={{ fontSize:11, color:'#94A3B8', margin:'0 0 4px', textTransform:'uppercase', letterSpacing:'0.05em', fontWeight: 600 }}>{dept.label}</p>
+          <p style={{ fontSize:24, fontWeight:800, color:'#E2E8F0', margin:0, fontFamily:MONO }}>
             {stealth ? '●●●●●' : dept.metric}
-            <span style={{ fontSize:12, color:'#64748B', marginLeft:6 }}>{dept.unit}</span>
+            <span style={{ fontSize:12, color:'#94A3B8', marginLeft:6 }}>{dept.unit}</span>
           </p>
         </div>
       </div>
 
       {/* Last action */}
       <div style={{ flex: 1 }}>
-        <p style={{ fontSize:11, color:'#64748B', margin:'0 0 4px', letterSpacing:'0.04em', fontWeight: 600 }}>LAST ACTION</p>
-        <p style={{ fontSize:13, color:'#334155', margin:0, lineHeight:1.5, fontWeight: 500 }}>
+        <p style={{ fontSize:11, color:'#94A3B8', margin:'0 0 4px', letterSpacing:'0.04em', fontWeight: 600 }}>LAST ACTION</p>
+        <p style={{ fontSize:13, color:'#CBD5E1', margin:0, lineHeight:1.5, fontWeight: 500 }}>
           {stealth ? '[ REDACTED — STEALTH ACTIVE ]' : lastAction}
         </p>
-        {agent?.time && <p style={{ fontSize:11, color:'#94A3B8', margin:'6px 0 0', fontFamily:MONO }}>{agent.time}</p>}
+        {agent?.time && <p style={{ fontSize:11, color:'#64748B', margin:'6px 0 0', fontFamily:MONO }}>{agent.time}</p>}
       </div>
 
       {/* Button */}
@@ -139,8 +139,8 @@ function AgentCard({
         onClick={handle}
         disabled={!enabled || busy || pageLoading}
         style={{
-          background: busy ? '#E2E8F0' : dept.bg,
-          color: busy ? '#94A3B8' : dept.color,
+          background: busy ? 'rgba(255,255,255,0.06)' : dept.bg,
+          color: busy ? '#64748B' : dept.color,
           border: `1px solid ${dept.bd}`,
           borderRadius: 12, padding: '12px 0', fontSize: 14, fontWeight: 700,
           cursor: !enabled || busy || pageLoading ? 'not-allowed' : 'pointer',
@@ -343,7 +343,7 @@ export default function ShadowPage() {
         <div style={{ display:'flex', alignItems:'center', gap:12 }}>
           <div style={{ width: 36, height: 36, background: '#0F172A', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🌑</div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize:14, fontWeight:800, color:'#0F172A', letterSpacing:'0.1em' }}>Stealth Execution Suite</span>
+            <span style={{ fontSize:14, fontWeight:800, color:'#E2E8F0', letterSpacing:'0.1em' }}>Stealth Execution Suite</span>
             <span style={{ fontSize:10, color:'#64748B', letterSpacing:'0.06em', fontWeight: 600 }}>NEXUS v2.0</span>
           </div>
         </div>
@@ -354,7 +354,7 @@ export default function ShadowPage() {
             {isDemo ? 'Testnet Data' : 'Live'}
           </span>
           {/* Solana */}
-          <span style={{ fontSize:12, padding:'6px 14px', borderRadius:999, background:'#F8FAFC', border:'1px solid #E2E8F0', color:'#475569', display:'flex', alignItems:'center', gap:6, fontWeight:700 }}>
+          <span style={{ fontSize:12, padding:'6px 14px', borderRadius:999, background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', color:'#94A3B8', display:'flex', alignItems:'center', gap:6, fontWeight:700 }}>
             <span style={{ width:6, height:6, borderRadius:'50%', background:'#64748B' }} />Solana Devnet
           </span>
           {/* Health */}
@@ -364,7 +364,7 @@ export default function ShadowPage() {
           </span>
           {/* Retry button — only shown when API is offline */}
           {health === 'down' && (
-            <button onClick={runInit} style={{ fontSize:12, padding:'6px 14px', borderRadius:999, cursor:'pointer', background:'#DBEAFE', border:'1px solid #BFDBFE', color:'#3B82F6', fontWeight:700, transition:'all 0.2s' }} onMouseOver={e=>(e.currentTarget.style.background='#BFDBFE')} onMouseOut={e=>(e.currentTarget.style.background='#DBEAFE')}>
+            <button onClick={runInit} style={{ fontSize:12, padding:'6px 14px', borderRadius:999, cursor:'pointer', background:'rgba(59,130,246,0.15)', border:'1px solid rgba(59,130,246,0.3)', color:'#60A5FA', fontWeight:700, transition:'all 0.2s' }} onMouseOver={e=>(e.currentTarget.style.background='rgba(59,130,246,0.25)')} onMouseOut={e=>(e.currentTarget.style.background='rgba(59,130,246,0.15)')}>
               ↻ Retry
             </button>
           )}
@@ -419,19 +419,19 @@ export default function ShadowPage() {
         </section>
 
         {/* Alerts */}
-        {error && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:12, padding:'16px 20px', marginBottom:24, fontSize:14, fontWeight: 600, color:'#EF4444' }}>❌ {error}</motion.div>}
-        {message && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ background:'#F0FDF4', border:'1px solid #BBF7D0', borderRadius:12, padding:'16px 20px', marginBottom:24, fontSize:14, fontWeight: 600, color:'#10B981' }}>✅ {message}</motion.div>}
-        {!wallet && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ background:'#F8FAFC', border:'1px solid #E2E8F0', borderRadius:12, padding:'16px 20px', marginBottom:24, fontSize:14, fontWeight: 600, color:'#64748B', display: 'flex', alignItems: 'center', gap: 8 }}>
+        {error && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:12, padding:'16px 20px', marginBottom:24, fontSize:14, fontWeight: 600, color:'#F87171' }}>❌ {error}</motion.div>}
+        {message && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ background:'rgba(16,185,129,0.1)', border:'1px solid rgba(16,185,129,0.25)', borderRadius:12, padding:'16px 20px', marginBottom:24, fontSize:14, fontWeight: 600, color:'#34D399' }}>✅ {message}</motion.div>}
+        {!wallet && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:12, padding:'16px 20px', marginBottom:24, fontSize:14, fontWeight: 600, color:'#94A3B8', display: 'flex', alignItems: 'center', gap: 8 }}>
           <span>🔗</span> Connect Phantom to enable agent triggers and org management.
         </motion.div>}
 
         {/* Stats Strip */}
         <div className="bento-grid" style={{ marginBottom: 40 }}>
           {[
-            { label:'Yield Operations Hub Balance',   value: stealth?'●●●●●':'12,480.50 SOL', icon:'💰', color:'#EAB308', bg:'#FEF9C3' },
-            { label:'Active Agents',       value:`${agents.filter(a=>(a.status||'active')==='active').length||6} / 7`,         icon:'🤖', color:'#10B981', bg:'#D1FAE5' },
-            { label:'SOL Streamed Today',  value: stealth?'●●●●●':`${streamed.toFixed(4)} SOL`, icon:'💸', color:'#3B82F6', bg:'#DBEAFE' },
-            { label:'Threat Level',        value:'2 / 10 — LOW',                                icon:'🛡', color:'#10B981', bg:'#D1FAE5' },
+            { label:'Yield Operations Hub Balance',   value: stealth?'●●●●●':'12,480.50 SOL', icon:'💰', color:'#EAB308', bg:'rgba(234,179,8,0.15)' },
+            { label:'Active Agents',       value:`${agents.filter(a=>(a.status||'active')==='active').length||6} / 7`,         icon:'🤖', color:'#10B981', bg:'rgba(16,185,129,0.15)' },
+            { label:'SOL Streamed Today',  value: stealth?'●●●●●':`${streamed.toFixed(4)} SOL`, icon:'💸', color:'#3B82F6', bg:'rgba(59,130,246,0.15)' },
+            { label:'Threat Level',        value:'2 / 10 — LOW',                                icon:'🛡', color:'#10B981', bg:'rgba(16,185,129,0.15)' },
           ].map((s, i) => (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
@@ -445,8 +445,8 @@ export default function ShadowPage() {
                 {s.icon}
               </div>
               <div>
-                <p style={{ fontSize: 12, color: '#64748B', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>{s.label}</p>
-                <p style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', margin: 0, fontFamily: MONO }}>{s.value}</p>
+                <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>{s.label}</p>
+                <p style={{ fontSize: 20, fontWeight: 800, color: '#E2E8F0', margin: 0, fontFamily: MONO }}>{s.value}</p>
               </div>
             </motion.div>
           ))}
@@ -455,17 +455,17 @@ export default function ShadowPage() {
         {/* Org Setup */}
         {orgOpen && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="glass-card" style={{ padding:'32px', marginBottom:40, borderTop: '4px solid #64748B' }}>
-            <p style={{ fontSize:18, fontWeight:800, color:'#0F172A', margin:'0 0 24px' }}>⚙ Organization Setup</p>
+            <p style={{ fontSize:18, fontWeight:800, color:'#E2E8F0', margin:'0 0 24px' }}>⚙ Organization Setup</p>
             <form onSubmit={setupOrg} style={{ display:'grid', gridTemplateColumns:'1fr 1fr auto', gap:24, alignItems:'end' }}>
               <div>
-                <label style={{ display:'block', fontSize:12, fontWeight: 700, color:'#64748B', marginBottom:8, letterSpacing:'0.05em' }}>ORGANIZATION NAME</label>
-                <input value={orgName} onChange={e=>setOrgName(e.target.value)} placeholder="Shadow DAO" style={{ width:'100%', padding:'14px 16px', background:'#F8FAFC', border:'1px solid #E2E8F0', borderRadius:12, color:'#0F172A', fontSize:14, fontWeight: 500, boxSizing:'border-box', outline:'none', transition: 'border-color 0.2s' }} onFocus={e => e.target.style.borderColor = '#64748B'} onBlur={e => e.target.style.borderColor = '#E2E8F0'} />
+                <label style={{ display:'block', fontSize:12, fontWeight: 700, color:'#94A3B8', marginBottom:8, letterSpacing:'0.05em' }}>ORGANIZATION NAME</label>
+                <input value={orgName} onChange={e=>setOrgName(e.target.value)} placeholder="Shadow DAO" style={{ width:'100%', padding:'14px 16px', background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:12, color:'#E2E8F0', fontSize:14, fontWeight: 500, boxSizing:'border-box', outline:'none', transition: 'border-color 0.2s' }} onFocus={e => e.target.style.borderColor = 'rgba(255,255,255,0.3)'} onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'} />
               </div>
               <div>
-                <label style={{ display:'block', fontSize:12, fontWeight: 700, color:'#64748B', marginBottom:8, letterSpacing:'0.05em' }}>ADMIN WALLET (SOLANA)</label>
-                <input value={admin} onChange={e=>setAdmin(e.target.value)} placeholder="Solana public key" style={{ width:'100%', padding:'14px 16px', background:'#F8FAFC', border:'1px solid #E2E8F0', borderRadius:12, color:'#0F172A', fontSize:14, fontWeight: 500, fontFamily:MONO, boxSizing:'border-box', outline:'none', transition: 'border-color 0.2s' }} onFocus={e => e.target.style.borderColor = '#64748B'} onBlur={e => e.target.style.borderColor = '#E2E8F0'} />
+                <label style={{ display:'block', fontSize:12, fontWeight: 700, color:'#94A3B8', marginBottom:8, letterSpacing:'0.05em' }}>ADMIN WALLET (SOLANA)</label>
+                <input value={admin} onChange={e=>setAdmin(e.target.value)} placeholder="Solana public key" style={{ width:'100%', padding:'14px 16px', background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:12, color:'#E2E8F0', fontSize:14, fontWeight: 500, fontFamily:MONO, boxSizing:'border-box', outline:'none', transition: 'border-color 0.2s' }} onFocus={e => e.target.style.borderColor = 'rgba(255,255,255,0.3)'} onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'} />
               </div>
-              <button type="submit" disabled={loading} style={{ background:'#0F172A', color:'#fff', border:'none', borderRadius:12, padding:'14px 32px', fontSize:14, fontWeight:700, cursor:loading?'not-allowed':'pointer', whiteSpace:'nowrap', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#1E293B'} onMouseOut={e => e.currentTarget.style.background = '#0F172A'}>
+              <button type="submit" disabled={loading} style={{ background:'linear-gradient(135deg,#4338CA,#6366F1)', color:'#fff', border:'none', borderRadius:12, padding:'14px 32px', fontSize:14, fontWeight:700, cursor:loading?'not-allowed':'pointer', whiteSpace:'nowrap', transition: 'filter 0.2s' }} onMouseOver={e => e.currentTarget.style.filter = 'brightness(1.12)'} onMouseOut={e => e.currentTarget.style.filter = 'brightness(1)'}>
                 {loading?'⟳ Saving…':'💾 Save Configuration'}
               </button>
             </form>
@@ -477,41 +477,41 @@ export default function ShadowPage() {
           {/* Yield Operations Hub */}
           <div className="glass-card" style={{ padding: '32px' }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: 24 }}>
-              <p style={{ fontSize:18, fontWeight:800, color:'#0F172A', margin:0 }}>💰 Yield Operations Hub Overview</p>
-              <span style={{ fontSize:11, color:'#64748B', fontFamily:MONO, background: '#F1F5F9', padding: '4px 12px', borderRadius: 999 }}>CFO AGENT MANAGED</span>
+              <p style={{ fontSize:18, fontWeight:800, color:'#E2E8F0', margin:0 }}>💰 Yield Operations Hub Overview</p>
+              <span style={{ fontSize:11, color:'#94A3B8', fontFamily:MONO, background: 'rgba(255,255,255,0.06)', padding: '4px 12px', borderRadius: 999 }}>CFO AGENT MANAGED</span>
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom: 24 }}>
               {[
-                { label:'24h Inflow',      value:'+420.00 SOL', color:'#10B981', bg:'#D1FAE5'  },
-                { label:'24h Outflow',     value:'-180.00 SOL', color:'#EF4444', bg:'#FEE2E2'  },
-                { label:'Reserve Pool',    value:'4,992.20 SOL', color:'#EAB308', bg:'#FEF9C3' },
-                { label:'Operations Pool', value:'7,488.30 SOL', color:'#3B82F6', bg:'#DBEAFE'  },
+                { label:'24h Inflow',      value:'+420.00 SOL', color:'#10B981', bg:'rgba(16,185,129,0.15)'  },
+                { label:'24h Outflow',     value:'-180.00 SOL', color:'#EF4444', bg:'rgba(239,68,68,0.15)'   },
+                { label:'Reserve Pool',    value:'4,992.20 SOL', color:'#EAB308', bg:'rgba(234,179,8,0.15)'  },
+                { label:'Operations Pool', value:'7,488.30 SOL', color:'#3B82F6', bg:'rgba(59,130,246,0.15)' },
               ].map(m=>(
-                <div key={m.label} style={{ background:'#F8FAFC', border: '1px solid #E2E8F0', borderRadius:16, padding:'16px' }}>
+                <div key={m.label} style={{ background:'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius:16, padding:'16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                     <div style={{ width: 8, height: 8, borderRadius: '50%', background: m.color }} />
-                    <p style={{ fontSize:11, color:'#64748B', margin:0, textTransform:'uppercase', letterSpacing:'0.04em', fontWeight: 600 }}>{m.label}</p>
+                    <p style={{ fontSize:11, color:'#94A3B8', margin:0, textTransform:'uppercase', letterSpacing:'0.04em', fontWeight: 600 }}>{m.label}</p>
                   </div>
-                  <p style={{ fontSize:20, fontWeight:800, color: '#0F172A', margin:0, fontFamily:MONO }}>{stealth?'●●●●●':m.value}</p>
+                  <p style={{ fontSize:20, fontWeight:800, color: '#E2E8F0', margin:0, fontFamily:MONO }}>{stealth?'●●●●●':m.value}</p>
                 </div>
               ))}
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom: 24 }}>
-              <div style={{ flex:1, height:8, borderRadius:4, background:'#E2E8F0', overflow:'hidden' }}>
+              <div style={{ flex:1, height:8, borderRadius:4, background:'rgba(255,255,255,0.08)', overflow:'hidden' }}>
                 <motion.div initial={{ width: 0 }} animate={{ width: '60%' }} transition={{ duration: 1 }} style={{ height:'100%', borderRadius:4, background:`linear-gradient(90deg, #EAB308, #F97316)` }} />
               </div>
-              <span style={{ fontSize:12, fontWeight: 600, color:'#64748B', whiteSpace:'nowrap' }}>60% Ops / 40% Reserve</span>
+              <span style={{ fontSize:12, fontWeight: 600, color:'#94A3B8', whiteSpace:'nowrap' }}>60% Ops / 40% Reserve</span>
             </div>
             {/* Payroll streams */}
-            <div style={{ padding:'20px', background:'#F8FAFC', border:'1px solid #E2E8F0', borderRadius:16 }}>
+            <div style={{ padding:'20px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:16 }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
-                <p style={{ fontSize:14, fontWeight:700, color:'#0F172A', margin:0 }}>💸 Active Payroll Streams</p>
+                <p style={{ fontSize:14, fontWeight:700, color:'#E2E8F0', margin:0 }}>💸 Active Payroll Streams</p>
                 <span style={{ fontSize:13, color:'#10B981', fontFamily:MONO, fontWeight: 700 }}>{stealth?'●●● SOL/s':`${RATE} SOL/s total`}</span>
               </div>
               {[{ r:'Dev Team', v:'0.00023 SOL/s' },{ r:'Marketing', v:'0.00011 SOL/s' }].map(s=>(
-                <div key={s.r} style={{ display:'flex', justifyContent:'space-between', fontSize:13, color:'#64748B', marginTop:8, fontWeight: 500 }}>
+                <div key={s.r} style={{ display:'flex', justifyContent:'space-between', fontSize:13, color:'#94A3B8', marginTop:8, fontWeight: 500 }}>
                   <span>{s.r}</span>
-                  <span style={{ fontFamily:MONO, color: '#0F172A' }}>{stealth?'●●●':s.v}</span>
+                  <span style={{ fontFamily:MONO, color: '#E2E8F0' }}>{stealth?'●●●':s.v}</span>
                 </div>
               ))}
             </div>
@@ -520,8 +520,8 @@ export default function ShadowPage() {
           {/* Activity */}
           <div className="glass-card" style={{ padding:'32px', display:'flex', flexDirection:'column', height: '100%' }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:24 }}>
-              <p style={{ fontSize:18, fontWeight:800, color:'#0F172A', margin:0 }}>📡 Global Activity Feed</p>
-              {isDemo && <span style={{ fontSize:11, color:'#10B981', fontFamily:MONO, fontWeight: 600, display:'flex', alignItems:'center', gap:6, background: '#D1FAE5', padding: '4px 12px', borderRadius: 999 }}>
+              <p style={{ fontSize:18, fontWeight:800, color:'#E2E8F0', margin:0 }}>📡 Global Activity Feed</p>
+              {isDemo && <span style={{ fontSize:11, color:'#10B981', fontFamily:MONO, fontWeight: 600, display:'flex', alignItems:'center', gap:6, background: 'rgba(16,185,129,0.12)', padding: '4px 12px', borderRadius: 999 }}>
                 <span style={{ width:6, height:6, borderRadius:'50%', background:'#10B981', boxShadow:`0 0 6px #10B981`, display:'inline-block' }} />LIVE SIM
               </span>}
             </div>
@@ -534,13 +534,13 @@ export default function ShadowPage() {
                         key={item.id||i} 
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        style={{ padding:'16px', background: i===0?'#F1F5F9':'#FFFFFF', border:`1px solid ${i===0?'#CBD5E1':'#E2E8F0'}`, borderRadius:12 }}
+                        style={{ padding:'16px', background: i===0?'rgba(255,255,255,0.07)':'rgba(255,255,255,0.03)', border:`1px solid ${i===0?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.05)'}`, borderRadius:12 }}
                       >
                         <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
-                          <span style={{ fontSize:12, fontWeight:700, color: i===0?'#0F172A':'#64748B' }}>{item.agentType}</span>
-                          <span style={{ fontSize:11, color:'#94A3B8', fontFamily:MONO }}>{item.timestamp}</span>
+                          <span style={{ fontSize:12, fontWeight:700, color: i===0?'#E2E8F0':'#94A3B8' }}>{item.agentType}</span>
+                          <span style={{ fontSize:11, color:'#64748B', fontFamily:MONO }}>{item.timestamp}</span>
                         </div>
-                        <p style={{ fontSize:13, color:stealth?'#CBD5E1':'#334155', margin:0, lineHeight:1.5, fontWeight: 500 }}>
+                        <p style={{ fontSize:13, color:stealth?'#475569':'#CBD5E1', margin:0, lineHeight:1.5, fontWeight: 500 }}>
                           {stealth?'■■■■ ■■■■■■ ■■■ ■■■■■■■':item.action}
                         </p>
                       </motion.div>
@@ -554,12 +554,12 @@ export default function ShadowPage() {
         {/* Agent Grid */}
         <section style={{ marginBottom:40 }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:24 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#0F172A', margin: 0 }}>AI Department Grid</h2>
-            {!wallet && !isDemo && <p style={{ fontSize:13, color:'#64748B', margin:0, fontWeight: 500 }}>Connect wallet to enable triggers</p>}
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#E2E8F0', margin: 0 }}>AI Department Grid</h2>
+            {!wallet && !isDemo && <p style={{ fontSize:13, color:'#94A3B8', margin:0, fontWeight: 500 }}>Connect wallet to enable triggers</p>}
           </div>
           {loading
             ? <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:24 }}>
-                {DEPTS.map(d=><div key={d.type} className="glass-card" style={{ height:260, animation:'pulse 1.5s ease-in-out infinite', background: '#F1F5F9' }} />)}
+                {DEPTS.map(d=><div key={d.type} className="glass-card" style={{ height:260, animation:'pulse 1.5s ease-in-out infinite' }} />)}
               </div>
             : <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:24 }}>
                 {DEPTS.map(dept=>{
@@ -575,7 +575,7 @@ export default function ShadowPage() {
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(400px,1fr))', gap:24, marginBottom: 40 }}>
           {/* Simulation */}
           <div className="glass-card" style={{ padding:'32px' }}>
-            <p style={{ fontSize:18, fontWeight:800, color:'#0F172A', margin:'0 0 24px' }}>📊 Yield Operations Hub Simulation</p>
+            <p style={{ fontSize:18, fontWeight:800, color:'#E2E8F0', margin:'0 0 24px' }}>📊 Yield Operations Hub Simulation</p>
             <div style={{ display:'flex', flexDirection:'column', gap:20, marginBottom:32 }}>
               {[
                 { label:'Yield Operations Hub Size (SOL)', min:1000, max:100000, step:500, val:simT, set:setSimT },
@@ -584,8 +584,8 @@ export default function ShadowPage() {
               ].map(s=>(
                 <div key={s.label}>
                   <div style={{ display:'flex', justifyContent:'space-between', marginBottom:8 }}>
-                    <label style={{ fontSize:12, fontWeight: 600, color:'#64748B', letterSpacing:'0.02em' }}>{s.label}</label>
-                    <span style={{ fontSize:13, color:'#0F172A', fontFamily:MONO, fontWeight:700 }}>{s.val.toLocaleString()}</span>
+                    <label style={{ fontSize:12, fontWeight: 600, color:'#94A3B8', letterSpacing:'0.02em' }}>{s.label}</label>
+                    <span style={{ fontSize:13, color:'#E2E8F0', fontFamily:MONO, fontWeight:700 }}>{s.val.toLocaleString()}</span>
                   </div>
                   <input type="range" min={s.min} max={s.max} step={s.step} value={s.val} onChange={e=>s.set(Number(e.target.value))} style={{ width:'100%', accentColor: '#64748B' }} />
                 </div>
@@ -597,15 +597,15 @@ export default function ShadowPage() {
                 { label:'Risk Score',   value:`${riskPct}/100`,        color:riskPct<30?'#10B981':riskPct<60?'#F59E0B':'#EF4444' },
                 { label:'Q4 Forecast',  value:q4>0?`${Math.round(q4).toLocaleString()}`:'DEFICIT', color:q4>0?'#10B981':'#EF4444' },
               ].map(m=>(
-                <div key={m.label} style={{ background:'#F8FAFC', border: '1px solid #E2E8F0', borderRadius:16, padding:'16px 12px', textAlign:'center' }}>
-                  <p style={{ fontSize:11, color:'#64748B', margin:'0 0 8px', textTransform:'uppercase', letterSpacing:'0.04em', fontWeight: 600 }}>{m.label}</p>
+                <div key={m.label} style={{ background:'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius:16, padding:'16px 12px', textAlign:'center' }}>
+                  <p style={{ fontSize:11, color:'#94A3B8', margin:'0 0 8px', textTransform:'uppercase', letterSpacing:'0.04em', fontWeight: 600 }}>{m.label}</p>
                   <p style={{ fontSize:20, fontWeight:800, color:m.color, margin:0, fontFamily:MONO }}>{m.value}</p>
                 </div>
               ))}
             </div>
             <div>
-              <div style={{ display:'flex', justifyContent:'space-between', fontSize:11, fontWeight: 700, color:'#94A3B8', marginBottom:8 }}><span>LOW RISK</span><span>HIGH RISK</span></div>
-              <div style={{ height:8, borderRadius:4, background:'#E2E8F0', overflow:'hidden' }}>
+              <div style={{ display:'flex', justifyContent:'space-between', fontSize:11, fontWeight: 700, color:'#64748B', marginBottom:8 }}><span>LOW RISK</span><span>HIGH RISK</span></div>
+              <div style={{ height:8, borderRadius:4, background:'rgba(255,255,255,0.08)', overflow:'hidden' }}>
                 <div style={{ width:`${riskPct}%`, height:'100%', borderRadius:4, background:`linear-gradient(90deg, #10B981, #F59E0B, #EF4444)`, transition:'width 0.4s' }} />
               </div>
             </div>
@@ -614,28 +614,28 @@ export default function ShadowPage() {
           {/* Stealth Card */}
           <div className="glass-card" style={{ padding:'32px', display:'flex', flexDirection:'column', gap:20, border: stealth ? '2px solid #EF4444' : '1px solid rgba(255, 255, 255, 0.6)' }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-              <p style={{ fontSize:18, fontWeight:800, color:stealth?'#EF4444':'#0F172A', margin:0 }}>🕵️ Stealth Mode</p>
-              {stealth && <span style={{ fontSize:11, color:'#EF4444', fontFamily:MONO, fontWeight:700, letterSpacing:'0.1em', background: '#FEE2E2', padding: '4px 12px', borderRadius: 999 }}>● ACTIVE</span>}
+              <p style={{ fontSize:18, fontWeight:800, color:stealth?'#EF4444':'#E2E8F0', margin:0 }}>🕵️ Stealth Mode</p>
+              {stealth && <span style={{ fontSize:11, color:'#F87171', fontFamily:MONO, fontWeight:700, letterSpacing:'0.1em', background: 'rgba(239,68,68,0.15)', padding: '4px 12px', borderRadius: 999 }}>● ACTIVE</span>}
             </div>
-            <p style={{ fontSize:14, color:'#475569', margin:0, lineHeight:1.6, fontWeight: 500 }}>When active, financial amounts, wallet addresses and agent activity are masked — ideal for screen sharing or public demos.</p>
+            <p style={{ fontSize:14, color:'#94A3B8', margin:0, lineHeight:1.6, fontWeight: 500 }}>When active, financial amounts, wallet addresses and agent activity are masked — ideal for screen sharing or public demos.</p>
             <div style={{ display:'flex', flexDirection:'column', gap:12, flex: 1 }}>
               {['Mask wallet addresses','Redact Yield Operations Hub balances','Redact activity logs','Blur agent metrics'].map(item=>(
-                <div key={item} style={{ display:'flex', alignItems:'center', gap:12, fontSize:13, fontWeight: 600, color:stealth?'#0F172A':'#64748B' }}>
-                  <span style={{ width:8, height:8, borderRadius:'50%', background:stealth?'#EF4444':'#CBD5E1', flexShrink:0 }} />{item}
+                <div key={item} style={{ display:'flex', alignItems:'center', gap:12, fontSize:13, fontWeight: 600, color:stealth?'#E2E8F0':'#94A3B8' }}>
+                  <span style={{ width:8, height:8, borderRadius:'50%', background:stealth?'#EF4444':'rgba(255,255,255,0.15)', flexShrink:0 }} />{item}
                 </div>
               ))}
             </div>
-            
-            <button onClick={()=>setStealth(s=>!s)} style={{ background:stealth?'#EF4444':'#F8FAFC', color:stealth?'#fff':'#0F172A', border:stealth?'none':'1px solid #E2E8F0', borderRadius:12, padding:'14px 0', fontSize:14, fontWeight:700, cursor:'pointer', width:'100%', transition: 'all 0.2s', boxShadow: stealth ? '0 4px 12px rgba(239, 68, 68, 0.25)' : 'none' }}>
+
+            <button onClick={()=>setStealth(s=>!s)} style={{ background:stealth?'#EF4444':'rgba(255,255,255,0.06)', color:stealth?'#fff':'#E2E8F0', border:stealth?'none':'1px solid rgba(255,255,255,0.12)', borderRadius:12, padding:'14px 0', fontSize:14, fontWeight:700, cursor:'pointer', width:'100%', transition: 'all 0.2s', boxShadow: stealth ? '0 4px 20px rgba(239,68,68,0.35)' : 'none' }}>
               {stealth?'🔴 Disable Stealth Mode':'⚫ Enable Stealth Mode'}
             </button>
 
             {/* Compliance quick summary */}
-            <div style={{ padding:'20px', background:'#F8FAFC', border:'1px solid #E2E8F0', borderRadius:16, marginTop: 8 }}>
+            <div style={{ padding:'20px', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:16, marginTop: 8 }}>
               <p style={{ fontSize:13, fontWeight:800, color:'#10B981', margin:'0 0 12px' }}>⚖️ Compliance Summary</p>
               {[{ k:'AML Rules', v:'347 / 347 passed' },{ k:'KYC Flags', v:'0 active' },{ k:'Last Sweep', v:'2m ago' }].map(r=>(
-                <div key={r.k} style={{ display:'flex', justifyContent:'space-between', fontSize:13, color:'#64748B', marginTop:8, fontWeight: 600 }}>
-                  <span>{r.k}</span><span style={{ fontFamily:MONO, color:'#0F172A' }}>{r.v}</span>
+                <div key={r.k} style={{ display:'flex', justifyContent:'space-between', fontSize:13, color:'#94A3B8', marginTop:8, fontWeight: 600 }}>
+                  <span>{r.k}</span><span style={{ fontFamily:MONO, color:'#E2E8F0' }}>{r.v}</span>
                 </div>
               ))}
             </div>
@@ -649,10 +649,10 @@ export default function ShadowPage() {
 
       <style>{`
         .shadow-container {
-          background-color: #F8FAFC;
-          background-image: radial-gradient(at 0% 0%, #F1F5F9 0px, transparent 50%),
-                            radial-gradient(at 100% 0%, #E2E8F0 0px, transparent 50%);
-          color: #0F172A;
+          background-color: #080808;
+          background-image: radial-gradient(at 0% 0%, #0d1117 0px, transparent 50%),
+                            radial-gradient(at 100% 0%, #111827 0px, transparent 50%);
+          color: #E2E8F0;
           font-family: 'Inter', system-ui, sans-serif;
           min-height: 100vh;
           position: relative;
@@ -660,12 +660,16 @@ export default function ShadowPage() {
           width: 100%;
         }
 
+        .shadow-container .page-title { color: #E2E8F0; }
+        .shadow-container .page-subtitle { color: rgba(255,255,255,0.55); }
+        .shadow-container .page-eyebrow { color: #94A3B8; }
+
         .dot-grid-overlay {
           position: absolute;
           inset: 0;
-          background-image: radial-gradient(circle, #CBD5E1 1px, transparent 1px);
+          background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
           background-size: 32px 32px;
-          opacity: 0.4;
+          opacity: 0.6;
           pointer-events: none;
           z-index: 0;
         }
@@ -680,7 +684,7 @@ export default function ShadowPage() {
 
         .float-shape {
           position: absolute;
-          background: linear-gradient(135deg, rgba(100,116,139,0.1), rgba(100,116,139,0.02));
+          background: linear-gradient(135deg, rgba(100,116,139,0.12), rgba(100,116,139,0.02));
           border-radius: 50%;
           animation: drift linear infinite;
           backdrop-filter: blur(8px);
@@ -694,17 +698,17 @@ export default function ShadowPage() {
         }
 
         .glass-card {
-          background: rgba(255, 255, 255, 0.85);
+          background: rgba(255, 255, 255, 0.04);
           backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 24px;
-          box-shadow: 0 8px 32px rgba(100, 116, 139, 0.08);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
         .nav-bar {
-          background: rgba(248, 250, 252, 0.8);
+          background: rgba(8, 8, 8, 0.9);
           backdrop-filter: blur(16px);
-          border-bottom: 1px solid rgba(100, 116, 139, 0.1);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
           position: sticky;
           top: 0;
           z-index: 1000;
@@ -729,7 +733,7 @@ export default function ShadowPage() {
         }
 
         .btn-primary {
-          background-color: #0F172A;
+          background: linear-gradient(135deg, #4338CA, #6366F1);
           color: #FFFFFF;
           border: none;
           padding: 14px 32px;
@@ -738,34 +742,33 @@ export default function ShadowPage() {
           font-weight: 600;
           cursor: pointer;
           transition: all 0.2s;
-          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+          box-shadow: 0 4px 20px rgba(99,102,241,0.35);
         }
         .btn-primary:hover {
           transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
-          background-color: #1E293B;
+          box-shadow: 0 8px 30px rgba(99,102,241,0.5);
+          filter: brightness(1.1);
         }
 
         .btn-secondary {
-          background-color: #FFFFFF;
-          color: #0F172A;
-          border: 1px solid #E2E8F0;
+          background-color: rgba(255, 255, 255, 0.06);
+          color: #E2E8F0;
+          border: 1px solid rgba(255, 255, 255, 0.14);
           padding: 14px 32px;
           border-radius: 9999px;
           font-size: 15px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.2s;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
         .btn-secondary:hover {
           transform: translateY(-2px);
-          background-color: #F8FAFC;
-          border-color: #CBD5E1;
+          background-color: rgba(255, 255, 255, 0.1);
+          border-color: rgba(255, 255, 255, 0.22);
         }
 
         @keyframes spin { to { transform:rotate(360deg); } }
-        @keyframes pulse { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
+        @keyframes pulse { 0%,100% { opacity:0.4; } 50% { opacity:0.8; } }
       `}</style>
 
       <div style={{ textAlign: 'center', padding: '24px', fontSize: '12px', color: 'inherit', opacity: 0.6, fontWeight: 500 }}>

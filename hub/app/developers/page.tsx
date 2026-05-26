@@ -52,7 +52,7 @@ const ENDPOINTS: DevEndpoint[] = [
     id: 'ep-deploy',
     method: 'POST',
     path: '/api/agents/deploy',
-    tool: 'Agent co-ordinator',
+    tool: 'Agent Coordinator',
     description: 'Verifies Phantom signatures and deploys stateful, autonomous worker agents on Solana.',
     params: [
       { name: 'wallet', type: 'string', required: true, description: 'Solana wallet address' },

@@ -37,10 +37,10 @@ const MUTED2  = 'rgba(255,255,255,0.35)'
 const NAV = [
   { icon: '◉', label: 'Overview',        href: '/dashboard' },
   { icon: '◈', label: 'Credit Passport', href: '/credit'    },
-  { icon: '⬟', label: 'Family vault',    href: '/legacy'    },
-  { icon: '⬡', label: 'Agent co-ordinator',      href: '/agents'    },
+  { icon: '⬟', label: 'Family Vault',    href: '/legacy'    },
+  { icon: '⬡', label: 'Agent Coordinator',      href: '/agents'    },
   { icon: '🔐', label: 'Private Vault',   href: '/vault'     },
-  { icon: '◆', label: 'Bill split',       href: '/split'     },
+  { icon: '◆', label: 'Bill Split',       href: '/split'     },
   { icon: '◎', label: 'AI Lending',      href: '/lend'      },
   { icon: '◇', label: 'Yield Operations Hub',     href: '/treasury'  },
   { icon: '▲', label: 'Stealth Execution Suite',       href: '/shadow'    },

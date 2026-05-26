@@ -27,7 +27,7 @@ const INITIAL_SETTLED_BILLS = [
     date: 'May 18, 2026',
     amount: '180.00 USDC',
     participants: 6,
-    txHash: 'SCXK7FEAST8A2B',
+    txHash: 'a3f8c21b9e4d7062f1a5b38c4e9d2f7a6b1c8e3d5f9a2b4c7e0f3a6b9c2d5e8f',
   },
   {
     id: 'settled-2',
@@ -35,7 +35,7 @@ const INITIAL_SETTLED_BILLS = [
     date: 'May 12, 2026',
     amount: '450.00 USDC',
     participants: 4,
-    txHash: 'SCXK2RESORT8A2B',
+    txHash: 'b7e2d9f4a1c6b3e8f5a2d9c4b1e6f3a8c5d2b9e4f7a1c6d3b8e5f2a9c4d7b0e3',
   },
   {
     id: 'settled-3',
@@ -43,7 +43,7 @@ const INITIAL_SETTLED_BILLS = [
     date: 'May 05, 2026',
     amount: '120.00 USDC',
     participants: 3,
-    txHash: 'SCXK9TICKET8A2B',
+    txHash: 'c9d4b7e2f5a8c1d6b3e0f7a4c9d2b5e8f1a6c3d0b7e4f9a2c5d8b1e6f3a0c7d2',
   },
   {
     id: 'settled-4',
@@ -51,7 +51,7 @@ const INITIAL_SETTLED_BILLS = [
     date: 'Apr 28, 2026',
     amount: '300.00 USDC',
     participants: 5,
-    txHash: 'SCXK4COWORK8A2B',
+    txHash: 'd1e6f9a4c7b2e5f8a3d0c9b4e7f2a5d8c3b6e1f4a9d2c5b8e3f6a1d4c7b0e5f8',
   }
 ]
 
@@ -471,14 +471,14 @@ export default function SyncSplitPage() {
   }, [])
 
   return (
-    <div className="Bill split-container">
+    <div className="billsplit-container">
       {/* Google Fonts Link */}
       <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=DM+Sans:wght@400;500&family=Dancing+Script:wght@600&family=Fira+Code:wght@400&display=swap" rel="stylesheet" />
 
       {/* Embedded Vanilla CSS Stylesheet */}
       <style dangerouslySetInnerHTML={{ __html: `
         /* Custom Font Imports fallback */
-        .Bill split-container {
+        .billsplit-container {
           background-color: #FFF0F7;
           color: #2D1A26;
           font-family: 'DM Sans', sans-serif;
@@ -527,7 +527,7 @@ export default function SyncSplitPage() {
           .custom-cursor-dot, .custom-cursor-ring {
             display: none !important;
           }
-          .Bill split-container {
+          .billsplit-container {
             cursor: auto !important;
           }
         }
@@ -1898,7 +1898,7 @@ export default function SyncSplitPage() {
       {/* NAVBAR */}
       <header className="nav-bar">
         <div className="nav-logo">
-          <span className="sparkle-icon">✦</span> Bill split
+          <span className="sparkle-icon">✦</span> Bill Split
         </div>
         <nav className="nav-links">
           <a href="#how-it-works" className="nav-link" onClick={(e) => { e.preventDefault(); scrollTo('how-it-works') }}>How it Works</a>
@@ -1929,7 +1929,7 @@ export default function SyncSplitPage() {
           Split every bill, trustlessly, on-chain.
         </h1>
         <p className="page-subtitle">
-          No more awkward reminders. No more trust issues. Bill split uses Stellar Soroban smart contracts to lock everyone's share in escrow — and releases the full amount only when every participant has paid.
+          No more awkward reminders. No more trust issues. Bill Split uses Stellar Soroban smart contracts to lock everyone's share in escrow — and releases the full amount only when every participant has paid.
         </p>
         <div className="pull-quote">
           "Your share. Your wallet. Your chain."
@@ -2521,7 +2521,7 @@ export default function SyncSplitPage() {
         <div className="footer-top">
           <div className="footer-brand">
             <div className="footer-logo">
-              ✦ Bill split
+              ✦ Bill Split
             </div>
             <div className="footer-tagline">
               "Split bills. Build trust. On Stellar. ✦"

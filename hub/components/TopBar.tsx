@@ -14,11 +14,11 @@ const MONO = '"Fira Code","JetBrains Mono",monospace'
 
 const BREADCRUMB_NAMES: Record<string, string> = {
   dashboard: 'Dashboard',
-  split: 'Bill split',
+  split: 'Bill Split',
   credit: 'Credit Passport',
-  legacy: 'Family vault',
-  agents: 'Agent co-ordinator',
-  vault: 'Private vault',
+  legacy: 'Family Vault',
+  agents: 'Agent Coordinator',
+  vault: 'Private Vault',
   lend: 'Protocol Borrow Engine',
   treasury: 'Yield Operations Hub',
   shadow: 'Stealth Execution Suite',
@@ -146,7 +146,7 @@ export default function TopBar({ onMobileToggle, isMobile }: Props) {
               {[
                 { icon: '◇', msg: 'PalmFlow: Yield Operations Hub rebalanced', time: '2m ago', color: '#10b981' },
                 { icon: '◈', msg: 'Credit Passport: Score updated to 742', time: '15m ago', color: '#06b6d4' },
-                { icon: '⬡', msg: 'Agent co-ordinator: Agent deployed', time: '1h ago', color: '#6366f1' },
+                { icon: '⬡', msg: 'Agent Coordinator: Agent deployed', time: '1h ago', color: '#6366f1' },
               ].map((n, i) => (
                 <div key={i} style={{
                   display: 'flex', alignItems: 'flex-start', gap: 10,

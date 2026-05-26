@@ -1,8 +1,8 @@
 // Built by vsrupeshkumar
 import type { Metadata } from 'next'
 
-const title = 'Bill split — Kubryx'
-const description = 'On-chain bill splitting on Stellar Testnet'
+const title = 'Bill Split — Kubryx'
+const description = 'On-chain bill splitting on Stellar Soroban'
 const url = 'https://kubryx.vercel.app/split'
 
 export const metadata: Metadata = {
