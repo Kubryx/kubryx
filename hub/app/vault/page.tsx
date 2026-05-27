@@ -142,22 +142,14 @@ function VaultInner() {
           position: relative;
           overflow-x: hidden;
           width: 100%;
-          cursor: none;
+          cursor: auto;
         }
 
         .custom-cursor-dot {
-          position: fixed; width: 6px; height: 6px;
-          background-color: #06B6D4; border-radius: 50%;
-          pointer-events: none; z-index: 99999;
-          transform: translate(-50%, -50%);
-          transition: transform 0.05s ease-out;
+          display: none !important;
         }
         .custom-cursor-ring {
-          position: fixed; width: 24px; height: 24px;
-          border: 1.5px solid #06B6D4; border-radius: 50%;
-          pointer-events: none; z-index: 99998;
-          transform: translate(-50%, -50%);
-          background-color: rgba(6, 182, 212, 0.05);
+          display: none !important;
         }
         a:hover ~ .custom-cursor-ring, button:hover ~ .custom-cursor-ring, input:hover ~ .custom-cursor-ring {
           width: 32px; height: 32px; border-color: #22D3EE; background-color: rgba(34, 211, 238, 0.1);

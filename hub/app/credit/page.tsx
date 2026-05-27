@@ -505,31 +505,15 @@ export default function CreditDashboard() {
           position: relative;
           overflow-x: hidden;
           width: 100%;
-          cursor: none;
+          cursor: auto;
         }
 
         /* ── Custom Cursor ── */
         .custom-cursor-dot {
-          position: fixed;
-          width: 6px;
-          height: 6px;
-          background-color: #F5A623;
-          border-radius: 50%;
-          pointer-events: none;
-          z-index: 99999;
-          transform: translate(-50%, -50%);
-          transition: transform 0.05s ease-out;
+          display: none !important;
         }
         .custom-cursor-ring {
-          position: fixed;
-          width: 24px;
-          height: 24px;
-          border: 1.5px solid #F5A623;
-          border-radius: 50%;
-          pointer-events: none;
-          z-index: 99998;
-          transform: translate(-50%, -50%);
-          background-color: rgba(245, 166, 35, 0.03);
+          display: none !important;
         }
         a:hover ~ .custom-cursor-ring,
         button:hover ~ .custom-cursor-ring,

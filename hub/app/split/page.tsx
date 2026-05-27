@@ -483,7 +483,7 @@ export default function SyncSplitPage() {
       {/* Embedded Vanilla CSS Stylesheet */}
       <style dangerouslySetInnerHTML={{ __html: `
         /* Custom Font Imports fallback */
-        .billsplit-container {
+         .billsplit-container {
           background-color: #FFF0F7;
           color: #2D1A26;
           font-family: 'DM Sans', sans-serif;
@@ -491,31 +491,15 @@ export default function SyncSplitPage() {
           position: relative;
           overflow-x: hidden;
           width: 100%;
-          cursor: none;
+          cursor: auto;
         }
 
         /* ── Custom Cursor ── */
         .custom-cursor-dot {
-          position: fixed;
-          width: 6px;
-          height: 6px;
-          background-color: #F472B6;
-          border-radius: 50%;
-          pointer-events: none;
-          z-index: 99999;
-          transform: translate(-50%, -50%);
-          transition: transform 0.05s ease-out;
+          display: none !important;
         }
         .custom-cursor-ring {
-          position: fixed;
-          width: 24px;
-          height: 24px;
-          border: 1.5px solid #F472B6;
-          border-radius: 50%;
-          pointer-events: none;
-          z-index: 99998;
-          transform: translate(-50%, -50%);
-          background-color: rgba(244, 114, 182, 0.03);
+          display: none !important;
         }
         a:hover ~ .custom-cursor-ring,
         button:hover ~ .custom-cursor-ring,
