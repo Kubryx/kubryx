@@ -12,6 +12,7 @@ import LoanPortfolio from '@/components/lend/LoanPortfolio'
 import BorrowForm from '@/components/lend/BorrowForm'
 import LendForm from '@/components/lend/LendForm'
 import LendMarkets from '@/components/lend/LendMarkets'
+import DefiTVLWidget from '@/components/lend/DefiTVLWidget'
 
 export type LendTabId = 'dashboard' | 'loans' | 'borrow' | 'lend' | 'markets'
 
@@ -631,6 +632,9 @@ function LendInner() {
           {tab === 'lend'      && <LendForm walletAddress={wallet} prefillAsset={prefillAsset} />}
           {tab === 'markets'   && <LendMarkets onSupply={(a) => { setPrefillAsset(a); setTab('lend') }} onBorrow={() => setTab('borrow')} />}
         </div>
+
+        {/* Live DeFi TVL Widget (Prompt 3) */}
+        <DefiTVLWidget />
       </div>
 
       <div style={{ textAlign: 'center', padding: '24px', fontSize: '12px', color: 'inherit', opacity: 0.6, fontWeight: 500 }}>

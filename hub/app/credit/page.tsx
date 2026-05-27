@@ -34,6 +34,7 @@ import { getCreditTier, getVaultBoost, getStellarBoost, getTreasuryBoost } from 
 import { PlatformModeBadge } from '../../components/ui/PlatformModeBadge'
 import FeatureOverviewPanel from '../../components/ui/FeatureOverviewPanel'
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import CreditPassportVerifier from '../../components/credit/CreditPassportVerifier'
 
 const historyData = [
   { month: 'Jan', score: 320 },
@@ -955,6 +956,9 @@ export default function CreditDashboard() {
                 }}>SOULBOUND NFT</span>
               </div>
             )}
+
+            {/* Credit Passport Verifier (Prompt 2) */}
+            {wallet && <CreditPassportVerifier walletAddress={wallet} />}
 
             {/* ── Main 2-col layout ── */}
             <div className="bento-grid" style={{ marginBottom: 24 }}>

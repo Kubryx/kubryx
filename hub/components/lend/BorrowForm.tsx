@@ -61,6 +61,19 @@ export default function BorrowForm({
   const [success, setSuccess] = useState<{ id: string; tx: SimTx } | null>(null)
   const ref = useRef<HTMLDivElement>(null)
 
+  const [chainlinkPrices, setChainlinkPrices] = useState<Record<string, number>>({})
+  const [loadingChainlink, setLoadingChainlink] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/chainlink')
+      .then(r => r.json())
+      .then(d => {
+        if (d.prices) setChainlinkPrices(d.prices)
+      })
+      .catch(e => console.error(e))
+      .finally(() => setLoadingChainlink(false))
+  }, [])
+
   useEffect(() => { ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' }) }, [chat, thinking])
 
   async function callBackend(message: string): Promise<string | null> {
@@ -153,8 +166,22 @@ export default function BorrowForm({
         <Section label="Step 1: Collateral">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 10 }}>
             {(['ETH', 'BTC', 'SOL'] as Asset[]).map(a => (
-              <button key={a} onClick={() => setCollat(a)} style={card(collat === a)}>{a}</button>
+              <button key={a} onClick={() => setCollat(a)} style={{ ...card(collat === a), display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 12px' }}>
+                <span style={{ fontSize: 13, fontWeight: 700 }}>{a}</span>
+                <span style={{ fontSize: 10, color: collat === a ? LENDORA_ACCENT : 'rgba(255,255,255,0.4)', fontWeight: 500 }}>
+                  {loadingChainlink ? '...' : chainlinkPrices[a] ? `$${chainlinkPrices[a].toLocaleString(undefined, { maximumFractionDigits: 2 })}` : '—'}
+                </span>
+              </button>
             ))}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#3B82F6' }} />
+              Live Chainlink Price Feed
+            </span>
+            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>
+              Powered by Chainlink 🔗
+            </span>
           </div>
           <input value={collatAmt} onChange={e => setCollatAmt(e.target.value.replace(/[^0-9.]/g, ''))} placeholder={`Amount in ${collat}`} style={inputStyle} />
         </Section>
