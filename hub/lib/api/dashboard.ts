@@ -29,8 +29,8 @@ export interface DashboardStats {
 
 const BACKENDS: { name: string; url: string }[] = [
   { name: 'CreditBlock', url: 'https://creditblock-rs-backend.onrender.com/health' },
-  { name: 'Palmflow',    url: 'https://kubryx-palmflow.onrender.com/health'        },
-  { name: 'Shadow',      url: 'https://kubryx-shadow.onrender.com/health'           },
+  { name: 'Yield Operations Hub', url: 'https://kubryx-palmflow.onrender.com/health' },
+  { name: 'Stealth Executive Suite', url: 'https://kubryx-shadow.onrender.com/health' },
   { name: 'SyncSplit',   url: 'https://kubryx-syncsplit.onrender.com/health'        },
   { name: 'TrustMesh',   url: 'https://kubryx-trustmesh.onrender.com/health'        },
 ]

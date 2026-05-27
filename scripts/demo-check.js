@@ -28,7 +28,7 @@ const checks = [
     expect: { status: 'ok' },
   },
   {
-    name: 'ShadowLedger',
+    name: 'Stealth Executive Suite',
     url: 'https://kubryx-shadow.onrender.com/health',
     expect: { status: 'ok' },
   },
@@ -43,7 +43,7 @@ const checks = [
     expect: { status: 'ok' },
   },
   {
-    name: 'PalmFlow',
+    name: 'Yield Operations Hub',
     url: 'https://kubryx-palmflow.onrender.com/api/health',
     expect: { status: 'ok' },
   },

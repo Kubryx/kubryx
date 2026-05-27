@@ -49,8 +49,8 @@ export async function fetchAllActivity(walletAddress: string): Promise<ActivityI
   const sources: Source[] = [
     ETERNALVAULT_API && { tool: 'Legacy Vault', toolColor: '#F5A623', chain: 'QIE Mainnet',   url: `${ETERNALVAULT_API}/api/vaults/${walletAddress}` },
     TRUSTMESH_API     && { tool: 'Agent Mesh',  toolColor: '#9945FF', chain: 'Solana Devnet', url: `${TRUSTMESH_API}/api/activity/${walletAddress}` },
-    SHADOW_API        && { tool: 'Shadow OS',   toolColor: '#64748B', chain: 'Solana Devnet', url: `${SHADOW_API}/api/activity` },
-    PALMFLOW_API      && { tool: 'Treasury AI', toolColor: '#10B981', chain: 'Solana Devnet', url: `${PALMFLOW_API}/api/payroll/${walletAddress}` },
+    SHADOW_API        && { tool: 'Stealth Executive Suite', toolColor: '#64748B', chain: 'Solana Devnet', url: `${SHADOW_API}/api/activity` },
+    PALMFLOW_API      && { tool: 'Yield Operations Hub', toolColor: '#10B981', chain: 'Solana Devnet', url: `${PALMFLOW_API}/api/payroll/${walletAddress}` },
     CIPHER_API        && { tool: 'Private Vault', toolColor: '#06B6D4', chain: 'Multi-chain', url: `${CIPHER_API}/api/trades/${walletAddress}` },
   ].filter(Boolean) as Source[]
 

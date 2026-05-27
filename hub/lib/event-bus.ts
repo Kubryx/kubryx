@@ -38,10 +38,10 @@ export interface EventBusState {
 const DEFAULT_RULES: AutomationRule[] = [
   {
     id: 'rule-suspicious',
-    title: 'Shadow OS Intrusion Guard',
+    title: 'Stealth Executive Suite Intrusion Guard',
     trigger: 'suspicious_wallet_activity',
     action: 'notify_shadow_os',
-    description: 'If suspicious wallet activity is detected, automatically escalate alert, notify Shadow OS and rotate secure key vaults.',
+    description: 'If suspicious wallet activity is detected, automatically escalate alert, notify Stealth Executive Suite and rotate secure key vaults.',
     active: true,
     timesTriggered: 0,
   },
@@ -179,13 +179,13 @@ export function fireEvent(trigger: string, customDetails?: string) {
     let effectDetails = ''
     
     if (rule.action === 'notify_shadow_os') {
-      effectDetails = 'Triggered threat response. Notified Shadow OS compliance CFO and Risk bots.'
+      effectDetails = 'Triggered threat response. Notified Stealth Executive Suite compliance CFO and Risk bots.'
       updateIntelligenceState((prev) => ({
         memory: { ...prev.memory, suspiciousActivityFlag: true }
       }))
       updatePlatformState(() => ({ activeScenario: 'suspicious_activity' }))
-      recordOSEvent('Shadow OS', 'Triggered threat response. Rotate secure key vaults.', 'Solana')
-      toast.warning('Threat detected! Shadow OS has locked down the private key vaults.')
+      recordOSEvent('Stealth Executive Suite', 'Triggered threat response. Rotate secure key vaults.', 'Solana')
+      toast.warning('Threat detected! Stealth Executive Suite has locked down the private key vaults.')
     }
     
     else if (rule.action === 'trigger_lending_warning') {
@@ -213,7 +213,7 @@ export function fireEvent(trigger: string, customDetails?: string) {
       updateOrgState((prev) => ({
         operationalAlerts: prev.operationalAlerts.map(a => a.id === 'al-1' ? { ...a, resolved: false, timestamp: new Date().toISOString() } : a)
       }))
-      recordOSEvent('Treasury AI', 'Staking rates rise. Rebalancing recommendation dispatched.', 'Solana')
+      recordOSEvent('Yield Operations Hub', 'Staking rates rise. Rebalancing recommendation dispatched.', 'Solana')
       toast.success('Yield Spike: APY rises. Stake NCRD on QIE to secure yield.')
     }
     

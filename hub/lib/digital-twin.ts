@@ -37,7 +37,7 @@ export const TWIN_SCENARIOS: TwinScenarioProfile[] = [
       '08ms: Gateway Cache Fallback Layer automatically assumes routing priorities.',
       '12ms: Telemetry monitors fire high-severity RETRY_BACKOFF diagnostics alerts.'
     ],
-    narrativeText: 'Shadow OS flagged elevated anomaly density after repeated RPC degradation. Cache layers absorbed transaction load, maintaining 98.42% SLA.',
+    narrativeText: 'Stealth Executive Suite flagged elevated anomaly density after repeated RPC degradation. Cache layers absorbed transaction load, maintaining 98.42% SLA.',
     riskImpact: 35,
     resilienceUptime: 98.42
   },

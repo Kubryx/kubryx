@@ -241,13 +241,13 @@ export const SHOWCASE_FLOW: WalkthroughStep[] = [
     tip: '💡 Tech Focus: If backend services are offline, a secure local fallback handles natural language models seamlessly.',
   },
   {
-    title: '4. PalmFlow AI (Treasury & Multi-Sig Streams)',
+    title: '4. Yield Operations Hub (Treasury & Multi-Sig Streams)',
     route: '/treasury',
     instructions: 'Monitor real-time payroll inflow/outflow streams on Solana Devnet. Use the Yield Optimizer to balance treasury assets.',
     tip: '💡 UX Polish: Features smooth micro-animations and zero layout shifts during rebalances.',
   },
   {
-    title: '5. Shadow OS (AI Corporate Orchestrations)',
+    title: '5. Stealth Executive Suite (AI Corporate Orchestrations)',
     route: '/shadow',
     instructions: 'Trigger and command 7 automated corporate departments including CFO, Risk, Audits, and Compliance bots.',
     tip: '💡 Presentation Power: Showcases deterministic execution loops even with high network latency.',

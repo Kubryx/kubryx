@@ -11,8 +11,8 @@ const BACKENDS: Array<{ name: string; url: string | undefined }> = [
   { name: 'Cipher',       url: process.env.NEXT_PUBLIC_CIPHER_URL       },
   { name: 'EternalVault', url: process.env.NEXT_PUBLIC_ETERNALVAULT_URL },
   { name: 'Lendora',      url: process.env.NEXT_PUBLIC_LENDORA_URL      },
-  { name: 'Palmflow',     url: process.env.NEXT_PUBLIC_PALMFLOW_URL     },
-  { name: 'Shadow',       url: process.env.NEXT_PUBLIC_SHADOW_URL       },
+  { name: 'Yield Operations Hub', url: process.env.NEXT_PUBLIC_PALMFLOW_URL     },
+  { name: 'Stealth Executive Suite', url: process.env.NEXT_PUBLIC_SHADOW_URL       },
   { name: 'SyncSplit',    url: process.env.NEXT_PUBLIC_SYNCSPLIT_URL    },
   { name: 'TrustMesh',    url: process.env.NEXT_PUBLIC_TRUSTMESH_URL    },
 ]

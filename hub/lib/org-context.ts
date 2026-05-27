@@ -64,7 +64,7 @@ const DEFAULT_ORGS: Organization[] = [
   },
   {
     id: 'org-shadow',
-    name: 'Shadow DAO',
+    name: 'Stealth Executive Suite DAO',
     slug: 'shadow-dao',
     workspaces: [
       { id: 'ws-shadow-gov', name: 'Governance Operations', slug: 'governance', description: 'Automated executive voting and corporate department grids' },
@@ -90,7 +90,7 @@ const DEFAULT_TEAM_ACTIVITIES: TeamActivity[] = [
   { id: 'act-4', user: 'David', role: 'Admin', action: 'revised private key verification thresholds', timestamp: new Date(Date.now() - 2 * 3600000).toISOString(), orgId: 'org-acme', workspaceId: 'ws-acme-audits' },
   { id: 'act-5', user: 'Emma', role: 'Auditor', action: 'extracted zero-metadata bridge audit logs', timestamp: new Date(Date.now() - 5 * 3600000).toISOString(), orgId: 'org-acme', workspaceId: 'ws-acme-audits' },
   
-  { id: 'act-6', user: 'Fiona', role: 'Admin', action: 'deployed corporate ShadowGuard agent configuration', timestamp: new Date(Date.now() - 5 * 60000).toISOString(), orgId: 'org-shadow', workspaceId: 'ws-shadow-gov' },
+  { id: 'act-6', user: 'Fiona', role: 'Admin', action: 'deployed corporate StealthGuard agent configuration', timestamp: new Date(Date.now() - 5 * 60000).toISOString(), orgId: 'org-shadow', workspaceId: 'ws-shadow-gov' },
   { id: 'act-7', user: 'George', role: 'Auditor', action: 'flagged latency anomaly spikes on regional nodes', timestamp: new Date(Date.now() - 18 * 60000).toISOString(), orgId: 'org-shadow', workspaceId: 'ws-shadow-telemetry' },
   { id: 'act-8', user: 'Hannah', role: 'Risk Analyst', action: 'triggered diagnostic trace on degraded RPCs', timestamp: new Date(Date.now() - 45 * 60000).toISOString(), orgId: 'org-shadow', workspaceId: 'ws-shadow-telemetry' },
   
@@ -100,7 +100,7 @@ const DEFAULT_TEAM_ACTIVITIES: TeamActivity[] = [
 
 const DEFAULT_ALERTS: OperationalAlert[] = [
   { id: 'al-1', title: 'Rebalance Opportunity', description: 'Acme Protocol: Treasury APY rebalance recommended. Allocate 150 SOL to NCRD staking to capture 12.5% APY.', severity: 'warning', orgId: 'org-acme', timestamp: new Date(Date.now() - 10 * 60000).toISOString(), resolved: false },
-  { id: 'al-2', title: 'Unauthorized Connection Detected', description: 'Shadow DAO: Monitored suspicious routing attempts from an unauthorized RPC. Lock zero-metadata routing keys.', severity: 'critical', orgId: 'org-shadow', timestamp: new Date(Date.now() - 2 * 60000).toISOString(), resolved: false },
+  { id: 'al-2', title: 'Unauthorized Connection Detected', description: 'Stealth Executive Suite DAO: Monitored suspicious routing attempts from an unauthorized RPC. Lock zero-metadata routing keys.', severity: 'critical', orgId: 'org-shadow', timestamp: new Date(Date.now() - 2 * 60000).toISOString(), resolved: false },
   { id: 'al-3', title: 'Staking Verification', description: 'Acme Protocol: Active QIE Mainnet staking pools updated. Verify smart contract parameters.', severity: 'info', orgId: 'org-acme', timestamp: new Date(Date.now() - 50 * 60000).toISOString(), resolved: false },
   { id: 'al-4', title: 'Yield Stream Optimization', description: 'Eternal Fund: Staking APY risen to 14.5% — consider sweeping venture vaults.', severity: 'info', orgId: 'org-eternal', timestamp: new Date(Date.now() - 30 * 60000).toISOString(), resolved: false },
 ]
